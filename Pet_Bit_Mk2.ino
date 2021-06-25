@@ -9,7 +9,6 @@
 #include <vfs_api.h>                // File system library.
 #include <FSImpl.h>                 // File system library.
 #include <FS.h>                     // File system library.
-//#include <SD.h>                     // SD card library.
 #include <SPI.h>					// SPI bus for TFT using software SPI.
 #include <TFT_eSPI.h>               // TFT SPI library.
 #include <EEPROM.h>					// EEPROM library.
@@ -21,7 +20,6 @@
 #include "graphDistance.h"			// Daily distance chart
 #include "graphTime.h"				// Daily time chart
 #include "format_function.h"		// Special formatting function from Kris Kasprzak
-//#include "sDCard.h"                 // SD functions.
 #include "startScreen.h"			// Start screen bitmap.
 #include "batteryIcons.h"			// Battery level bitmaps.
 
