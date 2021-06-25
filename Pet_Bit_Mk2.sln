@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31410.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pet_Bit_Mk2", "Pet_Bit_Mk2.vcxproj", "{C5F80730-F44F-4478-BDAE-6634EFC2CA88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TFT_eSPI", "Libraries\TFT_eSPI\TFT_eSPI.vcxitems", "{3CDF696D-1DC6-4EFD-BE3D-D1F3393BFD11}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI", "Libraries\SPI\SPI.vcxitems", "{0045052C-42B2-4D47-8260-252518218D33}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EEPROM", "Libraries\EEPROM\EEPROM.vcxitems", "{A1198025-C119-4F38-AC85-3F4ABFECAEC0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FS", "Libraries\FS\FS.vcxitems", "{7449D5D4-0BFD-4537-B022-D230A93DB316}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Libraries\SPI\SPI.vcxitems*{0045052c-42b2-4d47-8260-252518218d33}*SharedItemsImports = 9
+		Libraries\TFT_eSPI\TFT_eSPI.vcxitems*{3cdf696d-1dc6-4efd-be3d-d1f3393bfd11}*SharedItemsImports = 9
+		Libraries\FS\FS.vcxitems*{7449d5d4-0bfd-4537-b022-d230a93db316}*SharedItemsImports = 9
+		Libraries\EEPROM\EEPROM.vcxitems*{a1198025-c119-4f38-ac85-3f4abfecaec0}*SharedItemsImports = 9
+		Libraries\EEPROM\EEPROM.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\FS\FS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\TFT_eSPI\TFT_eSPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.ActiveCfg = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Debug|x86.Build.0 = Debug|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.ActiveCfg = Release|Win32
+		{C5F80730-F44F-4478-BDAE-6634EFC2CA88}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {84625AED-F2CB-4F6C-9747-1986D474AA30}
+	EndGlobalSection
+EndGlobal
