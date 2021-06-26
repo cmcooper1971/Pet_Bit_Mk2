@@ -16,7 +16,7 @@ void ptSessionDistanceV1(TFT_eSPI& tft, double x, double y, double w, double h, 
 	tft.setFreeFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
 	tft.setTextColor(WHITE);
-	tft.setCursor(23, 34);
+	tft.setCursor(13, 26);
 	tft.println("Daily Distances");
 	tft.setFreeFont();
 
