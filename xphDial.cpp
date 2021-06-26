@@ -8,6 +8,8 @@
 #include "xphDial.h"
 #include "format_function.h"
 
+/*-----------------------------------------------------------------*/
+
 void XphDialScreen(TFT_eSPI& tft, int cx, int cy, int r, int loval, double hival, double inc, double sa, double curval, int dig, int dec, unsigned int needlecolor, unsigned int dialcolor, unsigned int  textcolor, String label, boolean& redraw) {
 
 	double ix, iy, ox, oy, tx, ty, lx, rx, ly, ry, i, offset, stepval, data, angle;

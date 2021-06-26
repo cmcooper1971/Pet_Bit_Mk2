@@ -20,8 +20,10 @@
 #include "graphDistance.h"			// Daily distance chart
 #include "graphTime.h"				// Daily time chart
 #include "format_function.h"		// Special formatting function from Kris Kasprzak
+#include "buttonIcons.h"			// bUTTON icons.
 #include "startScreen.h"			// Start screen bitmap.
-#include "batteryIcons.h"			// Battery level bitmaps.
+#include "icons.h"					// Battery level bitmaps.
+#include "touchCalibrate.h"			// Calibrate touch screen.
 
 // TFT SPI Interface for ESP32 using TFT-eSPI.
 
@@ -202,41 +204,59 @@ float sensorValuePerc;
 byte screenMenu = 4;				// Screen menu selection.
 boolean menuChange = 1;
 
-// Outer border & screen size
+// Outer border & screen size.
 #define FRAME1_X 0
 #define FRAME1_Y 0
 #define FRAME1_W 320
 #define FRAME1_H 240
 
-// Inner border & screen size
+// Inner border & screen size.
 #define FRAME2_X 8
 #define FRAME2_Y 8
 #define FRAME2_W 237
 #define FRAME2_H 224
 
-// Button 1 switch position and size
+// Button 1 switch position and size.
 #define BUTTON1_X 252
 #define BUTTON1_Y 182
 #define BUTTON1_W 60
 #define BUTTON1_H 50
 
-// Button 2 switch position and size
+// Button 2 switch position and size.
 #define BUTTON2_X 252
 #define BUTTON2_Y 124
 #define BUTTON2_W 60
 #define BUTTON2_H 50
 
-// Button 3 switch position and size
+// Button 3 switch position and size.
 #define BUTTON3_X 252
 #define BUTTON3_Y 66
 #define BUTTON3_W 60
 #define BUTTON3_H 50
 
-// Button 4 switch position and size
+// Button 4 switch position and size.
 #define BUTTON4_X 252
 #define BUTTON4_Y 8
 #define BUTTON4_W 60
 #define BUTTON4_H 50
+
+// WiFi icon position and size.
+#define WIFI_ICON_X 168
+#define WIFI_ICON_Y 13
+#define WIFI_ICON_W 16
+#define WIFI_ICON_H 16
+
+// Battery icon position and size.
+#define BATTERY_ICON_X 188
+#define BATTERY_ICON_Y 12
+#define BATTERY_ICON_W 32
+#define BATTERY_ICON_H 18
+
+// Settings Cog position and size.
+#define SETTINGS_COG_X 224
+#define SETTINGS_COG_Y 13
+#define SETTINGS_COG_W 16
+#define SETTINGS_COG_H 16
 
 // XPH Dial and position
 #define dialY 125
@@ -424,6 +444,13 @@ void setup() {
 
 	delay(1500);
 
+	// Calibrate touch screen.
+
+	// touch_calibrate(tft); // Build future meny option in settings
+
+	uint16_t calData[5] = { 365, 3511, 243, 3610, 7 };
+	tft.setTouch(calData);
+
 	// Clear screen.
 
 	tft.fillScreen(ILI9341_BLACK);
@@ -450,6 +477,12 @@ void loop() {
 	mainData();			// Calculates main data.
 	averageSpeed();		// Calculate average speed.
 	//demoSpeedData();	// Demo KPH data for testing, comment when finished.
+	
+	drawBattery(tft, BUTTON4_Y + 9, BUTTON4_X + 14, road, 32, 32);
+	drawBattery(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
+	drawBattery(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settings, SETTINGS_COG_W, SETTINGS_COG_H);
+	drawBattery(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFi, WIFI_ICON_W, WIFI_ICON_H);
+	
 
 	uint16_t x, y;
 
@@ -465,9 +498,9 @@ void loop() {
 		if ((x > BUTTON1_X) && (x < (BUTTON1_X + BUTTON1_W))) {
 			if ((y > BUTTON1_Y) && (y <= (BUTTON1_Y + BUTTON1_H))) {
 
-				if (screenMenu != 4) {		// To stop screen flicker when pressing the same menu button again.
+				if (screenMenu != 1) {		// To stop screen flicker when pressing the same menu button again.
 
-					screenMenu = 4;
+					screenMenu = 1;
 					menuChange = 1;
 					screenRedraw = 1;
 					graph_8 = true;
@@ -477,7 +510,7 @@ void loop() {
 					graph_12 = true;
 					graph_13 = true;
 					graph_14 = true;
-					Serial.print("Button 4 hit ");
+					Serial.print("Button 1 hit ");
 					Serial.print("Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
@@ -493,9 +526,9 @@ void loop() {
 		if ((x > BUTTON2_X) && (x < (BUTTON2_X + BUTTON2_W))) {
 			if ((y > BUTTON2_Y) && (y <= (BUTTON2_Y + BUTTON2_H))) {
 
-				if (screenMenu != 3) {		// To stop screen flicker when pressing the same menu button again.
+				if (screenMenu != 2) {		// To stop screen flicker when pressing the same menu button again.
 
-					screenMenu = 3;
+					screenMenu = 2;
 					menuChange = 1;
 					screenRedraw = 1;
 					graph_1 = true;
@@ -505,7 +538,7 @@ void loop() {
 					graph_5 = true;
 					graph_6 = true;
 					graph_7 = true;;
-					Serial.print("Button 3 hit ");
+					Serial.print("Button 2 hit ");
 					Serial.print("Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
@@ -521,13 +554,13 @@ void loop() {
 		if ((x > BUTTON3_X) && (x < (BUTTON3_X + BUTTON3_W))) {
 			if ((y > BUTTON3_Y) && (y <= (BUTTON3_Y + BUTTON3_H))) {
 
-				if (screenMenu != 2) {		// To stop screen flicker when pressing the same menu button again.
+				if (screenMenu != 3) {		// To stop screen flicker when pressing the same menu button again.
 
-					screenMenu = 2;
+					screenMenu = 3;
 					menuChange = 1;
 					screenRedraw = 1;
 					dial_1 = true;
-					Serial.print("Button 2 hit ");
+					Serial.print("Button 3 hit ");
 					Serial.print("Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
@@ -543,12 +576,31 @@ void loop() {
 		if ((x > BUTTON4_X) && (x < (BUTTON4_X + BUTTON4_W))) {
 			if ((y > BUTTON4_Y) && (y <= (BUTTON4_Y + BUTTON4_H))) {
 
-				if (screenMenu != 1) {		// To stop screen flicker when pressing the same menu button again.
+				if (screenMenu != 4) {		// To stop screen flicker when pressing the same menu button again.
 
-					screenMenu = 1;
+					screenMenu = 4;
 					menuChange = 1;
 					screenRedraw = 1;
-					Serial.print("Button 1 hit ");
+					Serial.print("Button 4 hit ");
+					Serial.print("Screen Menu: ");
+					Serial.print(screenMenu);
+					Serial.println(" ");
+
+				} // Close if.
+
+			} // Close if.
+
+		} // Close if.
+
+		if ((x > SETTINGS_COG_X) && (x < (SETTINGS_COG_X + SETTINGS_COG_W))) {
+			if ((y > SETTINGS_COG_Y) && (y <= (SETTINGS_COG_Y + SETTINGS_COG_H))) {
+
+				if (screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
+
+					screenMenu = 5;
+					menuChange = 1;
+					screenRedraw = 1;
+					Serial.print("Button 5 hit ");
 					Serial.print("Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
@@ -572,8 +624,8 @@ void loop() {
 
 		} // Close if.
 
-		configurationDisplay();				// Start up display.
-
+		CurrentExerciseScreen();
+			
 	} // Close if.
 
 	if (screenMenu == 2) {
@@ -766,6 +818,19 @@ void loop() {
 		} // Close else if.
 
 		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray7, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14)));
+
+	} // Close if.
+
+	if (screenMenu == 5) {
+
+		if (screenRedraw == 1) {
+
+			drawBlackBox();
+			screenRedraw = 0;
+
+		} // Close if.
+
+		configurationDisplay();
 
 	} // Close if.
 
@@ -979,6 +1044,51 @@ void averageSpeed() {
 	} // Close if.
 
 }  // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void CurrentExerciseScreen() {
+
+	tft.setFreeFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(WHITE);
+	tft.setCursor(23, 34);
+	tft.print("Current Session");
+
+	tft.setTextSize(1);
+	tft.setTextColor(WHITE);
+
+	tft.setCursor(23, 64);
+	tft.print("Xph: ");
+	tft.setCursor(23, 84);
+	tft.print("Ave: ");
+	tft.setCursor(23, 104);
+	tft.print("Max: ");
+	tft.setCursor(23, 124);
+	tft.print("Dis: ");
+	tft.setCursor(23, 144);
+	tft.print("Time: ");
+
+	tft.setFreeFont();
+	tft.setTextSize(2);
+	tft.setTextColor(WHITE, BLACK);
+
+	tft.setCursor(100, 64);
+	tft.println(kphArray);
+
+	tft.setCursor(100, 84);
+	tft.println(averageKphSpeedArray);
+
+	tft.setCursor(100, 104);
+	tft.println(maxKphArray);
+
+	tft.setCursor(100, 124);
+	tft.println(sessionDistanceArray);
+
+	tft.setCursor(100, 144);
+	tft.println(currentSessionTimeArray);
+
+} // Close function.
 
 /*-----------------------------------------------------------------*/
 
@@ -1236,59 +1346,6 @@ void configurationDisplay() {
 
 /*-----------------------------------------------------------------*/
 
-void CurrentExerciseScreen() {
-
-	// Drawing thicker rectangle with Foor Loop, function, X, Y, W, H, colour.
-
-	for (uint16_t a = 0; a < 2; a++) {
-
-		tft.drawRect(0 + a, 0 + a, 159, 127, WHITE);
-
-	}  // Close for loop.
-
-	tft.setFreeFont(&FreeSans9pt7b);
-	tft.setTextSize(1);
-	tft.setTextColor(WHITE);
-	tft.setCursor(14, 20);
-	tft.print("Current Session");
-
-	tft.setTextSize(1);
-	tft.setTextColor(WHITE);
-
-	tft.setCursor(15, 40);
-	tft.print("Xph: ");
-	tft.setCursor(15, 60);
-	tft.print("Ave: ");
-	tft.setCursor(15, 80);
-	tft.print("Max: ");
-	tft.setCursor(15, 100);
-	tft.print("Dis: ");
-	tft.setCursor(15, 120);
-	tft.print("Time: ");
-
-	tft.setFreeFont();
-	tft.setTextSize(2);
-	tft.setTextColor(WHITE, BLACK);
-
-	tft.setCursor(72, 28);
-	tft.println(kphArray);
-
-	tft.setCursor(72, 48);
-	tft.println(averageKphSpeedArray);
-
-	tft.setCursor(72, 68);
-	tft.println(maxKphArray);
-
-	tft.setCursor(72, 88);
-	tft.println(sessionDistanceArray);
-
-	tft.setCursor(72, 108);
-	tft.println(currentSessionTimeArray);
-
-} // Close function.
-
-/*-----------------------------------------------------------------*/
-
 void drawBorder()
 {
 	// Draw layout borders.
@@ -1388,15 +1445,15 @@ void button4()
 
 		if (screenMenu == 4) {
 
-			tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_RED);
+			//tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_RED);
 		}
 
-		else (tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE));
+		//else (tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE));
 		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
-		tft.setTextColor(TFT_WHITE);
-		tft.setTextSize(1);
-		tft.setCursor(270, 30);
-		tft.print("Menu");
+		//tft.setTextColor(TFT_WHITE);
+		//tft.setTextSize(1);
+		//tft.setCursor(270, 30);
+		//tft.print("Menu");
 
 	} // Close if.
 
@@ -1425,7 +1482,7 @@ void startUp() {
 	tft.fillRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, LTBLUE);
 	tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_WHITE);
 
-	tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE);
+	//tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE);
 	tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
 
 } // Close function.

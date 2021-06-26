@@ -36,7 +36,7 @@
     <ClInclude Include="colours.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="batteryIcons.h">
+    <ClInclude Include="icons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Free_Fonts.h">
@@ -46,6 +46,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="startScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="touchCalibrate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="buttonIcons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -63,6 +69,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="xphDial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="touchCalibrate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -4,6 +4,8 @@
 
 #include "format_function.h"
 
+/*-----------------------------------------------------------------*/
+
 String Format(double val, int dec, int dig) {
 	int addpad = 0;
 	char sbuf[20];
@@ -17,3 +19,5 @@ String Format(double val, int dec, int dig) {
 	return (condata);
 
 } // Close function.
+
+/*-----------------------------------------------------------------*/
