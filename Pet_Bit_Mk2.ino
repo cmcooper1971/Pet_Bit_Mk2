@@ -15,7 +15,8 @@
 
 #include "Free_Fonts.h"				// Free fonts for use with eTFT.
 #include "colours.h"                // Colours.
-#include "drawBatteryBitmap.h"		// Draw battery level bitmaps.
+#include "screenLayout.h"				// Screen layout
+#include "drawBitmap.h"		// Draw battery level bitmaps.
 #include "xphDial.h"				// XPH Odometre
 #include "graphDistance.h"			// Daily distance chart
 #include "graphTime.h"				// Daily time chart
@@ -36,21 +37,18 @@
 #define TFT_MISO 19
 #define TOUCH_CS 14
 
-// SD Card.
+// Pin out Configuration.
 
-byte sDCS = 33;						// Chip select pin.
+byte sDCS = 33;						// SD Card chip select pin.
+const int interruptWheelSensor = 26;		// Reed swtich sensor.
+
+byte bPlus = 1;						// Button +
+byte bMinus = 3;					// Button -
 
 // Configure ILI9341 display.
 
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
 boolean screenRedraw = 0;
-
-// Pin out Configuration.
-
-byte bPlus = 1;			  // Button +
-byte bMinus = 3;		  // Button -
-
-const int interruptWheelSensor = 26;		// Reed swtich sensor.
 
 // Data variables.
 
@@ -147,7 +145,7 @@ boolean eeResetSettingChange = false;		// Used for reset setting change before c
 int eeSessionArrayPositionAddress = 76;		// EEPROM address for array position.
 unsigned int eeSessionArrayPosition;		// Actual commit for writing, 4 bytes.
 
-// Average calculation variables.
+// Average speed calculation variables.
 
 const int numReadings = 10;
 
@@ -192,7 +190,7 @@ unsigned int distanceTravelledArray7;
 
 // Battery measurement variables.
 
-#define sensitivity (4 / 1024.0)			// Battery sensitivity setting.
+#define sensitivity (4 / 1024.0)				// Battery sensitivity setting.
 unsigned long batteryMeasureInterval = 600000;	// Battery measuring interval.
 unsigned long batteryMeasureNow;
 float sensorValue;
@@ -204,82 +202,15 @@ float sensorValuePerc;
 byte screenMenu = 4;				// Screen menu selection.
 boolean menuChange = 1;
 
-// Outer border & screen size.
-#define FRAME1_X 0
-#define FRAME1_Y 0
-#define FRAME1_W 320
-#define FRAME1_H 240
-
-// Inner border & screen size.
-#define FRAME2_X 8
-#define FRAME2_Y 8
-#define FRAME2_W 247
-#define FRAME2_H 224
-
-// Button 1 switch position and size.
-#define BUTTON1_X 262
-#define BUTTON1_Y 182
-#define BUTTON1_W 50
-#define BUTTON1_H 50
-
-// Button 2 switch position and size.
-#define BUTTON2_X 262
-#define BUTTON2_Y 124
-#define BUTTON2_W 50
-#define BUTTON2_H 50
-
-// Button 3 switch position and size.
-#define BUTTON3_X 262
-#define BUTTON3_Y 66
-#define BUTTON3_W 50
-#define BUTTON3_H 50
-
-// Button 4 switch position and size.
-#define BUTTON4_X 262
-#define BUTTON4_Y 8
-#define BUTTON4_W 50
-#define BUTTON4_H 50
-
-// WiFi icon position and size.
-#define WIFI_ICON_X 177
-#define WIFI_ICON_Y 13
-#define WIFI_ICON_W 16
-#define WIFI_ICON_H 16
-
-// Battery icon position and size.
-#define BATTERY_ICON_X 197
-#define BATTERY_ICON_Y 12
-#define BATTERY_ICON_W 32
-#define BATTERY_ICON_H 18
-
-// Settings Cog position and size.
-#define SETTINGS_COG_X 233
-#define SETTINGS_COG_Y 13
-#define SETTINGS_COG_W 16
-#define SETTINGS_COG_H 16
-
-// XPH Dial and position
-#define dialY 125
-#define dialX 120
-
-boolean dial_1 = true;				// XPH dial.
+// Function for odemeter testing only.
 
 unsigned long speedMeasureInterval = 50;	// Demo speed dial data function.
 unsigned long speedMeasureNow;				// Demo speed dial data function.
 boolean speedDirection = 1;					// Demo speed dial data function.
 
-// Bar charts and positions.
-#define graphY 210
-#define graphX1 24
-#define graphX2 52 
-#define graphX3 80
-#define graphX4 108
-#define graphX5 136
-#define graphX6 164
-#define graphX7 192
+// Dial and chart function parametres.
 
-#define graphW 14
-#define graphH 160
+boolean dial_1 = true;				// Odometer dial.
 
 boolean graph_1 = true;				// Bar graph.
 boolean graph_2 = true;
@@ -302,6 +233,7 @@ boolean graph_14 = true;
 void setup() {
 
 	//Begin serial mode.
+
 	Serial.begin(115200);
 
 	// Set pin modes.
@@ -395,7 +327,7 @@ void setup() {
 
 	if (screenMenu < 0 || screenMenu > 4) {
 
-		screenMenu = 0;
+		screenMenu = 4;
 
 	} // Close if.
 
@@ -460,6 +392,8 @@ void setup() {
 	drawBorder();
 	startUp();
 
+	screenMenu = 1;
+
 	speedMeasureNow = millis() - speedMeasureInterval;	// Set initial level so first measurement is made.
 	speedMeasureNow = millis();							// Reset measurement to match interval.
 
@@ -469,10 +403,6 @@ void setup() {
 
 void loop() {
 
-	//button1();			// Draw button one.
-	button2();			// Draw button two.
-	button3();			// Draw button three.
-	button4();			// Draw button four.
 	menu_Change();		// Reset menu change at each pass after touch is pressed.
 	mainData();			// Calculates main data.
 	averageSpeed();		// Calculate average speed.
@@ -482,47 +412,72 @@ void loop() {
 
 	if (screenMenu == 5) {
 
-		drawBattery(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsRed, SETTINGS_COG_W, SETTINGS_COG_H);
+		drawBitmap(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsRed, SETTINGS_COG_W, SETTINGS_COG_H);
+		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, configSet, BUTTON4_W - 2, BUTTON4_H - 2);
+		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_BLACK);
+		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, configPlus, BUTTON3_W - 2, BUTTON3_H - 2);
+		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_BLACK);
+		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, configMinus, BUTTON2_W - 2, BUTTON2_H - 2);
+		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_BLACK);
+		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, configExit, BUTTON1_W - 2, BUTTON1_H - 2);
+		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_BLACK);
 
 	}
 
-	else drawBattery(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsWhite, SETTINGS_COG_W, SETTINGS_COG_H);
+	else drawBitmap(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsWhite, SETTINGS_COG_W, SETTINGS_COG_H);
 
 	if (screenMenu == 4) {
 
-		drawBattery(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconRed, BUTTON4_W - 2, BUTTON4_H - 2);
+		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconRed, BUTTON4_W - 2, BUTTON4_H - 2);
+		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_RED);
 
 	}
 
-	else drawBattery(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconWhite, BUTTON4_W - 2, BUTTON4_H - 2);
-	
+	else if (screenMenu != 5) {
+
+		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconWhite, BUTTON4_W - 2, BUTTON4_H - 2);
+		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_BLACK);
+	}
+
 	if (screenMenu == 3) {
 
-		drawBattery(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconRed, BUTTON3_W - 2, BUTTON4_H - 2);
-
+		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconRed, BUTTON3_W - 2, BUTTON4_H - 2);
+		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_RED);
 	}
 
-	else drawBattery(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconWhite, BUTTON3_W - 2, BUTTON4_H - 2);
+	else if (screenMenu != 5) {
+
+		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconWhite, BUTTON3_W - 2, BUTTON4_H - 2);
+		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_BLACK);
+	}
 
 	if (screenMenu == 2) {
 
-		drawBattery(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconRed, BUTTON2_W - 2, BUTTON2_H - 2);
-
+		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconRed, BUTTON2_W - 2, BUTTON2_H - 2);
+		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_RED);
 	}
 
-	else drawBattery(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconWhite, BUTTON2_W - 2, BUTTON2_H - 2);
+	else if (screenMenu != 5) { 
+		
+		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconWhite, BUTTON2_W - 2, BUTTON2_H - 2); 
+		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_BLACK);
+	}
 
 	if (screenMenu == 1) {
 
-		drawBattery(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconRed, BUTTON1_W - 2, BUTTON1_H - 2);
-
+		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconRed, BUTTON1_W - 2, BUTTON1_H - 2);
+		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
 	}
 
-	else drawBattery(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconWhite, BUTTON1_W - 2, BUTTON1_H - 2);
+	else if (screenMenu != 5) { 
+		
+		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconWhite, BUTTON1_W - 2, BUTTON1_H - 2); 
+		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_BLACK);
+	}
 
-	drawBattery(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
+	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
 
-	drawBattery(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
 
 
 	uint16_t x, y;
@@ -678,7 +633,7 @@ void loop() {
 
 		} // Close if.
 
-		XphDialScreen(tft, dialX, dialY, 90, 0, 20, 2, 210, speedKph, 2, 0, RED, WHITE, BLACK, "Xph", dial_1); // XPH dial screen function.
+		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Xph", dial_1); // XPH dial screen function.
 
 	} // Close if.
 
@@ -1140,7 +1095,7 @@ void configurationDisplay() {
 	EEPROM.get(eeMenuAddress, eeMenuSetting);
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeResetSettingAddress, eeResetSetting);
-	
+
 	tft.setFreeFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
 	tft.setTextColor(WHITE);
@@ -1148,67 +1103,59 @@ void configurationDisplay() {
 	tft.println("System Setup");
 	tft.setFreeFont();
 
-	tft.setFreeFont(&FreeSans9pt7b);
-	tft.setTextSize(1);
-	tft.setTextColor(WHITE);
-	tft.setCursor(27, 70);
-	tft.println("Battery Level");
+	//tft.setFreeFont(&FreeSans9pt7b);
+	//tft.setTextSize(1);
+	//tft.setTextColor(WHITE);
+	//tft.setCursor(27, 70);
+	//tft.println("Battery Level");
 
-	tft.setFreeFont();
-	tft.setTextSize(1);
-	tft.setTextColor(WHITE, BLACK);
-	tft.setCursor(35, 90);
-	tft.print("V: ");
-	tft.println(sensorValueVolts);
-	tft.setCursor(35, 110);
-	tft.print("%: ");
-	tft.println(int(sensorValuePerc));
-	tft.println();
+	//tft.setFreeFont();
+	//tft.setTextSize(1);
+	//tft.setTextColor(WHITE, BLACK);
+	//tft.setCursor(35, 90);
+	//tft.print("V: ");
+	//tft.println(sensorValueVolts);
+	//tft.setCursor(35, 110);
+	//tft.print("%: ");
+	//tft.println(int(sensorValuePerc));
+	//tft.println();
 
-	if (sensorValuePerc > 95) {
+	//if (sensorValuePerc > 95) {
 
-		drawBattery(tft, 27, 90, ccBatt100, 32, 18);
+	//	drawBitmap(tft, 27, 90, ccBatt100, 32, 18);
 
-	}
+	//}
 
-	else if (sensorValuePerc > 79 && sensorValuePerc < 95) {
+	//else if (sensorValuePerc > 79 && sensorValuePerc < 95) {
 
-		drawBattery(tft, 27, 90, ccBatt80, 32, 18);
+	//	drawBitmap(tft, 27, 90, ccBatt80, 32, 18);
 
-	}
+	//}
 
-	else if (sensorValuePerc > 59 && sensorValuePerc < 80) {
+	//else if (sensorValuePerc > 59 && sensorValuePerc < 80) {
 
-		drawBattery(tft, 27, 90, ccBatt60, 32, 18);
+	//	drawBitmap(tft, 27, 90, ccBatt60, 32, 18);
 
-	}
+	//}
 
-	else if (sensorValuePerc > 39 && sensorValuePerc < 60) {
+	//else if (sensorValuePerc > 39 && sensorValuePerc < 60) {
 
-		drawBattery(tft, 27, 90, ccBatt40, 32, 18);
+	//	drawBitmap(tft, 27, 90, ccBatt40, 32, 18);
 
-	}
+	//}
 
-	else if (sensorValuePerc > 19 && sensorValuePerc < 40) {
+	//else if (sensorValuePerc > 19 && sensorValuePerc < 40) {
 
-		drawBattery(tft, 27, 90, ccBatt20, 32, 18);
+	//	drawBitmap(tft, 27, 90, ccBatt20, 32, 18);
 
-	}
+	//}
 
-	else if (sensorValuePerc < 20) {
+	//else if (sensorValuePerc < 20) {
 
-		drawBattery(tft, 27, 90, ccBatt00, 32, 18);
+	//	drawBitmap(tft, 27, 90, ccBatt00, 32, 18);
 
-	}
+	//}
 
-	tft.setFreeFont(&FreeSans9pt7b);
-	tft.setTextSize(1);
-	tft.setTextColor(WHITE);
-	tft.setCursor(27, 140);
-	tft.println("Configuration");
-
-	tft.setFreeFont();
-	tft.setTextSize(1);
 	tft.setTextColor(WHITE, BLACK);
 
 	if (configurationFlag == 3) {
@@ -1219,7 +1166,7 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	tft.setCursor(15, 160);
+	tft.setCursor(23, 70);
 	tft.print("System Reset     : ");
 	tft.println(eeResetSetting);
 
@@ -1231,11 +1178,11 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	tft.setCursor(15, 180);
+	tft.setCursor(23, 90);
 	tft.print("Circumference    : ");
 	tft.println(eeCircSetting);
 	tft.println();
-	tft.setCursor(15, 210);
+	tft.setCursor(23, 110);
 
 	if (configurationFlag == 1) {
 
@@ -1247,11 +1194,11 @@ void configurationDisplay() {
 
 	tft.print("Screen Menu Strt : ");
 	tft.println(eeMenuSetting);
-	tft.setCursor(15, 105);
+	tft.setCursor(23, 130);
 
 	tft.setTextColor(WHITE, BLACK);
 	tft.print("Total Distance To Date");
-	tft.setCursor(70, 220);
+	tft.setCursor(23, 150);
 	tft.println(distanceTravelled = distanceCounter * circumference);
 
 	if (digitalRead(bPlus) == LOW && (digitalRead(bMinus) == LOW)) {
@@ -1408,102 +1355,8 @@ void drawBlackBox()
 {
 	// Clear screen by using a black box.
 
-	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 1, FRAME2_W - 2, FRAME2_H - 2, TFT_BLACK);
-
-} // Close function.
-
-/*-----------------------------------------------------------------*/
-
-// Draw a button 1
-
-void button1()
-{
-	if (menuChange == 1) {
-
-		//if (screenMenu == 1) {
-
-			//tft.fillRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
-		//}
-
-		//else (//tft.fillRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, LTBLUE));
-
-		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_WHITE);
-		//tft.setTextColor(TFT_WHITE);
-		//tft.setTextSize(1);
-		//tft.setCursor(270, 203);
-		//tft.print("Menu");
-
-	} // Close if.
-
-} // Close function.
-
-/*-----------------------------------------------------------------*/
-
-// Draw a button 2
-
-void button2()
-{
-	if (menuChange == 1) {
-
-		if (screenMenu == 2) {
-
-			tft.fillRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_RED);
-		}
-
-		else (tft.fillRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, LTBLUE));
-		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_WHITE);
-		tft.setTextColor(TFT_WHITE);
-		tft.setTextSize(1);
-		tft.setTextDatum(MC_DATUM);
-
-	} // Close if.
-
-} // Close function.
-
-/*-----------------------------------------------------------------*/
-
-// Draw a button 3
-
-void button3()
-{
-	if (menuChange == 1) {
-
-		if (screenMenu == 3) {
-
-			tft.fillRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_RED);
-		}
-
-		else (tft.fillRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, LTBLUE));
-		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_WHITE);
-		tft.setTextColor(TFT_WHITE);
-		tft.setTextSize(2);
-		tft.setTextDatum(MC_DATUM);
-
-	} // Close if.
-
-} // Close function.
-
-/*-----------------------------------------------------------------*/
-
-// Draw a button 4
-
-void button4()
-{
-	if (menuChange == 1) {
-
-		if (screenMenu == 4) {
-
-			tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE);
-		}
-
-		//else (tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE));
-		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
-		//tft.setTextColor(TFT_WHITE);
-		//tft.setTextSize(1);
-		//tft.setCursor(270, 30);
-		//tft.print("Menu");
-
-	} // Close if.
+	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 22, FRAME2_W - 2, FRAME2_H - 23, TFT_BLACK);		// This covers only the graphs and charts, not the system icons to save refresh flicker.
+	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 1, FRAME2_W - 90, FRAME2_H - 200, TFT_BLACK);		// Ths covers the title text per page
 
 } // Close function.
 
@@ -1522,16 +1375,16 @@ void startUp() {
 	// Draw buttons at startup.
 
 	//tft.fillRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
-	tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_WHITE);
+	//tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_WHITE);
 
 	//tft.fillRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, LTBLUE);
-	tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_WHITE);
+	//tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_WHITE);
 
 	//tft.fillRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, LTBLUE);
-	tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_WHITE);
+	//tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_WHITE);
 
 	//tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE);
-	tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
+	//tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
 
 } // Close function.
 

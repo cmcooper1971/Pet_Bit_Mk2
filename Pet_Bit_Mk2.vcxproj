@@ -122,18 +122,19 @@
   <ItemGroup>
     <ClInclude Include="buttonIcons.h" />
     <ClInclude Include="icons.h" />
-    <ClInclude Include="drawBatteryBitmap.h" />
+    <ClInclude Include="drawBitmap.h" />
     <ClInclude Include="format_function.h" />
     <ClInclude Include="graphDistance.h" />
     <ClInclude Include="graphTime.h" />
     <ClInclude Include="colours.h" />
     <ClInclude Include="Free_Fonts.h" />
+    <ClInclude Include="screenLayout.h" />
     <ClInclude Include="startScreen.h" />
     <ClInclude Include="touchCalibrate.h" />
     <ClInclude Include="__vm\.Pet_Bit_Mk2.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="drawBatteryBitmap.cpp" />
+    <ClCompile Include="drawBitmap.cpp" />
     <ClCompile Include="format_function.cpp" />
     <ClCompile Include="graphDistance.cpp" />
     <ClCompile Include="graphTime.cpp" />

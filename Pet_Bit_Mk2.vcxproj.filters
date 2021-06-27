@@ -42,7 +42,7 @@
     <ClInclude Include="Free_Fonts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="drawBatteryBitmap.h">
+    <ClInclude Include="drawBitmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="startScreen.h">
@@ -54,9 +54,12 @@
     <ClInclude Include="buttonIcons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="screenLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="drawBatteryBitmap.cpp">
+    <ClCompile Include="drawBitmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="format_function.cpp">

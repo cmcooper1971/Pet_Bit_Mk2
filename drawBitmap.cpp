@@ -3,11 +3,11 @@
 // 
 
 #include <TFT_eSPI.h>
-#include "drawBatteryBitmap.h"
+#include "drawBitmap.h"
 
 /*-----------------------------------------------------------------*/
 
-void drawBattery(TFT_eSPI& tft, int x, int y, const uint16_t* bitmap, int bw, int bh) {
+void drawBitmap(TFT_eSPI& tft, int x, int y, const uint16_t* bitmap, int bw, int bh) {
 
 	//int h = 64, w = 64, row, col, buffidx = 0;
 	int buffidx = 0;
