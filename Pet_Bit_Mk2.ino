@@ -52,7 +52,7 @@ boolean screenRedraw = 0;
 
 // Data variables.
 
-byte configurationFlag = 0;					// Configuration menu flag.
+byte configurationFlag = 3;					// Configuration menu flag.
 
 volatile unsigned int  distanceCounter = 0;	// Counting rotations for distance travelled.
 
@@ -325,23 +325,23 @@ void setup() {
 
 	// Ensure menu position, circumference & array position are within parametres.
 
-	if (screenMenu < 0 || screenMenu > 4) {
+	Serial.print("EE Menu Setting: ");
+	Serial.print(eeMenuSetting);
+	Serial.println(" ");
+	Serial.print("Screen Menu : ");
+	Serial.print(screenMenu);
+	Serial.println(" ");
 
-		screenMenu = 4;
+	screenMenu == eeMenuSetting;
 
-	} // Close if.
+	Serial.print("EE Menu Setting: ");
+	Serial.print(eeMenuSetting);
+	Serial.println(" ");
+	Serial.print("Screen Menu : ");
+	Serial.print(screenMenu);
+	Serial.println(" ");
 
-	if (circumference < 0 || circumference > 2) {
-
-		circumference = 1.0;
-
-	} // Close if.
-
-	if (sessionArrayPosition < 0 || sessionArrayPosition > 6) {
-
-		sessionArrayPosition = 0;
-
-	} // Close if.
+	circumference == eeCircSetting;
 
 	// Initialise TFT display.
 
@@ -392,10 +392,14 @@ void setup() {
 	drawBorder();
 	startUp();
 
-	screenMenu = 1;
-
 	speedMeasureNow = millis() - speedMeasureInterval;	// Set initial level so first measurement is made.
 	speedMeasureNow = millis();							// Reset measurement to match interval.
+
+	// Debug Data.
+
+	Serial.print("Configuration Flag: ");
+	Serial.print(configurationFlag);
+	Serial.println(" ");
 
 } // Close setup.
 
@@ -457,9 +461,9 @@ void loop() {
 		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_RED);
 	}
 
-	else if (screenMenu != 5) { 
-		
-		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconWhite, BUTTON2_W - 2, BUTTON2_H - 2); 
+	else if (screenMenu != 5) {
+
+		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconWhite, BUTTON2_W - 2, BUTTON2_H - 2);
 		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_BLACK);
 	}
 
@@ -469,9 +473,9 @@ void loop() {
 		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
 	}
 
-	else if (screenMenu != 5) { 
-		
-		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconWhite, BUTTON1_W - 2, BUTTON1_H - 2); 
+	else if (screenMenu != 5) {
+
+		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconWhite, BUTTON1_W - 2, BUTTON1_H - 2);
 		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_BLACK);
 	}
 
@@ -522,7 +526,7 @@ void loop() {
 		if ((x > BUTTON2_X) && (x < (BUTTON2_X + BUTTON2_W))) {
 			if ((y > BUTTON2_Y) && (y <= (BUTTON2_Y + BUTTON2_H))) {
 
-				if (screenMenu != 2) {		// To stop screen flicker when pressing the same menu button again.
+				if (screenMenu != 2 && screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
 
 					screenMenu = 2;
 					menuChange = 1;
@@ -541,6 +545,24 @@ void loop() {
 
 				} // Close if.
 
+				else if (configurationFlag == 3) {
+
+					resetMenuSettingMinus();
+
+				} // Close else if.
+
+				else if (configurationFlag == 2) {
+
+					circumferenceSettingMinus();
+
+				} // Close else if.
+
+				else if (configurationFlag == 1) {
+
+					menuSettingMinus();
+
+				} // Close else if.
+
 			} // Close if.
 
 		} // Close if.
@@ -550,7 +572,7 @@ void loop() {
 		if ((x > BUTTON3_X) && (x < (BUTTON3_X + BUTTON3_W))) {
 			if ((y > BUTTON3_Y) && (y <= (BUTTON3_Y + BUTTON3_H))) {
 
-				if (screenMenu != 3) {		// To stop screen flicker when pressing the same menu button again.
+				if (screenMenu != 3 && screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
 
 					screenMenu = 3;
 					menuChange = 1;
@@ -563,6 +585,24 @@ void loop() {
 
 				} // Close if.
 
+				else if (configurationFlag == 3) {
+
+					resetMenuSettingPlus();
+
+				} // Close else if.
+
+				else if (configurationFlag == 2) {
+
+					circumferenceSettingPlus();
+
+				} // Close else if.
+
+				else if (configurationFlag == 1) {
+
+					menuSettingPlus();
+
+				} // Close else if.
+
 			} // Close if.
 
 		} // Close if.
@@ -572,7 +612,7 @@ void loop() {
 		if ((x > BUTTON4_X) && (x < (BUTTON4_X + BUTTON4_W))) {
 			if ((y > BUTTON4_Y) && (y <= (BUTTON4_Y + BUTTON4_H))) {
 
-				if (screenMenu != 4) {		// To stop screen flicker when pressing the same menu button again.
+				if (screenMenu != 4 && screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
 
 					screenMenu = 4;
 					menuChange = 1;
@@ -583,6 +623,20 @@ void loop() {
 					Serial.println(" ");
 
 				} // Close if.
+
+				else
+				{
+					configurationFlag--;
+					Serial.print("Configuration Flag: ");
+					Serial.print(configurationFlag);
+					Serial.println(" ");
+
+					if (configurationFlag == 0) {
+
+						configurationFlag = 3;
+					}
+
+				}
 
 			} // Close if.
 
@@ -1090,11 +1144,15 @@ void CurrentExerciseScreen() {
 
 void configurationDisplay() {
 
-	// Drawing thicker rectangle with for loop, function, X, Y, W, H, colour.
+	// Configuration display layout.
+
+	// Retrieve saved configuration data from EEPROM.
 
 	EEPROM.get(eeMenuAddress, eeMenuSetting);
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeResetSettingAddress, eeResetSetting);
+
+	// Display configuration data and selection options.
 
 	tft.setFreeFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -1103,60 +1161,9 @@ void configurationDisplay() {
 	tft.println("System Setup");
 	tft.setFreeFont();
 
-	//tft.setFreeFont(&FreeSans9pt7b);
-	//tft.setTextSize(1);
-	//tft.setTextColor(WHITE);
-	//tft.setCursor(27, 70);
-	//tft.println("Battery Level");
-
-	//tft.setFreeFont();
-	//tft.setTextSize(1);
-	//tft.setTextColor(WHITE, BLACK);
-	//tft.setCursor(35, 90);
-	//tft.print("V: ");
-	//tft.println(sensorValueVolts);
-	//tft.setCursor(35, 110);
-	//tft.print("%: ");
-	//tft.println(int(sensorValuePerc));
-	//tft.println();
-
-	//if (sensorValuePerc > 95) {
-
-	//	drawBitmap(tft, 27, 90, ccBatt100, 32, 18);
-
-	//}
-
-	//else if (sensorValuePerc > 79 && sensorValuePerc < 95) {
-
-	//	drawBitmap(tft, 27, 90, ccBatt80, 32, 18);
-
-	//}
-
-	//else if (sensorValuePerc > 59 && sensorValuePerc < 80) {
-
-	//	drawBitmap(tft, 27, 90, ccBatt60, 32, 18);
-
-	//}
-
-	//else if (sensorValuePerc > 39 && sensorValuePerc < 60) {
-
-	//	drawBitmap(tft, 27, 90, ccBatt40, 32, 18);
-
-	//}
-
-	//else if (sensorValuePerc > 19 && sensorValuePerc < 40) {
-
-	//	drawBitmap(tft, 27, 90, ccBatt20, 32, 18);
-
-	//}
-
-	//else if (sensorValuePerc < 20) {
-
-	//	drawBitmap(tft, 27, 90, ccBatt00, 32, 18);
-
-	//}
-
 	tft.setTextColor(WHITE, BLACK);
+
+	// Menu option 3 is System Reset menu.
 
 	if (configurationFlag == 3) {
 
@@ -1169,6 +1176,8 @@ void configurationDisplay() {
 	tft.setCursor(23, 70);
 	tft.print("System Reset     : ");
 	tft.println(eeResetSetting);
+
+	// Menu option 2 is Circumference menu.
 
 	if (configurationFlag == 2) {
 
@@ -1184,6 +1193,8 @@ void configurationDisplay() {
 	tft.println();
 	tft.setCursor(23, 110);
 
+	// Menu option 1 is Start Screem menu.
+
 	if (configurationFlag == 1) {
 
 		tft.setTextColor(TFT_RED, BLACK);
@@ -1196,55 +1207,77 @@ void configurationDisplay() {
 	tft.println(eeMenuSetting);
 	tft.setCursor(23, 130);
 
+	// Display total distance travelled since initial start up.
+
 	tft.setTextColor(WHITE, BLACK);
 	tft.print("Total Distance To Date");
 	tft.setCursor(23, 150);
 	tft.println(distanceTravelled = distanceCounter * circumference);
 
-	if (digitalRead(bPlus) == LOW && (digitalRead(bMinus) == LOW)) {
+} // Close function.
 
-		if (configurationFlag == 4) {
+/*-----------------------------------------------------------------*/
 
-			configurationFlag = 0;
+void menuSettingPlus() {
 
-		}
+	// Incremental function to menu setting.
 
-		configurationFlag++;
-
-	} // Close if.
-
-	if (digitalRead(bPlus) == LOW && configurationFlag == 1)
+	if (eeMenuSetting == 5)
 	{
-		if (eeMenuSetting == 4)
-		{
-			eeMenuSetting = 0;
-			eeMenuSettingChange = true;
+		eeMenuSetting = 1;
+		eeMenuSettingChange = true;
 
-		}
-		else
-		{
-			eeMenuSetting++;
-			eeMenuSettingChange = true;
-		}
-
-	} // Close if.
-
-	if (digitalRead(bMinus) == LOW && configurationFlag == 1)
+	}
+	else
 	{
-		if (eeMenuSetting == 0)
-		{
-			eeMenuSetting = 4;
-			eeMenuSettingChange = true;
-		}
-		else
-		{
-			eeMenuSetting--;
-			eeMenuSettingChange = true;
-		}
+		eeMenuSetting++;
+		eeMenuSettingChange = true;
+	}
 
-	} // Close if.
+	Serial.print("Menu Setting: ");
+	Serial.print(eeMenuSetting);
+	Serial.println(" ");
 
-		// Write menu setting to EEPROM.
+	if (eeMenuSettingChange == true) {			// Write results to EEPROM to save.
+
+		menuSettingSave();
+	}
+
+} // Close function.
+
+	/*-----------------------------------------------------------------*/
+
+void menuSettingMinus() {
+
+	// Incremental function to menu setting.
+
+	if (eeMenuSetting == 1)
+	{
+		eeMenuSetting = 5;
+		eeMenuSettingChange = true;
+	}
+	else
+	{
+		eeMenuSetting--;
+		eeMenuSettingChange = true;
+	}
+
+	Serial.print("Menu Setting: ");
+	Serial.print(eeMenuSetting);
+	Serial.println(" ");
+
+	if (eeMenuSettingChange == true) {			// Write results to EEPROM to save.
+
+		menuSettingSave();
+	}
+
+}  // Close function. 
+
+/*-----------------------------------------------------------------*/
+
+void menuSettingSave() {
+
+	// Write menu setting to EEPROM.
 
 	if (eeMenuSettingChange == true) {
 
@@ -1254,79 +1287,69 @@ void configurationDisplay() {
 
 	} // Close if.
 
-	if (digitalRead(bPlus) == LOW && configurationFlag == 2)
+}  // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void resetMenuSettingPlus() {
+
+	// Incremental function to reset setting.
+
+	if (eeResetSetting == 2)
 	{
-		if (eeCircSetting > 2.00)
-		{
-			eeCircSetting = 0.00;
-			eeCircSettingChange = true;
+		eeResetSetting = 0;
+		eeResetSettingChange = true;
 
-		}
-		else
-		{
-			eeCircSetting = eeCircSetting + 0.01;
-			eeCircSettingChange = true;
-		}
-
-	} // Close if.
-
-	if (digitalRead(bMinus) == LOW && configurationFlag == 2)
+	}
+	else
 	{
-		if (eeCircSetting < 0.00)
-		{
-			eeCircSetting = 2.00;
-			eeCircSettingChange = true;
-		}
-		else
-		{
-			eeCircSetting = eeCircSetting - 0.01;
-			eeCircSettingChange = true;
-		}
+		eeResetSetting++;
+		eeResetSettingChange = true;
+	}
 
-	} // Close if.
+	Serial.print("Reset Setting: ");
+	Serial.print(eeResetSetting);
+	Serial.println(" ");
 
-	// Write debug setting to EEPROM.
+	if (eeResetSettingChange == true) {			// Write results to EEPROM to save.
 
-	if (eeCircSettingChange == true) {
+		resetMenuSettingSave();
+	}
 
-		EEPROM.put(eeCircAddress, eeCircSetting);
-		EEPROM.commit();
-		eeCircSettingChange = false;
+} // Close function.
 
-	} // Close if.
+/*-----------------------------------------------------------------*/
 
-	if (digitalRead(bPlus) == LOW && configurationFlag == 3)
+void resetMenuSettingMinus() {
+
+	// Decremental function to reset setting.
+
+	if (eeResetSetting == 0)
 	{
-		if (eeResetSetting == 2)
-		{
-			eeResetSetting = 0;
-			eeResetSettingChange = true;
-
-		}
-		else
-		{
-			eeResetSetting++;
-			eeResetSettingChange = true;
-		}
-
-	} // Close if.
-
-	if (digitalRead(bMinus) == LOW && configurationFlag == 3)
+		eeResetSetting = 2;
+		eeResetSettingChange = true;
+	}
+	else
 	{
-		if (eeResetSetting == 0)
-		{
-			eeResetSetting = 2;
-			eeResetSettingChange = true;
-		}
-		else
-		{
-			eeResetSetting--;
-			eeResetSettingChange = true;
-		}
+		eeResetSetting--;
+		eeResetSettingChange = true;
+	}
 
-	} // Close if.
+	Serial.print("Reset Setting: ");
+	Serial.print(eeResetSetting);
+	Serial.println(" ");
 
-	// Write menu setting to EEPROM.
+	if (eeResetSettingChange == true) {			// Write results to EEPROM to save.
+
+		resetMenuSettingSave();
+	}
+
+} // Close function.
+/*-----------------------------------------------------------------*/
+
+void resetMenuSettingSave() {
+
+	// Write reset setting to EEPROM.
 
 	if (eeResetSettingChange == true) {
 
@@ -1337,6 +1360,79 @@ void configurationDisplay() {
 	} // Close if.
 
 } // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void circumferenceSettingPlus() {
+
+	// Incremental function to circumference setting.
+
+	if (eeCircSetting >= 2.00)
+	{
+		eeCircSetting = 0.01;
+		eeCircSettingChange = true;
+
+	}
+	else
+	{
+		eeCircSetting = eeCircSetting + 0.01;
+		eeCircSettingChange = true;
+	}
+
+	Serial.print("Circumference Setting: ");
+	Serial.print(eeCircSetting);
+	Serial.println(" ");
+
+	if (eeCircSettingChange == true) {			// Write results to EEPROM to save.
+
+		circumferenceSettingSave();
+	}
+
+}  // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void circumferenceSettingMinus() {
+
+	// Decremental function to circumference setting.
+
+	if (eeCircSetting <= 0.01)
+	{
+		eeCircSetting = 2.00;
+		eeCircSettingChange = true;
+	}
+	else
+	{
+		eeCircSetting = eeCircSetting - 0.01;
+		eeCircSettingChange = true;
+	}
+
+	Serial.print("Circumference Setting: ");
+	Serial.print(eeCircSetting);
+	Serial.println(" ");
+
+	if (eeCircSettingChange == true) {			// Write results to EEPROM to save.
+
+		circumferenceSettingSave();
+	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void circumferenceSettingSave() {
+
+	// Write circumference setting to EEPROM.
+
+	if (eeCircSettingChange == true) {
+
+		EEPROM.put(eeCircAddress, eeCircSetting);
+		EEPROM.commit();
+		eeCircSettingChange = false;
+
+	} // Close if.
+
+}  // Close function.
 
 /*-----------------------------------------------------------------*/
 
@@ -1466,7 +1562,7 @@ void demoSpeedData() {
 
 void resetSystemData() {
 
-	eeMenuSetting = 0;
+	eeMenuSetting = 2;
 	EEPROM.put(eeMenuAddress, eeMenuSetting);
 	EEPROM.commit();
 
@@ -1553,7 +1649,7 @@ void resetSystemData() {
 
 void resetSystemDemoData() {
 
-	eeMenuSetting = 0;
+	eeMenuSetting = 2;
 	EEPROM.put(eeMenuAddress, eeMenuSetting);
 	EEPROM.commit();
 
