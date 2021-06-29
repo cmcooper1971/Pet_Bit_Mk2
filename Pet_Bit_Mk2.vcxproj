@@ -130,6 +130,7 @@
     <ClInclude Include="Free_Fonts.h" />
     <ClInclude Include="screenLayout.h" />
     <ClInclude Include="startScreen.h" />
+    <ClInclude Include="startUpScreen.h" />
     <ClInclude Include="touchCalibrate.h" />
     <ClInclude Include="__vm\.Pet_Bit_Mk2.vsarduino.h" />
   </ItemGroup>
@@ -138,6 +139,7 @@
     <ClCompile Include="format_function.cpp" />
     <ClCompile Include="graphDistance.cpp" />
     <ClCompile Include="graphTime.cpp" />
+    <ClCompile Include="startUpScreen.cpp" />
     <ClCompile Include="touchCalibrate.cpp" />
     <ClCompile Include="xphDial.cpp" />
   </ItemGroup>

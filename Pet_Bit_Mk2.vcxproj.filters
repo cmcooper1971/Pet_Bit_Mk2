@@ -57,6 +57,9 @@
     <ClInclude Include="screenLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="startUpScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="drawBitmap.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="touchCalibrate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="startUpScreen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

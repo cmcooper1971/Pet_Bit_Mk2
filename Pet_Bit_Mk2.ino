@@ -15,14 +15,15 @@
 
 #include "Free_Fonts.h"				// Free fonts for use with eTFT.
 #include "colours.h"                // Colours.
-#include "screenLayout.h"				// Screen layout
-#include "drawBitmap.h"		// Draw battery level bitmaps.
+#include "screenLayout.h"			// Screen layout
+#include "drawBitmap.h"				// Draw battery level bitmaps.
 #include "xphDial.h"				// XPH Odometre
 #include "graphDistance.h"			// Daily distance chart
 #include "graphTime.h"				// Daily time chart
 #include "format_function.h"		// Special formatting function from Kris Kasprzak
 #include "buttonIcons.h"			// bUTTON icons.
 #include "startScreen.h"			// Start screen bitmap.
+#include "startUpScreen.h"			// Start up screen.
 #include "icons.h"					// Battery level bitmaps.
 #include "touchCalibrate.h"			// Calibrate touch screen.
 
@@ -48,13 +49,13 @@ byte bMinus = 3;					// Button -
 // Configure ILI9341 display.
 
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
-boolean screenRedraw = 0;
+boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen draws.
 
 // Data variables.
 
 byte configurationFlag = 3;					// Configuration menu flag.
 
-volatile unsigned int  distanceCounter = 0;	// Counting rotations for distance travelled.
+volatile unsigned int distanceCounter = 0;	// Counting rotations for distance travelled.
 
 volatile unsigned long passedTime;			// Setting time to calculate speed.
 volatile unsigned long startTime;			// Setting time to calculate speed.
@@ -202,12 +203,6 @@ float sensorValuePerc;
 byte screenMenu = 4;				// Screen menu selection.
 boolean menuChange = 1;
 
-// Function for odemeter testing only.
-
-unsigned long speedMeasureInterval = 50;	// Demo speed dial data function.
-unsigned long speedMeasureNow;				// Demo speed dial data function.
-boolean speedDirection = 1;					// Demo speed dial data function.
-
 // Dial and chart function parametres.
 
 boolean dial_1 = true;				// Odometer dial.
@@ -323,25 +318,10 @@ void setup() {
 	distanceTravelledArray6 = distanceTravelledArray[5];
 	distanceTravelledArray7 = distanceTravelledArray[6];
 
-	// Ensure menu position, circumference & array position are within parametres.
+	// Set menu position and circumference position from EEPROM data.
 
-	Serial.print("EE Menu Setting: ");
-	Serial.print(eeMenuSetting);
-	Serial.println(" ");
-	Serial.print("Screen Menu : ");
-	Serial.print(screenMenu);
-	Serial.println(" ");
-
-	screenMenu == eeMenuSetting;
-
-	Serial.print("EE Menu Setting: ");
-	Serial.print(eeMenuSetting);
-	Serial.println(" ");
-	Serial.print("Screen Menu : ");
-	Serial.print(screenMenu);
-	Serial.println(" ");
-
-	circumference == eeCircSetting;
+	screenMenu = eeMenuSetting;
+	circumference = eeCircSetting;
 
 	// Initialise TFT display.
 
@@ -356,18 +336,7 @@ void setup() {
 	// Start up screen.
 
 	tft.fillScreen(ILI9341_WHITE);
-
-	int h = 80, w = 112, row, col, buffidx = 0;
-
-	for (row = 16; row < h; row++) {		// For each scanline.
-
-		for (col = 48; col < w; col++) {	// For each pixel, read from Flash Memory, since image is stored as uint16_t, pgm_read_word is used as it uses 16bit address.
-			tft.drawPixel(col, row, pgm_read_word(startScreen + buffidx));
-			buffidx++;
-
-		} // End for loop.
-
-	} // End for loop.
+	startUpScreen(tft);
 
 	tft.setTextSize(1);
 	tft.setTextColor(BLACK);
@@ -392,29 +361,21 @@ void setup() {
 	drawBorder();
 	startUp();
 
-	speedMeasureNow = millis() - speedMeasureInterval;	// Set initial level so first measurement is made.
-	speedMeasureNow = millis();							// Reset measurement to match interval.
-
-	// Debug Data.
-
-	Serial.print("Configuration Flag: ");
-	Serial.print(configurationFlag);
-	Serial.println(" ");
-
 } // Close setup.
 
 /*-----------------------------------------------------------------*/
 
 void loop() {
 
+	// Main functions, checking menu, calculations & average speed.
+
 	menu_Change();		// Reset menu change at each pass after touch is pressed.
 	mainData();			// Calculates main data.
 	averageSpeed();		// Calculate average speed.
-	//demoSpeedData();	// Demo KPH data for testing, comment when finished.
 
 	// Draw screen icons and button images.
 
-	if (screenMenu == 5) {
+	if (screenMenu == 5) {			// Draw configuration buttons.
 
 		drawBitmap(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsRed, SETTINGS_COG_W, SETTINGS_COG_H);
 		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, configSet, BUTTON4_W - 2, BUTTON4_H - 2);
@@ -430,7 +391,7 @@ void loop() {
 
 	else drawBitmap(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsWhite, SETTINGS_COG_W, SETTINGS_COG_H);
 
-	if (screenMenu == 4) {
+	if (screenMenu == 4) {			// Draw session distance icons, red / white.
 
 		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconRed, BUTTON4_W - 2, BUTTON4_H - 2);
 		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_RED);
@@ -443,7 +404,7 @@ void loop() {
 		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_BLACK);
 	}
 
-	if (screenMenu == 3) {
+	if (screenMenu == 3) {			// Draw session time icons, red / white.
 
 		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconRed, BUTTON3_W - 2, BUTTON4_H - 2);
 		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_RED);
@@ -455,7 +416,7 @@ void loop() {
 		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_BLACK);
 	}
 
-	if (screenMenu == 2) {
+	if (screenMenu == 2) {			// Draw odometer icons, red / white.
 
 		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconRed, BUTTON2_W - 2, BUTTON2_H - 2);
 		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_RED);
@@ -467,7 +428,7 @@ void loop() {
 		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_BLACK);
 	}
 
-	if (screenMenu == 1) {
+	if (screenMenu == 1) {			// Draw current session icons, red / white.
 
 		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconRed, BUTTON1_W - 2, BUTTON1_H - 2);
 		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
@@ -479,16 +440,22 @@ void loop() {
 		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_BLACK);
 	}
 
+	// Draw configuraton icons, battery and WiFi.
+
 	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
 
 	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
 
+	// Touch screen setup and triggers.
 
-	uint16_t x, y;
+	uint16_t x, y;		// variables for touch data.
 
 	// See if there's any touch data for us
+	
 	if (tft.getTouch(&x, &y)) {
-		// Draw a block spot to show where touch was calculated to be
+		
+	// Draw a block spot to show where touch was calculated to be
+
 #ifdef BLACK_SPOT
 		tft.fillCircle(x, y, 2, TFT_BLACK);
 #endif
@@ -545,19 +512,19 @@ void loop() {
 
 				} // Close if.
 
-				else if (configurationFlag == 3) {
+				else if (screenMenu == 5 && configurationFlag == 3) {
 
 					resetMenuSettingMinus();
 
 				} // Close else if.
 
-				else if (configurationFlag == 2) {
+				else if (screenMenu == 5 && configurationFlag == 2) {
 
 					circumferenceSettingMinus();
 
 				} // Close else if.
 
-				else if (configurationFlag == 1) {
+				else if (screenMenu == 5 && configurationFlag == 1) {
 
 					menuSettingMinus();
 
@@ -585,19 +552,19 @@ void loop() {
 
 				} // Close if.
 
-				else if (configurationFlag == 3) {
+				else if (screenMenu == 5 && configurationFlag == 3) {
 
 					resetMenuSettingPlus();
 
 				} // Close else if.
 
-				else if (configurationFlag == 2) {
+				else if (screenMenu == 5 && configurationFlag == 2) {
 
 					circumferenceSettingPlus();
 
 				} // Close else if.
 
-				else if (configurationFlag == 1) {
+				else if (screenMenu == 5 && configurationFlag == 1) {
 
 					menuSettingPlus();
 
@@ -624,17 +591,18 @@ void loop() {
 
 				} // Close if.
 
-				else
-				{
+				else if (screenMenu == 5) {
+
 					configurationFlag--;
-					Serial.print("Configuration Flag: ");
+
+					if (configurationFlag == byte(0)) {
+
+						configurationFlag = byte(3);
+					}
+
+					Serial.print("Configuration Flag After If: ");
 					Serial.print(configurationFlag);
 					Serial.println(" ");
-
-					if (configurationFlag == 0) {
-
-						configurationFlag = 3;
-					}
 
 				}
 
@@ -663,7 +631,7 @@ void loop() {
 
 	} // Close if.
 
-	// Trigger screen choice.
+	// Trigger screen choice - Current exercise screen.
 
 	if (screenMenu == 1) {
 
@@ -678,6 +646,8 @@ void loop() {
 
 	} // Close if.
 
+	// Trigger screen choice - Odometer screen.
+
 	if (screenMenu == 2) {
 
 		if (screenRedraw == 1) {
@@ -690,6 +660,8 @@ void loop() {
 		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Xph", dial_1); // XPH dial screen function.
 
 	} // Close if.
+
+	// Trigger screen choice - Distance sessions screen.
 
 	if (screenMenu == 3) {
 
@@ -759,6 +731,8 @@ void loop() {
 		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
 
 	} // Close if.
+
+	// Trigger screen choice - Time sessions screen.
 
 	if (screenMenu == 4) {
 
@@ -871,6 +845,8 @@ void loop() {
 
 	} // Close if.
 
+	// Trigger screen choice - Configuration screen.
+
 	if (screenMenu == 5) {
 
 		if (screenRedraw == 1) {
@@ -910,7 +886,6 @@ void mainData() {
 		sessionTime = sessionTimeMillis / 10 / 60;
 
 	} // Close else.
-
 
 	// Ensure data is always "0" or greater, if not set to "0"
 
@@ -1525,38 +1500,6 @@ void rotationInterruptISR() {
 	last_interrupt_time = interrupt_time;
 
 }  // Close function.
-
-/*-----------------------------------------------------------------*/
-
-void demoSpeedData() {
-
-	if (millis() >= speedMeasureNow + speedMeasureInterval) {
-
-		if (speedKph == 20) {
-
-			speedDirection = 0;
-		}
-
-		if (speedDirection == 0) {
-
-			speedKph--;
-		}
-
-		if (speedKph == -1) {
-
-			speedDirection = 1;
-		}
-
-		if (speedDirection == 1) {
-
-			speedKph++;
-		}
-
-		speedMeasureNow = millis();
-
-	} // Close if.
-
-} // Close function.
 
 /*-----------------------------------------------------------------*/
 
