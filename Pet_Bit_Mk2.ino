@@ -41,7 +41,7 @@
 // Pin out Configuration.
 
 byte sDCS = 33;						// SD Card chip select pin.
-const int interruptWheelSensor = 26;		// Reed swtich sensor.
+const int interruptWheelSensor = 39;		// Reed swtich sensor.
 
 byte bPlus = 1;						// Button +
 byte bMinus = 3;					// Button -
@@ -63,13 +63,13 @@ volatile unsigned long startTime;			// Setting time to calculate speed.
 volatile unsigned long lastRotation1;		// Checking if wheel is still turning.
 volatile unsigned long lastRotation2;		// Checking if wheel is still turning.
 
-float circumference;						// Wheel circumference.
-float circImperial;							// Conversion into MPH.
+double circumference;						// Wheel circumference.
+double circImperial;							// Conversion into MPH.
 
-float distanceTravelled = 0.00;				// Total distance travelled.
-float speedKph = 0.00;
-float speedMph = 0.00;
-float rpm = 0.00;
+double distanceTravelled = 0.00;				// Total distance travelled.
+double speedKph = 0.00;
+double speedMph = 0.00;
+double rpm = 0.00;
 
 float maxKphSpeed = 0;						// Recording max speed.
 
@@ -150,10 +150,10 @@ unsigned int eeSessionArrayPosition;		// Actual commit for writing, 4 bytes.
 
 const int numReadings = 10;
 
-float	readings[numReadings];				// Latest Kph readings.
+double	readings[numReadings];				// Latest Kph readings.
 int		readIndex = 0;						// The index of the current reading.
-float	total = 0.00;						// The running total of the readings.
-float	averageKphSpeed = 0.00;				// The average speed.
+double	total = 0.00;						// The running total of the readings.
+double	averageKphSpeed = 0.00;				// The average speed.
 
 // Session time variables.
 
@@ -166,8 +166,8 @@ byte sessionArrayPosition = 0;				// Array position, this is also used for the d
 volatile unsigned long sessionTimeMillis;	// Time each pt session in millis.
 volatile unsigned int sessionTime;			// Time each pt session in minutes.
 
-float sessionStartDistance = 0.00;
-float sessionDistance;						// Session distance.
+double sessionStartDistance = 0.00;
+double sessionDistance;						// Session distance.
 
 unsigned int distanceGraphCap = 999;		// Set cap for graph if statements.
 
@@ -225,6 +225,48 @@ boolean graph_14 = true;
 
 /*-----------------------------------------------------------------*/
 
+void IRAM_ATTR rotationInterruptISR() {
+
+	static unsigned long  last_interrupt_time = 0;                  // Function to solve debounce
+	unsigned long         interrupt_time = millis();
+
+	if (interrupt_time - last_interrupt_time > 100) {
+
+		detachInterrupt(interruptWheelSensor);
+
+		passedTime = millis() - startTime;
+		startTime = millis();
+
+		rpm = (60000 * circumference) / passedTime;			// Revs per minute.
+		speedKph = (3600 * circumference) / passedTime;		// km/h.
+		speedMph = (3600 * circImperial) / passedTime;		// Miles per hour.
+
+		distanceCounter++;
+		eeTotalDistanceChange = true;
+		distanceTravelled = distanceCounter * circumference;
+
+		if (sessionTimeFlag == 0) {		// Set session timer to start.
+
+			sessionTimeFlag = 1;
+			sessionStartTime = millis();
+			sessionStartDistance = distanceTravelled;
+			recordSessions = 0;
+
+		} // Close if.
+
+		lastRotation1 = millis();
+		lastRotation2 = lastRotation1 + 4000;
+
+		attachInterrupt(digitalPinToInterrupt(interruptWheelSensor), rotationInterruptISR, FALLING);
+
+	} // Close if.
+
+	last_interrupt_time = interrupt_time;
+
+}  // Close function.
+
+/*-----------------------------------------------------------------*/
+
 void setup() {
 
 	//Begin serial mode.
@@ -235,7 +277,7 @@ void setup() {
 
 	pinMode(TFT_LED, OUTPUT);				// Output for LCD back light.
 	pinMode(sDCS, OUTPUT);					// Output for chip select for SD SPI bus.
-	pinMode(interruptWheelSensor, INPUT_PULLUP);	// Wheel sensor (REED switch).
+	pinMode(interruptWheelSensor, INPUT);	// Wheel sensor (REED switch).
 	digitalWrite(TFT_LED, HIGH);			// Outout for LCD back light.
 
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
@@ -860,6 +902,24 @@ void loop() {
 
 	} // Close if.
 
+		// Check for new max speed.
+
+	if (speedKph > maxKphSpeed) {
+
+		maxKphSpeed = speedKph;
+
+	} // Close if.
+
+	// Calculate average speed & remove any minus calculations.
+
+	averageKphSpeed = total / numReadings;
+
+	if (averageKphSpeed < 0.99) {
+
+		averageKphSpeed = 0.00;
+
+	}  // Close if.
+
 } // Close loop.
 
 /*-----------------------------------------------------------------*/
@@ -1458,48 +1518,6 @@ void startUp() {
 	//tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
 
 } // Close function.
-
-/*-----------------------------------------------------------------*/
-
-void rotationInterruptISR() {
-
-	static unsigned long  last_interrupt_time = 0;                  // Function to solve debounce
-	unsigned long         interrupt_time = millis();
-
-	if (interrupt_time - last_interrupt_time > 100) {
-
-		detachInterrupt(interruptWheelSensor);
-
-		passedTime = millis() - startTime;
-		startTime = millis();
-
-		rpm = (60000 * circumference) / passedTime;			// Revs per minute.
-		speedKph = (3600 * circumference) / passedTime;		// km/h.
-		speedMph = (3600 * circImperial) / passedTime;		// Miles per hour.
-
-		distanceCounter++;
-		eeTotalDistanceChange = true;
-		distanceTravelled = distanceCounter * circumference;
-
-		if (sessionTimeFlag == 0) {		// Set session timer to start.
-
-			sessionTimeFlag = 1;
-			sessionStartTime = millis();
-			sessionStartDistance = distanceTravelled;
-			recordSessions = 0;
-
-		} // Close if.
-
-		lastRotation1 = millis();
-		lastRotation2 = lastRotation1 + 4000;
-
-		attachInterrupt(digitalPinToInterrupt(interruptWheelSensor), rotationInterruptISR, FALLING);
-
-	} // Close if.
-
-	last_interrupt_time = interrupt_time;
-
-}  // Close function.
 
 /*-----------------------------------------------------------------*/
 
