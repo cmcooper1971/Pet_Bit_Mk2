@@ -64,9 +64,9 @@ volatile unsigned long lastRotation1;		// Checking if wheel is still turning.
 volatile unsigned long lastRotation2;		// Checking if wheel is still turning.
 
 double circumference;						// Wheel circumference.
-double circImperial;							// Conversion into MPH.
+double circImperial;						// Conversion into MPH.
 
-double distanceTravelled = 0.00;				// Total distance travelled.
+double distanceTravelled = 0.00;			// Total distance travelled.
 double speedKph = 0.00;
 double speedMph = 0.00;
 double rpm = 0.00;
