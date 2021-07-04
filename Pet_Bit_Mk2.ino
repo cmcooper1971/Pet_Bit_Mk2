@@ -6,12 +6,20 @@
 
 // Libraries.
 
+
+#include <WiFi.h>					// Arduino WiFi library
+#include <AsyncTCP.h>				// Random Nerd library
+#include <ESPAsyncWebServer.h>		// Random Nerd library
+#include <SPIFFS.h>					// File store
+#include <Arduino_JSON.h>			// Arduino JSon Library
+
 #include <vfs_api.h>                // File system library.
 #include <FSImpl.h>                 // File system library.
 #include <FS.h>                     // File system library.
 #include <SPI.h>					// SPI bus for TFT using software SPI.
 #include <TFT_eSPI.h>               // TFT SPI library.
 #include <EEPROM.h>					// EEPROM library.
+
 
 #include "Free_Fonts.h"				// Free fonts for use with eTFT.
 #include "colours.h"                // Colours.
@@ -21,7 +29,7 @@
 #include "graphDistance.h"			// Daily distance chart
 #include "graphTime.h"				// Daily time chart
 #include "format_function.h"		// Special formatting function from Kris Kasprzak
-#include "buttonIcons.h"			// bUTTON icons.
+#include "buttonIcons.h"			// Button icons.
 #include "startScreen.h"			// Start screen bitmap.
 #include "startUpScreen.h"			// Start up screen.
 #include "icons.h"					// Battery level bitmaps.
@@ -50,6 +58,42 @@ byte bMinus = 3;					// Button -
 
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
 boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen draws.
+
+// Web Server configuration.
+
+// Create AsyncWebServer object on port 80
+AsyncWebServer server(80);
+
+// Create an Event Source on /events
+AsyncEventSource events("/events");
+
+// WiFi Configuration.
+
+// Search for parameter in HTTP POST request
+const char* PARAM_INPUT_1 = "ssid";
+const char* PARAM_INPUT_2 = "pass";
+const char* PARAM_INPUT_3 = "ip";
+
+//Variables to save values from HTML form
+String ssid;
+String pass;
+String ip;
+
+// File paths to save input values permanently
+const char* ssidPath = "/ssid.txt";
+const char* passPath = "/pass.txt";
+const char* ipPath = "/ip.txt";
+
+IPAddress localIP;
+//IPAddress localIP(192, 168, 1, 200); // hardcoded
+
+// Set your Gateway IP address
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 0, 0);
+
+// Timer variables (check wifi)
+unsigned long previousMillis = 0;
+const long interval = 10000;  // interval to wait for Wi-Fi connection (milliseconds)
 
 // Data variables.
 
@@ -267,6 +311,101 @@ void IRAM_ATTR rotationInterruptISR() {
 
 /*-----------------------------------------------------------------*/
 
+// Initialize WiFi
+
+bool initWiFi() {
+
+	if (ssid == "" || ip == "") {
+		Serial.println("Undefined SSID or IP address.");
+		return false;
+	}
+
+	WiFi.mode(WIFI_STA);
+	localIP.fromString(ip.c_str());
+
+	if (!WiFi.config(localIP, gateway, subnet)) {
+		Serial.println("STA Failed to configure");
+		return false;
+	}
+	WiFi.begin(ssid.c_str(), pass.c_str());
+	Serial.println("Connecting to WiFi...");
+
+	unsigned long currentMillis = millis();
+	previousMillis = currentMillis;
+
+	while (WiFi.status() != WL_CONNECTED) {
+		currentMillis = millis();
+		if (currentMillis - previousMillis >= interval) {
+			Serial.println("Failed to connect.");
+			return false;
+		}
+	}
+
+	Serial.println(WiFi.localIP());
+	return true;
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Initialize SPIFFS
+
+void initSPIFFS() {
+
+	if (!SPIFFS.begin(true)) {
+		Serial.println("An error has occurred while mounting SPIFFS");
+	}
+	else {
+		Serial.println("SPIFFS mounted successfully");
+	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Read File from SPIFFS
+
+String readFile(fs::FS& fs, const char* path) {
+	Serial.printf("Reading file: %s\r\n", path);
+
+	File file = fs.open(path);
+	if (!file || file.isDirectory()) {
+		Serial.println("- failed to open file for reading");
+		return String();
+	}
+
+	String fileContent;
+	while (file.available()) {
+		fileContent = file.readStringUntil('\n');
+		break;
+	}
+	return fileContent;
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// Write file to SPIFFS
+
+void writeFile(fs::FS& fs, const char* path, const char* message) {
+	Serial.printf("Writing file: %s\r\n", path);
+
+	File file = fs.open(path, FILE_WRITE);
+	if (!file) {
+		Serial.println("- failed to open file for writing");
+		return;
+	}
+	if (file.print(message)) {
+		Serial.println("- file written");
+	}
+	else {
+		Serial.println("- frite failed");
+	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
 void setup() {
 
 	//Begin serial mode.
@@ -387,6 +526,113 @@ void setup() {
 
 	delay(1500);
 
+	// Clear screen.
+
+	tft.fillScreen(ILI9341_BLACK);
+
+	// Initialize SPIFFS.
+
+	initSPIFFS();
+
+	// Load values saved in SPIFFS
+
+	ssid = readFile(SPIFFS, ssidPath);
+	pass = readFile(SPIFFS, passPath);
+	ip = readFile(SPIFFS, ipPath);
+
+	Serial.println(ssid);
+	Serial.println(pass);
+	Serial.println(ip);
+
+	// Initialize WiFi.
+
+	if (initWiFi()) {
+
+		// If ESP32 inits successfully in station mode, recolour WiFi to amber
+
+		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
+
+		//Handle the Web Server in Station Mode
+		// Route for root / web page
+		server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+			request->send(SPIFFS, "/index.html", "text/html");
+			});
+		server.serveStatic("/", SPIFFS, "/");
+
+		events.onConnect([](AsyncEventSourceClient* client) {
+			if (client->lastId()) {
+				Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+			}
+			});
+		server.addHandler(&events);
+
+		server.begin();
+	}
+
+	else {
+
+		// Initialize the ESP32 in Access Point mode, recolour to WiFI red.
+		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
+
+		// Set Access Point
+		Serial.println("Setting AP (Access Point)");
+
+		// NULL sets an open Access Point
+		WiFi.softAP("ESP-WIFI-MANAGER", NULL);
+
+		IPAddress IP = WiFi.softAPIP();
+		Serial.print("AP IP address: ");
+		Serial.println(IP);
+
+		// Web Server Root URL For WiFi Manager Web Page
+		server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+			request->send(SPIFFS, "/wifimanager.html", "text/html");
+			});
+
+		server.serveStatic("/", SPIFFS, "/");
+
+		// Get the parameters submited on the form 
+		server.on("/", HTTP_POST, [](AsyncWebServerRequest* request) {
+			int params = request->params();
+			for (int i = 0; i < params; i++) {
+				AsyncWebParameter* p = request->getParam(i);
+				if (p->isPost()) {
+					// HTTP POST ssid value
+					if (p->name() == PARAM_INPUT_1) {
+						ssid = p->value().c_str();
+						Serial.print("SSID set to: ");
+						Serial.println(ssid);
+						// Write file to save value
+						writeFile(SPIFFS, ssidPath, ssid.c_str());
+					}
+					// HTTP POST pass value
+					if (p->name() == PARAM_INPUT_2) {
+						pass = p->value().c_str();
+						Serial.print("Password set to: ");
+						Serial.println(pass);
+						// Write file to save value
+						writeFile(SPIFFS, passPath, pass.c_str());
+					}
+					// HTTP POST ip value
+					if (p->name() == PARAM_INPUT_3) {
+						ip = p->value().c_str();
+						Serial.print("IP Address set to: ");
+						Serial.println(ip);
+						// Write file to save value
+						writeFile(SPIFFS, ipPath, ip.c_str());
+					}
+					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+				}
+			}
+			request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
+			delay(3000);
+			// After saving the parameters, restart the ESP32
+			ESP.restart();
+			});
+		server.begin();
+	
+	}  // Close function.
+
 	// Calibrate touch screen.
 
 	// touch_calibrate(tft); // Build future meny option in settings
@@ -394,14 +640,16 @@ void setup() {
 	uint16_t calData[5] = { 365, 3511, 243, 3610, 7 };
 	tft.setTouch(calData);
 
-	// Clear screen.
-
-	tft.fillScreen(ILI9341_BLACK);
-
 	// Draw border and buttons at start.
 
 	drawBorder();
 	startUp();
+
+	// Draw configuraton icons, battery and WiFi.
+
+	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
+
+	//drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
 
 } // Close setup.
 
@@ -482,21 +730,15 @@ void loop() {
 		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_BLACK);
 	}
 
-	// Draw configuraton icons, battery and WiFi.
-
-	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
-
-	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
-
 	// Touch screen setup and triggers.
 
 	uint16_t x, y;		// variables for touch data.
 
 	// See if there's any touch data for us
-	
+
 	if (tft.getTouch(&x, &y)) {
-		
-	// Draw a block spot to show where touch was calculated to be
+
+		// Draw a block spot to show where touch was calculated to be
 
 #ifdef BLACK_SPOT
 		tft.fillCircle(x, y, 2, TFT_BLACK);

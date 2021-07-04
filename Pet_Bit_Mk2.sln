@@ -13,16 +13,32 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EEPROM", "Libraries\EEPROM\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FS", "Libraries\FS\FS.vcxitems", "{7449D5D4-0BFD-4537-B022-D230A93DB316}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPIFFS", "Libraries\SPIFFS\SPIFFS.vcxitems", "{F52603F1-4034-4B2A-8A98-C3EE4CAC65B5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "arduino_83418", "Libraries\arduino_83418\arduino_83418.vcxitems", "{A3D09C5F-6C62-4708-B7DA-AA758D9A747E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AsyncTCP-master", "Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems", "{0CD6C3F4-B0B8-46BC-BA3B-362BE905A3D0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESPAsyncWebServer-master", "Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems", "{1751CB50-4C0E-4E81-869F-EBB622929899}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Libraries\SPI\SPI.vcxitems*{0045052c-42b2-4d47-8260-252518218d33}*SharedItemsImports = 9
+		Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems*{0cd6c3f4-b0b8-46bc-ba3b-362be905a3d0}*SharedItemsImports = 9
+		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{1751cb50-4c0e-4e81-869f-ebb622929899}*SharedItemsImports = 9
 		Libraries\TFT_eSPI\TFT_eSPI.vcxitems*{3cdf696d-1dc6-4efd-be3d-d1f3393bfd11}*SharedItemsImports = 9
 		Libraries\FS\FS.vcxitems*{7449d5d4-0bfd-4537-b022-d230a93db316}*SharedItemsImports = 9
 		Libraries\EEPROM\EEPROM.vcxitems*{a1198025-c119-4f38-ac85-3f4abfecaec0}*SharedItemsImports = 9
+		Libraries\arduino_83418\arduino_83418.vcxitems*{a3d09c5f-6c62-4708-b7da-aa758d9a747e}*SharedItemsImports = 9
+		Libraries\arduino_83418\arduino_83418.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\EEPROM\EEPROM.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\FS\FS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPIFFS\SPIFFS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\TFT_eSPI\TFT_eSPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\SPIFFS\SPIFFS.vcxitems*{f52603f1-4034-4b2a-8a98-c3ee4cac65b5}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
