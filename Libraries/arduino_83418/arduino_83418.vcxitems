@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+  <PropertyGroup Label="Globals" >
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{a3d09c5f-6c62-4708-b7da-aa758d9a747e}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\JSON.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\JSONVar.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\cjson\cJSON.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Arduino_JSON.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\JSON.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\JSONVar.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\cjson\cJSON.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)keywords.txt" />
+<Text Include="$(MSBuildThisFileDirectory)library.properties" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.adoc" />
+<None Include="$(MSBuildThisFileDirectory)src\cjson\LICENSE" />
+  </ItemGroup>
+</Project>

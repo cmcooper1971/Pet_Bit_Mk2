@@ -19,6 +19,10 @@
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
+    <None Include="data\index.html" />
+    <None Include="data\script.js" />
+    <None Include="data\style.css" />
+    <None Include="data\wifimanager.html" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Pet_Bit_Mk2.vsarduino.h">
