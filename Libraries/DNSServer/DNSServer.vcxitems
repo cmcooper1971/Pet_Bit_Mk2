@@ -3,7 +3,7 @@
   <PropertyGroup Label="Globals" >
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <ItemsProjectGuid>{5b616a90-3108-4d67-9c94-f399b7214ac0}</ItemsProjectGuid>
+    <ItemsProjectGuid>{2703a092-4103-4aba-b8c6-788bb69ddb7b}</ItemsProjectGuid>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -14,10 +14,10 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\WiFiProv.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DNSServer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\WiFiProv.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\DNSServer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="$(MSBuildThisFileDirectory)library.properties" />

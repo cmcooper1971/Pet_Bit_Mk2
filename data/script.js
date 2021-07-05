@@ -1,19 +1,6 @@
 // Get current sensor readings when the page loads  
 window.addEventListener('load', getReadings);
 
-//Function to add date and time of last update
-function updateDateTime() {
-  var currentdate = new Date(); 
-  var datetime =  currentdate.getDate() + "/"
-  + (currentdate.getMonth()+1)  + "/" 
-  + currentdate.getFullYear() + " at "  
-  + currentdate.getHours() + ":"  
-  + currentdate.getMinutes() + ":" 
-  + currentdate.getSeconds();
-  document.getElementById("update-time").innerHTML = datetime;
-  console.log(datetime);
-}
-
 // Function to get current readings on the webpage when it loads for the first time
 function getReadings() {
   var xhr = new XMLHttpRequest();
