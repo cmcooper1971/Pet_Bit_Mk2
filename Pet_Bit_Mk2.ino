@@ -6,12 +6,12 @@
 
 // Libraries.
 
-
-#include <WiFi.h>					// Arduino WiFi library
-#include <AsyncTCP.h>				// Random Nerd library
-#include <ESPAsyncWebServer.h>		// Random Nerd library
-#include <SPIFFS.h>					// File store
-#include <Arduino_JSON.h>			// Arduino JSon Library
+#include <WiFi.h>					// Arduino WiFi library.
+#include "time.h"					// Arduino standard time library
+#include <AsyncTCP.h>				// Random Nerd library.
+#include <ESPAsyncWebServer.h>		// Random Nerd library.
+#include <SPIFFS.h>					// File store.
+#include <Arduino_JSON.h>			// Arduino JSon Library.
 
 #include <vfs_api.h>                // File system library.
 #include <FSImpl.h>                 // File system library.
@@ -20,15 +20,14 @@
 #include <TFT_eSPI.h>               // TFT SPI library.
 #include <EEPROM.h>					// EEPROM library.
 
-
 #include "Free_Fonts.h"				// Free fonts for use with eTFT.
 #include "colours.h"                // Colours.
-#include "screenLayout.h"			// Screen layout
+#include "screenLayout.h"			// Screen layout.
 #include "drawBitmap.h"				// Draw battery level bitmaps.
-#include "xphDial.h"				// XPH Odometre
-#include "graphDistance.h"			// Daily distance chart
-#include "graphTime.h"				// Daily time chart
-#include "format_function.h"		// Special formatting function from Kris Kasprzak
+#include "xphDial.h"				// XPH Odometre.
+#include "graphDistance.h"			// Daily distance chart.
+#include "graphTime.h"				// Daily time chart.
+#include "format_function.h"		// Special formatting function from Kris Kasprzak.
 #include "buttonIcons.h"			// Button icons.
 #include "startScreen.h"			// Start screen bitmap.
 #include "startUpScreen.h"			// Start up screen.
@@ -59,6 +58,14 @@ byte bMinus = 3;					// Button -
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
 boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen draws.
 
+// Configure time settings.
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 0;
+const int   daylightOffset_sec = 3600;
+long	LocalTime;
+int		localTimeInterval = 1000;
+
 // Web Server configuration.
 
 // Create AsyncWebServer object on port 80
@@ -88,8 +95,9 @@ IPAddress localIP;
 //IPAddress localIP(192, 168, 1, 200); // hardcoded
 
 // Set your Gateway IP address
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 0, 0);
+IPAddress gateway(192, 168, 1, 254);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress dns1(192, 168, 1, 254);
 
 // Timer variables (check wifi)
 unsigned long previousMillis = 0;
@@ -315,6 +323,32 @@ void IRAM_ATTR rotationInterruptISR() {
 
 bool initWiFi() {
 
+	// Title WiFi screen.
+
+	tft.setFreeFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(WHITE);
+	tft.setCursor(13, 26);
+	tft.println("WiFi Configuration");
+	tft.setFreeFont();
+
+	tft.setTextColor(WHITE);
+	tft.setFreeFont();
+	tft.setCursor(23, 50);
+	tft.print("WiFi Status: ");
+	tft.setCursor(23, 65);
+	tft.print("SSID: ");
+	tft.setCursor(23, 80);
+	tft.print("IP Address: ");
+	tft.setCursor(23, 95);
+	tft.print("Signal Strenght: ");
+	tft.setCursor(23, 110);
+	tft.print("Time Server: ");
+
+	// If ESP32 inits successfully in station mode, recolour WiFi to red.
+
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
+
 	if (ssid == "" || ip == "") {
 		Serial.println("Undefined SSID or IP address.");
 		return false;
@@ -323,12 +357,16 @@ bool initWiFi() {
 	WiFi.mode(WIFI_STA);
 	localIP.fromString(ip.c_str());
 
-	if (!WiFi.config(localIP, gateway, subnet)) {
+	if (!WiFi.config(localIP, gateway, subnet, dns1)) {
 		Serial.println("STA Failed to configure");
 		return false;
 	}
 	WiFi.begin(ssid.c_str(), pass.c_str());
 	Serial.println("Connecting to WiFi...");
+
+	// If ESP32 inits successfully in station mode, recolour WiFi to amber.
+
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
 
 	unsigned long currentMillis = millis();
 	previousMillis = currentMillis;
@@ -337,11 +375,48 @@ bool initWiFi() {
 		currentMillis = millis();
 		if (currentMillis - previousMillis >= interval) {
 			Serial.println("Failed to connect.");
+			// If ESP32 fails to connect, recolour WiFi to red.
+			drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
+			drawBlackBox();
 			return false;
 		}
 	}
 
 	Serial.println(WiFi.localIP());
+	Serial.println("");
+	Serial.print("RRSI: ");
+	Serial.println(WiFi.RSSI());
+
+	tft.setTextColor(WHITE);
+	tft.setFreeFont();
+	tft.setCursor(23, 50);
+	tft.print("WiFi Status: ");
+	tft.print(WiFi.status());
+	tft.println("");
+	tft.setCursor(23, 65);
+	tft.print("SSID: ");
+	tft.print(WiFi.SSID());
+	tft.println("");
+	tft.setCursor(23, 80);
+	tft.print("IP Address: ");
+	tft.print(WiFi.localIP());
+	tft.println("");
+	tft.setCursor(23, 95);
+	tft.print("Signal Strenght: ");
+	tft.print(WiFi.RSSI());
+	tft.println("");
+	tft.setCursor(23, 110);
+	tft.print("Time Server: ");
+	tft.print(ntpServer);
+	tft.println("");
+
+	// If ESP32 inits successfully in station mode, recolour WiFi to green.
+
+	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
+
+	delay(3000);
+	screenRedraw = 1;
+
 	return true;
 
 } // Close function.
@@ -403,6 +478,29 @@ void writeFile(fs::FS& fs, const char* path, const char* message) {
 	}
 
 } // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void printLocalTime()
+{
+	struct tm timeinfo;
+	if (!getLocalTime(&timeinfo)) {
+		Serial.println("Failed to obtain time");
+		tft.setTextColor(WHITE, BLACK);
+		tft.setFreeFont();
+		tft.setTextSize(1);
+		tft.setCursor(13, 220);
+		tft.println("Failed to connect to time server...");
+		return;
+	}
+	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+
+	tft.setTextColor(WHITE, BLACK);
+	tft.setFreeFont();
+	tft.setTextSize(1);
+	tft.setCursor(13, 220);
+	tft.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+}
 
 /*-----------------------------------------------------------------*/
 
@@ -544,13 +642,25 @@ void setup() {
 	Serial.println(pass);
 	Serial.println(ip);
 
+	// Calibrate touch screen.
+
+	// touch_calibrate(tft); // Build future meny option in settings
+
+	uint16_t calData[5] = { 365, 3511, 243, 3610, 7 };
+	tft.setTouch(calData);
+
+	// Draw border and buttons at start.
+
+	drawBorder();
+	startUp();
+
+	// Draw configuraton icons, battery and WiFi.
+
+	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
+
 	// Initialize WiFi.
 
 	if (initWiFi()) {
-
-		// If ESP32 inits successfully in station mode, recolour WiFi to amber
-
-		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
 
 		//Handle the Web Server in Station Mode
 		// Route for root / web page
@@ -630,26 +740,14 @@ void setup() {
 			ESP.restart();
 			});
 		server.begin();
-	
+
 	}  // Close function.
 
-	// Calibrate touch screen.
+	// initialize time and get the time.
 
-	// touch_calibrate(tft); // Build future meny option in settings
-
-	uint16_t calData[5] = { 365, 3511, 243, 3610, 7 };
-	tft.setTouch(calData);
-
-	// Draw border and buttons at start.
-
-	drawBorder();
-	startUp();
-
-	// Draw configuraton icons, battery and WiFi.
-
-	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
-
-	//drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
+	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+	printLocalTime();
+	LocalTime = millis();
 
 } // Close setup.
 
@@ -662,6 +760,13 @@ void loop() {
 	menu_Change();		// Reset menu change at each pass after touch is pressed.
 	mainData();			// Calculates main data.
 	averageSpeed();		// Calculate average speed.
+	
+
+	if (millis() >= LocalTime + localTimeInterval) {
+
+		printLocalTime();	// Get time and update display.
+		LocalTime = millis();
+	}
 
 	// Draw screen icons and button images.
 
@@ -926,7 +1031,7 @@ void loop() {
 
 		} // Close if.
 
-		CurrentExerciseScreen();
+		currentExerciseScreen();
 
 	} // Close if.
 
@@ -1374,7 +1479,7 @@ void averageSpeed() {
 
 /*-----------------------------------------------------------------*/
 
-void CurrentExerciseScreen() {
+void currentExerciseScreen() {
 
 	tft.setFreeFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -1414,6 +1519,8 @@ void CurrentExerciseScreen() {
 
 	tft.setCursor(100, 144);
 	tft.println(currentSessionTimeArray);
+	
+	tft.setTextSize(1);
 
 } // Close function.
 
@@ -1728,7 +1835,7 @@ void drawBlackBox()
 {
 	// Clear screen by using a black box.
 
-	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 22, FRAME2_W - 2, FRAME2_H - 23, TFT_BLACK);		// This covers only the graphs and charts, not the system icons to save refresh flicker.
+	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 25, FRAME2_W - 2, FRAME2_H - 40, TFT_BLACK);		// This covers only the graphs and charts, not the system icons to save refresh flicker.
 	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 1, FRAME2_W - 90, FRAME2_H - 200, TFT_BLACK);		// Ths covers the title text per page
 
 } // Close function.
