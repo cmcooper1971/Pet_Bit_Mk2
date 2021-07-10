@@ -63,8 +63,8 @@ boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 0;
 const int   daylightOffset_sec = 3600;
-long	LocalTime;
-int		localTimeInterval = 1000;
+long		LocalTime;
+int			localTimeInterval = 60000;
 
 // Web Server configuration.
 
@@ -100,12 +100,15 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress dns1(192, 168, 1, 254);
 
 // Timer variables (check wifi)
+volatile bool disconnectWiFi = false;
+volatile bool disconnectWiFiFlag = false;
 unsigned long previousMillis = 0;
 const long interval = 10000;  // interval to wait for Wi-Fi connection (milliseconds)
 
 // Data variables.
 
 byte configurationFlag = 3;					// Configuration menu flag.
+boolean loopCoreID = true;					// Flag to ID core only once.
 
 volatile unsigned int distanceCounter = 0;	// Counting rotations for distance travelled.
 
@@ -279,12 +282,15 @@ boolean graph_14 = true;
 
 void IRAM_ATTR rotationInterruptISR() {
 
-	static unsigned long  last_interrupt_time = 0;                  // Function to solve debounce
+	static unsigned long  last_interrupt_time = 0;                  // Function to solve debounce.
 	unsigned long         interrupt_time = millis();
-
-	if (interrupt_time - last_interrupt_time > 100) {
+	
+	if (interrupt_time - last_interrupt_time > 50) {
 
 		detachInterrupt(interruptWheelSensor);
+
+		disconnectWiFiFlag = true;									// Disable WiFi flag to stop repeat attempts.
+		disconnectWiFi = true;										// Disable WiFi on wheel turn.
 
 		passedTime = millis() - startTime;
 		startTime = millis();
@@ -493,13 +499,13 @@ void printLocalTime()
 		tft.println("Failed to connect to time server...");
 		return;
 	}
-	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M");
 
 	tft.setTextColor(WHITE, BLACK);
 	tft.setFreeFont();
 	tft.setTextSize(1);
 	tft.setCursor(13, 220);
-	tft.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+	tft.println(&timeinfo, "%A, %B %d %Y %H:%M");
 }
 
 /*-----------------------------------------------------------------*/
@@ -509,6 +515,10 @@ void setup() {
 	//Begin serial mode.
 
 	Serial.begin(115200);
+	delay(500);
+
+	Serial.print("Setup Running on Core : ");
+	Serial.println(xPortGetCoreID());
 
 	// Set pin modes.
 
@@ -749,6 +759,15 @@ void setup() {
 	printLocalTime();
 	LocalTime = millis();
 
+	if(disconnectWiFi == true) {
+
+		//disconnect WiFi as it's no longer needed
+		WiFi.disconnect();
+		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
+		//WiFi.mode(WIFI_OFF);
+	}
+	
+
 } // Close setup.
 
 /*-----------------------------------------------------------------*/
@@ -757,9 +776,44 @@ void loop() {
 
 	// Main functions, checking menu, calculations & average speed.
 
+	if (loopCoreID == true) {
+
+		Serial.print("Loop Running on Core : ");
+		Serial.println(xPortGetCoreID());
+
+		loopCoreID = false;
+
+	}
+
 	menu_Change();		// Reset menu change at each pass after touch is pressed.
 	mainData();			// Calculates main data.
 	averageSpeed();		// Calculate average speed.
+
+	// Enable / Disable WiFi when interrupt is in operation.
+
+	if (disconnectWiFi == true && disconnectWiFiFlag == true) {
+
+		if (WiFi.status() == WL_CONNECTED);
+		WiFi.disconnect();
+		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
+
+	}
+
+	else if (disconnectWiFi == false && disconnectWiFiFlag == true) {
+		
+		if (WiFi.status() != WL_CONNECTED);
+		WiFi.begin(ssid.c_str(), pass.c_str());
+		Serial.println("Connecting to WiFi...");
+		Serial.print("IP Address: ");
+		Serial.println(WiFi.localIP());
+		Serial.println("");
+		Serial.print("RRSI: ");
+		Serial.println(WiFi.RSSI());
+		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
+
+		disconnectWiFiFlag = false;
+		
+	}
 	
 
 	if (millis() >= LocalTime + localTimeInterval) {
@@ -1281,7 +1335,8 @@ void mainData() {
 		speedKph = 0.00;
 		speedMph = 0.00;
 		recordSessions = 1;
-		eeSessionChange = true;
+		eeSessionChange = true;     
+		disconnectWiFi = false;
 
 	} // Close if.
 
