@@ -284,7 +284,7 @@ void IRAM_ATTR rotationInterruptISR() {
 
 	static unsigned long  last_interrupt_time = 0;                  // Function to solve debounce.
 	unsigned long         interrupt_time = millis();
-	
+
 	if (interrupt_time - last_interrupt_time > 50) {
 
 		detachInterrupt(interruptWheelSensor);
@@ -759,14 +759,14 @@ void setup() {
 	printLocalTime();
 	LocalTime = millis();
 
-	if(disconnectWiFi == true) {
+	if (disconnectWiFi == true) {
 
 		//disconnect WiFi as it's no longer needed
 		WiFi.disconnect();
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
 		//WiFi.mode(WIFI_OFF);
 	}
-	
+
 
 } // Close setup.
 
@@ -800,7 +800,7 @@ void loop() {
 	}
 
 	else if (disconnectWiFi == false && disconnectWiFiFlag == true) {
-		
+
 		if (WiFi.status() != WL_CONNECTED);
 		WiFi.begin(ssid.c_str(), pass.c_str());
 		Serial.println("Connecting to WiFi...");
@@ -812,9 +812,9 @@ void loop() {
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
 
 		disconnectWiFiFlag = false;
-		
+
 	}
-	
+
 
 	if (millis() >= LocalTime + localTimeInterval) {
 
@@ -836,14 +836,54 @@ void loop() {
 		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, configExit, BUTTON1_W - 2, BUTTON1_H - 2);
 		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_BLACK);
 
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y + 49, BUTTON1_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y, BUTTON2_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X + 50, BUTTON2_Y, BUTTON2_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X - 8, BUTTON2_Y + 1, BUTTON2_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y + 49, BUTTON2_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y, BUTTON3_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X + 50, BUTTON3_Y, BUTTON3_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X - 8, BUTTON3_Y + 1, BUTTON3_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y + 49, BUTTON3_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y, BUTTON4_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y + 49, BUTTON4_H + 7, TFT_BLACK);
+
 	}
 
 	else drawBitmap(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsWhite, SETTINGS_COG_W, SETTINGS_COG_H);
 
 	if (screenMenu == 4) {			// Draw session distance icons, red / white.
 
-		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconRed, BUTTON4_W - 2, BUTTON4_H - 2);
-		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_RED);
+		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconWhite, BUTTON4_W - 2, BUTTON4_H - 2);
+		//tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
+
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y + 49, BUTTON1_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y, BUTTON2_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X + 50, BUTTON2_Y, BUTTON2_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X - 8, BUTTON2_Y + 1, BUTTON2_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y + 49, BUTTON2_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y, BUTTON3_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X + 50, BUTTON3_Y, BUTTON3_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X - 8, BUTTON3_Y + 1, BUTTON3_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y + 49, BUTTON3_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON4_X - 8, BUTTON4_Y, BUTTON4_H + 8, TFT_WHITE);
+		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_WHITE);
+		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_BLACK);
+		tft.drawFastHLine(BUTTON4_X - 8, BUTTON4_Y + 49, BUTTON4_H + 8, TFT_WHITE);
 
 	}
 
@@ -855,8 +895,28 @@ void loop() {
 
 	if (screenMenu == 3) {			// Draw session time icons, red / white.
 
-		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconRed, BUTTON3_W - 2, BUTTON4_H - 2);
-		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_RED);
+		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconWhite, BUTTON3_W - 2, BUTTON4_H - 2);
+		//tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_RED);
+
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y + 49, BUTTON1_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y, BUTTON2_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X + 50, BUTTON2_Y, BUTTON2_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X - 8, BUTTON2_Y + 1, BUTTON2_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y + 49, BUTTON2_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON3_X - 8, BUTTON3_Y, BUTTON3_H + 8, TFT_WHITE);
+		tft.drawFastVLine(BUTTON3_X + 50, BUTTON3_Y, BUTTON3_H, TFT_WHITE);
+		tft.drawFastVLine(BUTTON3_X - 8, BUTTON3_Y + 1, BUTTON3_H - 2, TFT_BLACK);
+		tft.drawFastHLine(BUTTON3_X - 8, BUTTON3_Y + 49, BUTTON3_H + 8, TFT_WHITE);
+
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y, BUTTON4_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y + 49, BUTTON4_H + 7, TFT_BLACK);
 	}
 
 	else if (screenMenu != 5) {
@@ -867,8 +927,29 @@ void loop() {
 
 	if (screenMenu == 2) {			// Draw odometer icons, red / white.
 
-		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconRed, BUTTON2_W - 2, BUTTON2_H - 2);
-		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_RED);
+		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconWhite, BUTTON2_W - 2, BUTTON2_H - 2);
+		//tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_RED);
+
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y + 49, BUTTON1_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON2_X - 8, BUTTON2_Y, BUTTON2_H + 8, TFT_WHITE);
+		tft.drawFastVLine(BUTTON2_X + 50, BUTTON2_Y, BUTTON2_H, TFT_WHITE);
+		tft.drawFastVLine(BUTTON2_X - 8, BUTTON2_Y + 1, BUTTON2_H - 2, TFT_BLACK);
+		tft.drawFastHLine(BUTTON2_X - 8, BUTTON2_Y + 49, BUTTON2_H + 8, TFT_WHITE);
+
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y, BUTTON3_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X + 50, BUTTON3_Y, BUTTON3_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X - 8, BUTTON3_Y + 1, BUTTON3_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y + 49, BUTTON3_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y, BUTTON4_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y + 49, BUTTON4_H + 7, TFT_BLACK);
+
 	}
 
 	else if (screenMenu != 5) {
@@ -879,8 +960,29 @@ void loop() {
 
 	if (screenMenu == 1) {			// Draw current session icons, red / white.
 
-		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconRed, BUTTON1_W - 2, BUTTON1_H - 2);
-		tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
+		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconWhite, BUTTON1_W - 2, BUTTON1_H - 2);
+		//tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
+
+		tft.drawFastHLine(BUTTON1_X - 8, BUTTON1_Y, BUTTON1_H + 8, TFT_WHITE);
+		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_WHITE);
+		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_BLACK);
+		tft.drawFastHLine(BUTTON1_X - 8, BUTTON1_Y + 49, BUTTON1_H + 8, TFT_WHITE);
+
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y, BUTTON2_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X + 50, BUTTON2_Y, BUTTON2_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON2_X - 8, BUTTON2_Y + 1, BUTTON2_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON2_X - 7, BUTTON2_Y + 49, BUTTON2_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y, BUTTON3_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X + 50, BUTTON3_Y, BUTTON3_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON3_X - 8, BUTTON3_Y + 1, BUTTON3_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON3_X - 7, BUTTON3_Y + 49, BUTTON3_H + 7, TFT_BLACK);
+
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y, BUTTON4_H + 7, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_BLACK);
+		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_WHITE);
+		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y + 49, BUTTON4_H + 7, TFT_BLACK);
+
 	}
 
 	else if (screenMenu != 5) {
@@ -1335,7 +1437,7 @@ void mainData() {
 		speedKph = 0.00;
 		speedMph = 0.00;
 		recordSessions = 1;
-		eeSessionChange = true;     
+		eeSessionChange = true;
 		disconnectWiFi = false;
 
 	} // Close if.
@@ -1574,7 +1676,7 @@ void currentExerciseScreen() {
 
 	tft.setCursor(100, 144);
 	tft.println(currentSessionTimeArray);
-	
+
 	tft.setTextSize(1);
 
 } // Close function.
