@@ -76,6 +76,8 @@ AsyncEventSource events("/events");
 
 // WiFi Configuration.
 
+boolean apMode = false;
+
 // Search for parameter in HTTP POST request
 const char* PARAM_INPUT_1 = "ssid";
 const char* PARAM_INPUT_2 = "pass";
@@ -329,27 +331,7 @@ void IRAM_ATTR rotationInterruptISR() {
 
 bool initWiFi() {
 
-	// Title WiFi screen.
-
-	tft.setFreeFont(&FreeSans9pt7b);
-	tft.setTextSize(1);
-	tft.setTextColor(WHITE);
-	tft.setCursor(13, 26);
-	tft.println("WiFi Configuration");
-	tft.setFreeFont();
-
-	tft.setTextColor(WHITE);
-	tft.setFreeFont();
-	tft.setCursor(23, 50);
-	tft.print("WiFi Status: ");
-	tft.setCursor(23, 65);
-	tft.print("SSID: ");
-	tft.setCursor(23, 80);
-	tft.print("IP Address: ");
-	tft.setCursor(23, 95);
-	tft.print("Signal Strenght: ");
-	tft.setCursor(23, 110);
-	tft.print("Time Server: ");
+	wiFiTitle();
 
 	// If ESP32 inits successfully in station mode, recolour WiFi to red.
 
@@ -397,30 +379,57 @@ bool initWiFi() {
 	tft.setFreeFont();
 	tft.setCursor(23, 50);
 	tft.print("WiFi Status: ");
+	tft.setTextColor(LTBLUE);
+	tft.setCursor(150, 50);
 	tft.print(WiFi.status());
 	tft.println("");
 	tft.setCursor(23, 65);
+	tft.setTextColor(WHITE);
 	tft.print("SSID: ");
+	tft.setTextColor(LTBLUE);
+	tft.setCursor(150, 65);
 	tft.print(WiFi.SSID());
 	tft.println("");
 	tft.setCursor(23, 80);
+	tft.setTextColor(WHITE);
 	tft.print("IP Address: ");
+	tft.setTextColor(LTBLUE);
+	tft.setCursor(150, 80);
 	tft.print(WiFi.localIP());
 	tft.println("");
 	tft.setCursor(23, 95);
+	tft.setTextColor(WHITE);
 	tft.print("Signal Strenght: ");
+	tft.setTextColor(LTBLUE);
+	tft.setCursor(150, 95);
 	tft.print(WiFi.RSSI());
 	tft.println("");
 	tft.setCursor(23, 110);
+	tft.setTextColor(WHITE);
 	tft.print("Time Server: ");
+	tft.setTextColor(LTBLUE);
+	tft.setCursor(150, 110);
 	tft.print(ntpServer);
-	tft.println("");
 
 	// If ESP32 inits successfully in station mode, recolour WiFi to green.
 
 	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
 
-	delay(3000);
+	uint16_t x, y;		// variables for touch data.
+
+	// See if there's any touch data for us
+
+	while (!tft.getTouch(&x, &y)) {
+
+		tft.setFreeFont(&FreeSans9pt7b);
+		tft.setTextSize(1);
+		tft.setTextColor(WHITE);
+		tft.println("");
+		tft.setCursor(20, 175);
+		tft.print("Touch screen to continue...");
+		tft.setFreeFont();
+	};
+
 	screenRedraw = 1;
 
 	return true;
@@ -496,7 +505,7 @@ void printLocalTime()
 		tft.setFreeFont();
 		tft.setTextSize(1);
 		tft.setCursor(13, 220);
-		tft.println("Failed to connect to time server...");
+		tft.println("Failed to get time...");
 		return;
 	}
 	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M");
@@ -691,6 +700,28 @@ void setup() {
 
 	else {
 
+		// Set mode to be in AP so loop is by past and screen stays the same
+
+		apMode = true;
+
+		wiFiTitle();
+		tft.setFreeFont();
+		tft.setTextColor(WHITE);
+		tft.setCursor(23, 130);
+		tft.print("Could not connect to WiFi");
+		tft.setCursor(23, 140);
+		tft.print("Pet Bit now in in Access Point Mode");
+		tft.setCursor(23, 150);
+		tft.print("Using your mobile phone");
+		tft.setCursor(23, 160);
+		tft.print("Connect to ESP WiFI Manager");
+		tft.setCursor(23, 170);
+		tft.print("Browse to 192.168.4.1");
+		tft.setCursor(23, 180);
+		tft.print("Enter your network settings");
+		tft.setCursor(23, 210);
+		tft.print("Unit will restart when configured");
+
 		// Initialize the ESP32 in Access Point mode, recolour to WiFI red.
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
 
@@ -753,7 +784,7 @@ void setup() {
 
 	}  // Close function.
 
-	// initialize time and get the time.
+// initialize time and get the time.
 
 	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 	printLocalTime();
@@ -773,6 +804,24 @@ void setup() {
 /*-----------------------------------------------------------------*/
 
 void loop() {
+
+	// Hold loop if in AP mode.
+
+	while (apMode == true) {
+
+		// Set wiFi icon to be white for AP mode.
+
+		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
+
+		// Write over time text to hide it.
+
+		tft.setTextColor(BLACK);
+		tft.setFreeFont();
+		tft.setTextSize(1);
+		tft.setCursor(13, 220);
+		tft.println("Failed to get time...");
+
+	} // Close While.
 
 	// Main functions, checking menu, calculations & average speed.
 
@@ -2022,6 +2071,34 @@ void startUp() {
 
 	//tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE);
 	//tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void wiFiTitle() {
+
+	// Title WiFi screen.
+
+	tft.setFreeFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(WHITE);
+	tft.setCursor(13, 26);
+	tft.println("WiFi Configuration");
+	tft.setFreeFont();
+
+	tft.setTextColor(WHITE);
+	tft.setFreeFont();
+	tft.setCursor(23, 50);
+	tft.print("WiFi Status: ");
+	tft.setCursor(23, 65);
+	tft.print("SSID: ");
+	tft.setCursor(23, 80);
+	tft.print("IP Address: ");
+	tft.setCursor(23, 95);
+	tft.print("Signal Strenght: ");
+	tft.setCursor(23, 110);
+	tft.print("Time Server: ");
 
 } // Close function.
 
