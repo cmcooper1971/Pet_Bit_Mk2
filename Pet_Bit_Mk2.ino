@@ -115,7 +115,7 @@ const long interval = 10000;  // interval to wait for Wi-Fi connection (millisec
 
 // Data variables.
 
-byte configurationFlag = 3;					// Configuration menu flag.
+byte configurationFlag = 1;					// Configuration menu flag.
 boolean loopCoreID = true;					// Flag to ID core only once.
 
 volatile unsigned int distanceCounter = 0;	// Counting rotations for distance travelled.
@@ -291,6 +291,13 @@ boolean graph_11 = true;
 boolean graph_12 = true;
 boolean graph_13 = true;
 boolean graph_14 = true;
+
+int graphDM = 1000;					// Configure later to recall from EEPROM
+int graphDMI = 200;					// Configure later to recall from EEPROM
+boolean graphDSC = false;			// 
+int graphDAP = 0;
+const int graphDAM [4] = { 500, 1000, 1500, 2000 };
+const int graphDAI[4] = { 100, 200, 300, 400 };
 
 /*-----------------------------------------------------------------*/
 
@@ -1134,10 +1141,30 @@ void loop() {
 
 				} // Close if.
 
-				else if (screenMenu == 5 && configurationFlag == 3) {
+				else if (screenMenu == 5 && configurationFlag == 6) {
 
 					tone(buzzerP, buzzerF);
 					resetMenuSettingMinus();
+
+				} // Close else if.
+
+				else if (screenMenu == 5 && configurationFlag == 5) {
+
+					tone(buzzerP, buzzerF);
+
+				} // Close else if.
+
+				else if (screenMenu == 5 && configurationFlag == 4) {
+
+					tone(buzzerP, buzzerF);
+					
+
+				} // Close else if.
+
+				else if (screenMenu == 5 && configurationFlag == 3) {
+
+					tone(buzzerP, buzzerF);
+					distanceScaleSettingMinus();
 
 				} // Close else if.
 
@@ -1178,10 +1205,31 @@ void loop() {
 
 				} // Close if.
 
-				else if (screenMenu == 5 && configurationFlag == 3) {
+				else if (screenMenu == 5 && configurationFlag == 6) {
 
 					tone(buzzerP, buzzerF);
 					resetMenuSettingPlus();
+
+				} // Close else if.
+
+				else if (screenMenu == 5 && configurationFlag == 5) {
+
+					tone(buzzerP, buzzerF);
+
+
+				} // Close else if.
+
+				else if (screenMenu == 5 && configurationFlag == 4) {
+
+					tone(buzzerP, buzzerF);
+
+
+				} // Close else if.
+
+				else if (screenMenu == 5 && configurationFlag == 3) {
+
+					tone(buzzerP, buzzerF);
+					distanceScaleSettingPlus();
 
 				} // Close else if.
 
@@ -1224,11 +1272,11 @@ void loop() {
 				else if (screenMenu == 5) {
 
 					tone(buzzerP, buzzerF);
-					configurationFlag--;
+					configurationFlag++;
 
-					if (configurationFlag == byte(0)) {
+					if (configurationFlag == byte(7)) {
 
-						configurationFlag = byte(3);
+						configurationFlag = byte(1);
 					}
 
 					Serial.print("Configuration Flag After If: ");
@@ -1379,101 +1427,101 @@ void loop() {
 
 		if (distanceTravelledArray1 <= 750) {
 
-			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
+			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
 
 		} // Close if.
 
 		else if (distanceTravelledArray1 >= 999) {
 
-			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, 1000, 200, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
+			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
 
 		} // Close else if.
 
-		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8)));
+		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8)));
 
 		if (distanceTravelledArray2 <= 750) {
 
-			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
+			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
 
 		} // Close if.
 
 		else if (distanceTravelledArray2 >= 999) {
 
-			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, 1000, 200, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
+			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
 
 		} // Close else if.
 
-		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9)));
+		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9)));
 
 		if (distanceTravelledArray3 <= 750) {
 
-			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
+			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
 
 		} // Close if.
 
 		else if (distanceTravelledArray3 >= 999) {
 
-			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, 1000, 200, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
+			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
 
 		} // Close else if.
 
-		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10)));
+		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10)));
 
 		if (distanceTravelledArray4 <= 750) {
 
-			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
+			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
 
 		} // Close if.
 
 		else if (distanceTravelledArray4 >= 999) {
 
-			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, 1000, 200, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
+			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
 
 		} // Close else if.
 
-		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, 1000, 200, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11)));
+		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11)));
 
 		if (distanceTravelledArray5 <= 750) {
 
-			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
+			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
 
 		} // Close if.
 
 		else if (distanceTravelledArray5 >= 999) {
 
-			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, 1000, 200, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
+			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
 
 		} // Close else if.
 
-		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12)));
+		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12)));
 
 		if (distanceTravelledArray6 <= 750) {
 
-			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
+			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
 
 		} // Close if.
 
 		else if (distanceTravelledArray6 >= 999) {
 
-			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, 1000, 200, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
+			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
 
 		} // Close else if.
 
-		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13)));
+		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13)));
 
 		if (distanceTravelledArray7 <= 750) {
 
-			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
+			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
 
 		} // Close if.
 
 		else if (distanceTravelledArray7 >= 999) {
 
-			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, 1000, 200, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
+			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
 
 		} // Close else if.
 
-		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, 1000, 200, distanceTravelledArray7, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14)));
+		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray7, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14)));
 
 	} // Close if.
 
@@ -1802,7 +1850,7 @@ void configurationDisplay() {
 	else tft.setTextColor(WHITE, BLACK);
 
 	tft.setCursor(23, 50);
-	tft.print("Screen Menu Strt : ");
+	tft.print("Start Up Screen  : ");
 	tft.setCursor(150, 50);
 	tft.print(menuArray[eeMenuSetting]);
 
@@ -1833,9 +1881,11 @@ void configurationDisplay() {
 	else tft.setTextColor(WHITE, BLACK);
 
 	tft.setCursor(23, 80);
-	tft.print("Another option   : ");
+	tft.print("Distance Scale   : ");
 	tft.setCursor(150, 80);
-	tft.println(eeCircSetting);
+	tft.print(graphDAM[graphDAP]);
+	tft.print(" / ");
+	tft.print(graphDAI[graphDAP]);
 	tft.println();
 
 	// Menu option 4 is Another option menu.
@@ -1963,6 +2013,88 @@ void menuSettingSave() {
 		EEPROM.put(eeMenuAddress, eeMenuSetting);
 		EEPROM.commit();
 		eeMenuSettingChange = false;
+
+	} // Close if.
+
+}  // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void distanceScaleSettingPlus() {
+
+	// Incremental function to menu setting.
+
+	if (graphDAP == 3)
+	{
+		graphDAP = 0;
+		graphDSC = true;
+	}
+	else
+	{
+		graphDAP++;
+		graphDSC = true;
+	
+	}
+
+	Serial.print("Distance Scale: ");
+	Serial.print(graphDAM[graphDAP]);
+	Serial.print(" & ");
+	Serial.print("Distance Increments: ");
+	Serial.print(graphDAI[graphDAP]);
+	Serial.println(" ");
+
+	if (graphDSC == true) {			// Write results to EEPROM to save.
+
+		distanceScaleSettingSave();
+	}
+
+} // Close function.
+
+	/*-----------------------------------------------------------------*/
+
+void distanceScaleSettingMinus() {
+
+	// Incremental function to menu setting.
+
+	if (graphDAP == 0)
+	{
+		graphDAP = 3;
+		graphDSC = true;
+	}
+	else
+	{
+		graphDAP--;
+		graphDSC = true;
+
+	}
+
+	Serial.print("Distance Scale: ");
+	Serial.print(graphDAM[graphDAP]);
+	Serial.print(" & ");
+	Serial.print("Distance Increments: ");
+	Serial.print(graphDAI[graphDAP]);
+	Serial.println(" ");
+
+	if (graphDSC == true) {			// Write results to EEPROM to save.
+
+		distanceScaleSettingSave();
+	}
+
+} // Close function.
+
+	/*-----------------------------------------------------------------*/
+
+void distanceScaleSettingSave() {
+
+	// Write menu setting to EEPROM.
+
+	if (graphDSC = true) {
+
+		graphDM = graphDAM[graphDAP];
+		graphDMI = graphDAI[graphDAP];
+		/*EEPROM.put(eeMenuAddress, eeMenuSetting);
+		EEPROM.commit();*/
+		graphDSC = false; 
 
 	} // Close if.
 
