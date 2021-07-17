@@ -47,7 +47,7 @@
 
 // Pin out Configuration.
 
-byte sDCS = 33;						// SD Card chip select pin.
+const byte sDCS = 33;						// SD Card chip select pin.
 const int interruptWheelSensor = 39;		// Reed swtich sensor.
 
 byte bPlus = 1;						// Button +
@@ -57,6 +57,12 @@ byte bMinus = 3;					// Button -
 
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
 boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen draws.
+
+// Configure sound.
+
+const byte buzzerP = 21;					// Buzzer pin.
+int buzzerF = 1000;					// Set frequency of the buzzer beep.
+int buzzerD = 75;					// Buzzer delay.
 
 // Configure time settings.
 
@@ -202,6 +208,12 @@ boolean eeResetSettingChange = false;		// Used for reset setting change before c
 
 int eeSessionArrayPositionAddress = 76;		// EEPROM address for array position.
 unsigned int eeSessionArrayPosition;		// Actual commit for writing, 4 bytes.
+
+// Misc arrays.
+
+char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " }; // Spaces to over write previous screen draw/
+char* resetArray[3] = { "None      ", "Full Reset", "Demo Data " };
+char* dayArray[9] = { "","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
 
 // Average speed calculation variables.
 
@@ -419,18 +431,17 @@ bool initWiFi() {
 
 	// See if there's any touch data for us
 
-	while (!tft.getTouch(&x, &y)) {
-
-		tft.setFreeFont(&FreeSans9pt7b);
-		tft.setTextSize(1);
-		tft.setTextColor(WHITE);
-		tft.println("");
-		tft.setCursor(20, 175);
-		tft.print("Touch screen to continue...");
-		tft.setFreeFont();
-	};
-
+	tft.setFreeFont(&FreeSans9pt7b);
+	tft.setTextSize(1);
+	tft.setTextColor(WHITE);
+	tft.println("");
+	tft.setCursor(20, 175);
+	tft.print("Unit is starting...");
+	tft.setFreeFont();
+	
 	screenRedraw = 1;
+
+	delay(3000);
 
 	return true;
 
@@ -478,6 +489,7 @@ String readFile(fs::FS& fs, const char* path) {
 // Write file to SPIFFS
 
 void writeFile(fs::FS& fs, const char* path, const char* message) {
+
 	Serial.printf("Writing file: %s\r\n", path);
 
 	File file = fs.open(path, FILE_WRITE);
@@ -495,6 +507,8 @@ void writeFile(fs::FS& fs, const char* path, const char* message) {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// Get and print time.
 
 void printLocalTime()
 {
@@ -516,6 +530,18 @@ void printLocalTime()
 	tft.setCursor(13, 220);
 	tft.println(&timeinfo, "%A, %B %d %Y %H:%M");
 }
+
+/*-----------------------------------------------------------------*/
+
+void tone(byte pin, int freq) {
+
+	ledcSetup(0, freq, 8);		// setup buzzer.
+	ledcAttachPin(pin, 0);		// attach buzzer.
+	ledcWriteTone(0, freq);		// play tone.
+	delay(buzzerD);					// Wait a moment.
+	ledcWriteTone(0, 0);		// Stop tone.
+
+} // Close function.
 
 /*-----------------------------------------------------------------*/
 
@@ -1061,6 +1087,7 @@ void loop() {
 
 				if (screenMenu != 1) {		// To stop screen flicker when pressing the same menu button again.
 
+					tone(buzzerP, buzzerF);
 					screenMenu = 1;
 					menuChange = 1;
 					screenRedraw = 1;
@@ -1089,6 +1116,7 @@ void loop() {
 
 				if (screenMenu != 2 && screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
 
+					tone(buzzerP, buzzerF);
 					screenMenu = 2;
 					menuChange = 1;
 					screenRedraw = 1;
@@ -1108,18 +1136,21 @@ void loop() {
 
 				else if (screenMenu == 5 && configurationFlag == 3) {
 
+					tone(buzzerP, buzzerF);
 					resetMenuSettingMinus();
 
 				} // Close else if.
 
 				else if (screenMenu == 5 && configurationFlag == 2) {
 
+					tone(buzzerP, buzzerF);
 					circumferenceSettingMinus();
 
 				} // Close else if.
 
 				else if (screenMenu == 5 && configurationFlag == 1) {
 
+					tone(buzzerP, buzzerF);
 					menuSettingMinus();
 
 				} // Close else if.
@@ -1135,6 +1166,7 @@ void loop() {
 
 				if (screenMenu != 3 && screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
 
+					tone(buzzerP, buzzerF);
 					screenMenu = 3;
 					menuChange = 1;
 					screenRedraw = 1;
@@ -1148,18 +1180,21 @@ void loop() {
 
 				else if (screenMenu == 5 && configurationFlag == 3) {
 
+					tone(buzzerP, buzzerF);
 					resetMenuSettingPlus();
 
 				} // Close else if.
 
 				else if (screenMenu == 5 && configurationFlag == 2) {
 
+					tone(buzzerP, buzzerF);
 					circumferenceSettingPlus();
 
 				} // Close else if.
 
 				else if (screenMenu == 5 && configurationFlag == 1) {
 
+					tone(buzzerP, buzzerF);
 					menuSettingPlus();
 
 				} // Close else if.
@@ -1175,6 +1210,7 @@ void loop() {
 
 				if (screenMenu != 4 && screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
 
+					tone(buzzerP, buzzerF);
 					screenMenu = 4;
 					menuChange = 1;
 					screenRedraw = 1;
@@ -1187,6 +1223,7 @@ void loop() {
 
 				else if (screenMenu == 5) {
 
+					tone(buzzerP, buzzerF);
 					configurationFlag--;
 
 					if (configurationFlag == byte(0)) {
@@ -1209,6 +1246,7 @@ void loop() {
 
 				if (screenMenu != 5) {		// To stop screen flicker when pressing the same menu button again.
 
+					tone(buzzerP, buzzerF);
 					screenMenu = 5;
 					menuChange = 1;
 					screenRedraw = 1;
@@ -1753,9 +1791,9 @@ void configurationDisplay() {
 
 	tft.setTextColor(WHITE, BLACK);
 
-	// Menu option 3 is System Reset menu.
+	// Menu option 1 is Start Screen menu.
 
-	if (configurationFlag == 3) {
+	if (configurationFlag == 1) {
 
 		tft.setTextColor(TFT_RED, BLACK);
 
@@ -1763,9 +1801,10 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	tft.setCursor(23, 70);
-	tft.print("System Reset     : ");
-	tft.println(eeResetSetting);
+	tft.setCursor(23, 50);
+	tft.print("Screen Menu Strt : ");
+	tft.setCursor(150, 50);
+	tft.print(menuArray[eeMenuSetting]);
 
 	// Menu option 2 is Circumference menu.
 
@@ -1777,15 +1816,15 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	tft.setCursor(23, 90);
+	tft.setCursor(23, 65);
 	tft.print("Circumference    : ");
+	tft.setCursor(150, 65);
 	tft.println(eeCircSetting);
 	tft.println();
-	tft.setCursor(23, 110);
 
-	// Menu option 1 is Start Screem menu.
+	// Menu option 3 is Another option menu.
 
-	if (configurationFlag == 1) {
+	if (configurationFlag == 3) {
 
 		tft.setTextColor(TFT_RED, BLACK);
 
@@ -1793,15 +1832,65 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	tft.print("Screen Menu Strt : ");
-	tft.println(eeMenuSetting);
-	tft.setCursor(23, 130);
+	tft.setCursor(23, 80);
+	tft.print("Another option   : ");
+	tft.setCursor(150, 80);
+	tft.println(eeCircSetting);
+	tft.println();
+
+	// Menu option 4 is Another option menu.
+
+	if (configurationFlag == 4) {
+
+		tft.setTextColor(TFT_RED, BLACK);
+
+	} // Close if.
+
+	else tft.setTextColor(WHITE, BLACK);
+
+	tft.setCursor(23, 95);
+	tft.print("Another option   : ");
+	tft.setCursor(150, 95);
+	tft.println(eeCircSetting);
+	tft.println();
+
+	// Menu option 5 is Another option menu.
+
+	if (configurationFlag == 5) {
+
+		tft.setTextColor(TFT_RED, BLACK);
+
+	} // Close if.
+
+	else tft.setTextColor(WHITE, BLACK);
+
+	tft.setCursor(23, 110);
+	tft.print("Another option   : ");
+	tft.setCursor(150, 110);
+	tft.println(eeCircSetting);
+	tft.println();
+
+	// Menu option 6 is System Reset menu.
+
+	if (configurationFlag == 6) {
+
+		tft.setTextColor(TFT_RED, BLACK);
+
+	} // Close if.
+
+	else tft.setTextColor(WHITE, BLACK);
+
+	tft.setCursor(23, 185);
+	tft.print("System Reset     : ");
+	tft.setCursor(150, 185);
+	tft.println(resetArray[eeResetSetting]);
 
 	// Display total distance travelled since initial start up.
 
 	tft.setTextColor(WHITE, BLACK);
-	tft.print("Total Distance To Date");
-	tft.setCursor(23, 150);
+	tft.setCursor(23, 200);
+	tft.print("Total Distance   : ");
+	tft.setCursor(150, 200);
 	tft.println(distanceTravelled = distanceCounter * circumference);
 
 } // Close function.

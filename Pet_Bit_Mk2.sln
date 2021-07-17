@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AsyncTCP-master", "Librarie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESPAsyncWebServer-master", "Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems", "{1751CB50-4C0E-4E81-869F-EBB622929899}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "esp32_tone-master", "Libraries\esp32_tone-master\esp32_tone-master.vcxitems", "{F8502568-C509-468A-8AC4-933FD97362AA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Libraries\SPI\SPI.vcxitems*{0045052c-42b2-4d47-8260-252518218d33}*SharedItemsImports = 9
@@ -33,12 +35,14 @@ Global
 		Libraries\arduino_83418\arduino_83418.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\EEPROM\EEPROM.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\esp32_tone-master\esp32_tone-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\FS\FS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPIFFS\SPIFFS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPI\SPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\TFT_eSPI\TFT_eSPI.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPIFFS\SPIFFS.vcxitems*{f52603f1-4034-4b2a-8a98-c3ee4cac65b5}*SharedItemsImports = 9
+		Libraries\esp32_tone-master\esp32_tone-master.vcxitems*{f8502568-c509-468a-8ac4-933fd97362aa}*SharedItemsImports = 9
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
