@@ -39,7 +39,7 @@ void ptSessionTimeV1(TFT_eSPI& tft, double x, double y, double w, double h, doub
 		stepval = (inc) * (double(h) / (double(hival - loval))) - 0;
 		for (i = 0; i <= h; i += stepval) {
 			my = y - h + i;
-			tft.drawFastHLine(x + w + 1, my + 1, 5, textcolor);
+			tft.drawFastHLine(x + w + 1, my, 5, textcolor);
 			// draw lables
 			tft.setTextSize(1);
 			tft.setTextColor(BLACK, backcolor);
@@ -89,7 +89,7 @@ void ptSessionTimeV2(TFT_eSPI& tft, double x, double y, double w, double h, doub
 		stepval = (inc) * (double(h) / (double(hival - loval))) - 0;
 		for (i = 0; i <= h; i += stepval) {
 			my = y - h + i;
-			tft.drawFastHLine(x + w + 1, my + 1, 5, textcolor);
+			tft.drawFastHLine(x + w + 1, my, 5, textcolor);
 			// draw lables
 			tft.setTextSize(1);
 			tft.setTextColor(BLACK, backcolor);
@@ -138,7 +138,7 @@ void ptSessionTimeV3(TFT_eSPI& tft, double x, double y, double w, double h, doub
 		stepval = (inc) * (double(h) / (double(hival - loval))) - 0;
 		for (i = 0; i <= h; i += stepval) {
 			my = y - h + i;
-			tft.drawFastHLine(x + w + 1, my + 1, 5, textcolor);
+			tft.drawFastHLine(x + w + 1, my, 5, textcolor);
 			// draw lables
 			tft.setTextSize(1);
 			tft.setTextColor(textcolor, backcolor);

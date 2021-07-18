@@ -144,7 +144,7 @@ void ptSessionDistanceV3(TFT_eSPI& tft, double x, double y, double w, double h, 
 			// draw lables
 			tft.setTextSize(1);
 			tft.setTextColor(textcolor, backcolor);
-			tft.setCursor(x + w + 7, my - 3);
+			tft.setCursor(x + w + 12, my - 3);
 			data = hival - (i * (inc / stepval));
 			tft.println(Format(data, dig, dec));
 		}

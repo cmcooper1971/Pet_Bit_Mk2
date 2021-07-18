@@ -207,7 +207,7 @@ double	averageKphSpeed = 0.00;				// The average speed.
 
 // Session time variables.
 
-unsigned long sessionTimeCap = 60;			// Set cap for graph if statements.
+unsigned long sessionTimeCap;			// Set cap for graph if statements.
 boolean recordSessions = 0;					// Flag to trigger the recording of each session.
 volatile boolean sessionTimeFlag = 0;		// Flag to trigger the recording of each session.
 volatile unsigned long sessionStartTime;	// Time each pt session starts.
@@ -219,7 +219,7 @@ volatile unsigned long sessionTime;			// Time each pt session in minutes.
 double sessionStartDistance = 0.00;
 double sessionDistance;						// Session distance.
 
-unsigned int distanceGraphCap = 999;		// Set cap for graph if statements.
+unsigned int distanceGraphCap;		// Set cap for graph if statements.
 
 unsigned int sessionTimeArray1;				// These variables are needed for the Kris Kasprzak charts.
 unsigned int sessionTimeArray2;
@@ -592,13 +592,13 @@ void setup() {
 	EEPROM.get(eeTotalDistanceAddress, distanceCounter);
 	EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
 
-	EEPROM.get(eegraphDMAddress, graphDM);
-	EEPROM.get(eegraphDMIAddress, graphDMI);
-	EEPROM.get(eegraphDAPAddress, graphDAP);
-
 	EEPROM.get(eegraphTMAddress, graphTM);
 	EEPROM.get(eegraphTMIAddress, graphTMI);
 	EEPROM.get(eegraphTAPAddress, graphTAP);
+
+	EEPROM.get(eegraphDMAddress, graphDM);
+	EEPROM.get(eegraphDMIAddress, graphDMI);
+	EEPROM.get(eegraphDAPAddress, graphDAP);
 
 	EEPROM.commit();
 
@@ -619,6 +619,8 @@ void setup() {
 
 	EEPROM.commit();
 
+	sessionTimeCap = graphTM;
+
 	sessionTimeArray1 = sessionTimeArray[0] / 100 / 60;
 	sessionTimeArray2 = sessionTimeArray[1] / 100 / 60;
 	sessionTimeArray3 = sessionTimeArray[2] / 100 / 60;
@@ -634,6 +636,8 @@ void setup() {
 	EEPROM.get(eeSessionDistanceArray5Address, distanceTravelledArray[4]);
 	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[5]);
 	EEPROM.get(eeSessionDistanceArray7Address, distanceTravelledArray[6]);
+
+	distanceGraphCap = graphDM;
 
 	EEPROM.commit();
 
@@ -1346,7 +1350,7 @@ void loop() {
 
 		// Session time bar graphs.
 
-		if (sessionTimeArray1 <= 60) {
+		if (sessionTimeArray1 <= sessionTimeCap) {
 
 			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
 
@@ -1354,7 +1358,7 @@ void loop() {
 
 		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
 
-		if (sessionTimeArray2 <= 60) {
+		if (sessionTimeArray2 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
 
@@ -1362,7 +1366,7 @@ void loop() {
 
 		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
 
-		if (sessionTimeArray3 <= 60) {
+		if (sessionTimeArray3 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
 
@@ -1370,7 +1374,7 @@ void loop() {
 
 		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
 
-		if (sessionTimeArray4 <= 60) {
+		if (sessionTimeArray4 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
 
@@ -1378,7 +1382,7 @@ void loop() {
 
 		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
 
-		if (sessionTimeArray5 <= 60) {
+		if (sessionTimeArray5 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
 
@@ -1386,7 +1390,7 @@ void loop() {
 
 		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
 
-		if (sessionTimeArray6 <= 60) {
+		if (sessionTimeArray6 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
 
@@ -1394,7 +1398,7 @@ void loop() {
 
 		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
 
-		if (sessionTimeArray7 <= 60) {
+		if (sessionTimeArray7 <= sessionTimeCap) {
 
 			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
 
@@ -1424,13 +1428,13 @@ void loop() {
 
 		// Distance bar graphs.
 
-		if (distanceTravelledArray1 <= 750) {
+		if (distanceTravelledArray1 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
 
 		} // Close if.
 
-		else if (distanceTravelledArray1 >= 999) {
+		else if (distanceTravelledArray1 >= distanceGraphCap) {
 
 			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
 
@@ -1438,13 +1442,13 @@ void loop() {
 
 		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8)));
 
-		if (distanceTravelledArray2 <= 750) {
+		if (distanceTravelledArray2 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
 
 		} // Close if.
 
-		else if (distanceTravelledArray2 >= 999) {
+		else if (distanceTravelledArray2 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
 
@@ -1452,13 +1456,13 @@ void loop() {
 
 		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9)));
 
-		if (distanceTravelledArray3 <= 750) {
+		if (distanceTravelledArray3 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
 
 		} // Close if.
 
-		else if (distanceTravelledArray3 >= 999) {
+		else if (distanceTravelledArray3 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
 
@@ -1466,13 +1470,13 @@ void loop() {
 
 		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10)));
 
-		if (distanceTravelledArray4 <= 750) {
+		if (distanceTravelledArray4 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
 
 		} // Close if.
 
-		else if (distanceTravelledArray4 >= 999) {
+		else if (distanceTravelledArray4 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
 
@@ -1480,13 +1484,13 @@ void loop() {
 
 		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11)));
 
-		if (distanceTravelledArray5 <= 750) {
+		if (distanceTravelledArray5 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
 
 		} // Close if.
 
-		else if (distanceTravelledArray5 >= 999) {
+		else if (distanceTravelledArray5 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
 
@@ -1494,13 +1498,13 @@ void loop() {
 
 		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12)));
 
-		if (distanceTravelledArray6 <= 750) {
+		if (distanceTravelledArray6 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
 
 		} // Close if.
 
-		else if (distanceTravelledArray6 >= 999) {
+		else if (distanceTravelledArray6 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
 
@@ -1508,13 +1512,13 @@ void loop() {
 
 		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13)));
 
-		if (distanceTravelledArray7 <= 750) {
+		if (distanceTravelledArray7 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
 
 		} // Close if.
 
-		else if (distanceTravelledArray7 >= 999) {
+		else if (distanceTravelledArray7 >= distanceGraphCap) {
 
 			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
 
@@ -1885,14 +1889,16 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	if (graph)
+	if (graphDAP == 0) {					// Used to blank out figure from screen draw.
+
+		tft.setCursor(167, 80);
+		tft.print(" ");
+	}
 
 	tft.setCursor(23, 80);
 	tft.print("Distance Scale   : ");
 	tft.setCursor(150, 80);
 	tft.print(graphDAM[graphDAP]);
-	tft.print(" / ");
-	tft.print(graphDAI[graphDAP]);
 	tft.println();
 
 	// Menu option 4 is Another option menu.
@@ -1905,12 +1911,16 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
+	if (graphTAP == 0 || graphTAP == 8) {	// Used to blank out figure from screen draw.
+
+		tft.setCursor(161, 95);
+		tft.print(" ");
+	}
+
 	tft.setCursor(23, 95);
 	tft.print("Time Scale       : ");
 	tft.setCursor(150, 95);
 	tft.print(graphTAM[graphTAP]);
-	tft.print(" / ");
-	tft.print(graphTAI[graphTAP]);
 	tft.println();
 
 	// Menu option 5 is Another option menu.
@@ -2102,6 +2112,8 @@ void distanceScaleSettingSave() {
 		graphDM = graphDAM[graphDAP];
 		graphDMI = graphDAI[graphDAP];
 
+		distanceGraphCap = graphDM;
+
 		EEPROM.put(eegraphDMAddress, graphDM);
 		EEPROM.put(eegraphDMIAddress, graphDMI);
 		EEPROM.put(eegraphDAPAddress, graphDAP);
@@ -2187,6 +2199,8 @@ void timeScaleSettingSave() {
 
 		graphTM = graphTAM[graphTAP];
 		graphTMI = graphTAI[graphTAP];
+
+		sessionTimeCap = graphTM;
 
 		EEPROM.put(eegraphTMAddress, graphTM);
 		EEPROM.put(eegraphTMIAddress, graphTMI);
