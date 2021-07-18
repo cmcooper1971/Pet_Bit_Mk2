@@ -45,9 +45,13 @@
 #define TFT_MISO 19
 #define TOUCH_CS 14
 
+unsigned long sleepT = 0;
+unsigned long sleepTime = 60000;	// Reset to 300,000 when finished with design (5 minutes sleep time).
+
 // Pin out Configuration.
 
-const int interruptWheelSensor = 39;// Reed swtich sensor.
+const int interruptWheelSensor = 39;	// Reed swtich sensor.
+boolean sensorT = 0;					// To update display when sensor passes.
 
 // Configure ILI9341 display.
 
@@ -57,8 +61,9 @@ boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen
 // Configure sound.
 
 const byte buzzerP = 21;			// Buzzer pin.
-int buzzerF = 0;					// Set frequency of the buzzer beep.
-int buzzerD = 0;					// Buzzer delay.
+int buzzerYN;						// Buzzer enabled / disabled.
+int buzzerF;						// Set frequency of the buzzer beep.
+int buzzerD;						// Buzzer delay.
 
 // Configure time settings.
 
@@ -146,15 +151,15 @@ char currentSessionTimeArray[7];
 
 int eeMenuAddress = 0;						// EEPROM address for start menu position.
 int eeMenuSetting;							// Actual commit for writing, 4 bytes.
-boolean eeMenuSettingChange = false;		// Used for menu scrolling before committing to save EEPROM writes.
+boolean eeMenuSettingChange = false;		// Change flag.
 
 int eeCircAddress = 4;						// EEPROM address for circumference.
 float eeCircSetting;						// Actual commit for writing, 4 bytes.
-boolean eeCircSettingChange = false;		// Used for circumference setting before committing to save EEPROM writes.
+boolean eeCircSettingChange = false;		// Change flag.
 
 int eeTotalDistanceAddress = 8;				// EEPROM address for total distance.
 unsigned long eeTotalDistance;				// Actual commit for writing, 4 bytes.
-boolean eeTotalDistanceChange = false;		// Used for total distance before committing to save EEPROM writes.
+boolean eeTotalDistanceChange = false;		// Change flag.
 
 int eeSessionTimeArray1Address = 16;		// EEPROM address for session time 1
 int eeSessionTimeArray2Address = 20;		// EEPROM address for session time 2
@@ -172,11 +177,11 @@ int eeSessionDistanceArray5Address = 60;	// EEPROM address for session distance 
 int eeSessionDistanceArray6Address = 64;	// EEPROM address for session distance 6
 int eeSessionDistanceArray7Address = 68;	// EEPROM address for session distance 7
 
-boolean eeSessionChange = false;			// Used for session time before committing to save EEPROM writes.
+boolean eeSessionChange = false;			// Change flag.
 
 int eeResetSettingAddress = 72;				// EEPROM address for master reset
 unsigned int eeResetSetting;				// Actual commit for writing, 1 byte.
-boolean eeResetSettingChange = false;		// Used for reset setting change before committing to save EEPROM writes.
+boolean eeResetSettingChange = false;		// Change flag.
 
 int eeSessionArrayPositionAddress = 76;		// EEPROM address for array position.
 unsigned int eeSessionArrayPosition;		// Actual commit for writing, 4 bytes.
@@ -187,7 +192,10 @@ int eegraphDAPAddress = 88;					// EEPROM address for graph distance array posit
 
 int eegraphTMAddress = 92;					// EEPROM address for graph distance scale.
 int eegraphTMIAddress = 96;					// EEPROM address for graph distance increment scale level.
-int eegraphTAPAddress = 100;					// EEPROM address for graph distance array position.
+int eegraphTAPAddress = 100;				// EEPROM address for graph distance array position.
+
+int eeBuzzerYNAddress = 200;				// EEPROM address for buzzer enabled / disabled.
+boolean eeBuzzerYNChange;					// Change flag.
 
 // Misc arrays.
 
@@ -195,6 +203,7 @@ char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ",
 char* resetArray[3] = { "None      ", "Full Reset", "Demo Data " };
 char* dayArray[9] = { "","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
 char* dayShortArray[9] = { "","Su","Mo","Tu","We","Th","Fr","Sa" };
+char* ynArray[2] = { "No", "Yes" };
 
 // Average speed calculation variables.
 
@@ -289,11 +298,25 @@ void IRAM_ATTR rotationInterruptISR() {
 
 		detachInterrupt(interruptWheelSensor);
 
+		if (sensorT == 0) {
+
+			sensorT = 1;
+
+		}
+
+		else if (sensorT == 1) {
+
+			sensorT = 0;
+
+		}
+
 		disconnectWiFiFlag = true;									// Disable WiFi flag to stop repeat attempts.
 		disconnectWiFi = true;										// Disable WiFi on wheel turn.
 
 		passedTime = millis() - startTime;
 		startTime = millis();
+		
+		sleepT = millis();											// Restart auto sleep timer.
 
 		rpm = (60000 * circumference) / passedTime;					// Revs per minute.
 		speedKph = (3600 * circumference) / passedTime;				// km/h.
@@ -549,7 +572,7 @@ void setup() {
 
 	pinMode(TFT_LED, OUTPUT);				// Output for LCD back light.
 	pinMode(interruptWheelSensor, INPUT);	// Wheel sensor (REED switch).
-	digitalWrite(TFT_LED, HIGH);			// Outout for LCD back light.
+	digitalWrite(TFT_LED, HIGH);			// Output for LCD back light.
 
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
 
@@ -599,6 +622,8 @@ void setup() {
 	EEPROM.get(eegraphDMAddress, graphDM);
 	EEPROM.get(eegraphDMIAddress, graphDMI);
 	EEPROM.get(eegraphDAPAddress, graphDAP);
+
+	EEPROM.get(eeBuzzerYNAddress, buzzerYN);
 
 	EEPROM.commit();
 
@@ -654,6 +679,22 @@ void setup() {
 	screenMenu = eeMenuSetting;
 	circumference = eeCircSetting;
 
+	// Buzzer settings.
+
+	if (buzzerYN == 0) {
+
+		buzzerF = 0;	// Set frequency of the buzzer beep.
+		buzzerD = 0;	// Set delay of the buzzer beep.
+
+	}
+
+	else {
+
+		buzzerF = 1000;	// Set frequency of the buzzer beep.
+		buzzerD = 75;	// Set deelay of the buzzer beep.
+
+	}
+
 	// Initialise TFT display.
 
 	tft.begin();
@@ -704,6 +745,7 @@ void setup() {
 	// Draw border and buttons at start.
 
 	drawBorder();
+	tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, TFT_ORANGE);		// Draw initial sensor
 	startUp();
 
 	// Initialize WiFi and web services.
@@ -840,6 +882,16 @@ void setup() {
 
 void loop() {
 
+	// Light sleep mode.
+
+	if (millis() >= sleepT + sleepTime) {
+
+		digitalWrite(TFT_LED, HIGH);			// Output for LCD back light.
+
+	}
+
+	else 	digitalWrite(TFT_LED, LOW);			// Output for LCD back light.
+
 	// Hold loop if in AP mode.
 
 	while (apMode == true) {
@@ -871,6 +923,7 @@ void loop() {
 
 	menu_Change();		// Reset menu change at each pass after touch is pressed.
 	mainData();			// Calculates main data.
+	drawSensor();		// Change sensor indicator on main display.
 	averageSpeed();		// Calculate average speed.
 
 	// Enable / Disable WiFi when interrupt is in operation.
@@ -1082,6 +1135,10 @@ void loop() {
 
 	if (tft.getTouch(&x, &y)) {
 
+		// Restart auto sleep timer.
+
+		sleepT = millis();
+
 		// Draw a block spot to show where touch was calculated to be
 
 #ifdef BLACK_SPOT
@@ -1138,6 +1195,7 @@ void loop() {
 				else if (screenMenu == 5 && configurationFlag == 5) {
 
 					tone(buzzerP, buzzerF);
+					buzzerSettingMinus();
 
 				} // Close else if.
 
@@ -1201,7 +1259,7 @@ void loop() {
 				else if (screenMenu == 5 && configurationFlag == 5) {
 
 					tone(buzzerP, buzzerF);
-
+					buzzerSettingPlus();
 
 				} // Close else if.
 
@@ -1806,19 +1864,19 @@ void currentExerciseScreen() {
 	tft.setTextSize(2);
 	tft.setTextColor(WHITE, BLACK);
 
-	tft.setCursor(100, 64);
+	tft.setCursor(100, 57);
 	tft.println(kphArray);
 
-	tft.setCursor(100, 84);
+	tft.setCursor(100, 77);
 	tft.println(averageKphSpeedArray);
 
-	tft.setCursor(100, 104);
+	tft.setCursor(100, 97);
 	tft.println(maxKphArray);
 
-	tft.setCursor(100, 124);
+	tft.setCursor(100, 117);
 	tft.println(sessionDistanceArray);
 
-	tft.setCursor(100, 144);
+	tft.setCursor(100, 137);
 	tft.println(currentSessionTimeArray);
 
 	tft.setTextSize(1);
@@ -1836,6 +1894,7 @@ void configurationDisplay() {
 	EEPROM.get(eeMenuAddress, eeMenuSetting);
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeResetSettingAddress, eeResetSetting);
+	EEPROM.get(eeBuzzerYNAddress, buzzerYN);
 
 	// Display configuration data and selection options.
 
@@ -1923,7 +1982,7 @@ void configurationDisplay() {
 	tft.print(graphTAM[graphTAP]);
 	tft.println();
 
-	// Menu option 5 is Another option menu.
+	// Menu option 5 is buzzer menu.
 
 	if (configurationFlag == 5) {
 
@@ -1933,10 +1992,16 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
+	if (buzzerYN == 0) {	// Used to blank out figure from screen draw.
+
+		tft.setCursor(161, 110);
+		tft.print(" ");
+	}
+
 	tft.setCursor(23, 110);
-	tft.print("Another option   : ");
+	tft.print("Touch Beep       : ");
 	tft.setCursor(150, 110);
-	tft.println(eeCircSetting);
+	tft.println(ynArray[buzzerYN]);
 	tft.println();
 
 	// Menu option 6 is System Reset menu.
@@ -2214,7 +2279,71 @@ void timeScaleSettingSave() {
 }  // Close function.
 
 
+/*-----------------------------------------------------------------*/
+
+void buzzerSettingPlus() {
+
+	// Y/N function change to buzzer setting.
+
+	if (buzzerYN == 0)
+	{
+		buzzerYN = 1;
+		eeBuzzerYNChange = true;
+
+	}
+
+	Serial.print("Buzzer Enabled: ");
+	Serial.print(buzzerYN);
+	Serial.println(" ");
+
+	if (eeBuzzerYNChange == true) {			// Write results to EEPROM to save.
+
+		buzzerSettingSave();
+	}
+
+} // Close function.
+
 	/*-----------------------------------------------------------------*/
+
+void buzzerSettingMinus() {
+
+	// Y/N function change to buzzer setting.
+
+	if (buzzerYN == 1)
+	{
+		buzzerYN = 0;
+		eeBuzzerYNChange = true;
+
+	}
+
+	Serial.print("Buzzer Enabled: ");
+	Serial.print(buzzerYN);
+	Serial.println(" ");
+
+	if (eeBuzzerYNChange == true) {			// Write results to EEPROM to save.
+
+		buzzerSettingSave();
+	}
+
+}  // Close function. 
+
+/*-----------------------------------------------------------------*/
+
+void buzzerSettingSave() {
+
+	// Write buzzer setting to EEPROM.
+
+	if (eeBuzzerYNChange == true) {
+
+		EEPROM.put(eeBuzzerYNAddress, buzzerYN);
+		EEPROM.commit();
+		eeBuzzerYNChange = false;
+
+	} // Close if.
+
+}  // Close function.
+
+/*-----------------------------------------------------------------*/
 
 void resetMenuSettingPlus() {
 
@@ -2393,6 +2522,26 @@ void drawBlackBox()
 
 /*-----------------------------------------------------------------*/
 
+// Draw sensor circle.
+
+void drawSensor()
+{
+	// Draw sensor icon.
+
+	tft.drawCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, TFT_WHITE);
+	
+	if (sensorT == true) {
+
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R-1, TFT_GREEN);
+	
+	}
+
+	else tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R-1, TFT_BLACK);
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
 // Update menu flag.
 
 void menu_Change() {
@@ -2465,6 +2614,22 @@ void resetSystemData() {
 
 	eeCircSetting = 1.00;
 	EEPROM.put(eeCircAddress, eeCircSetting);
+	EEPROM.commit();
+
+	graphDM = 1000;
+	graphDMI = 200;
+	EEPROM.put(eegraphDMAddress, graphDM);
+	EEPROM.put(eegraphDMIAddress, graphDMI);
+	EEPROM.commit();
+
+	graphTM = 60;
+	graphTMI = 6;
+	EEPROM.put(eegraphTMAddress, graphTM);
+	EEPROM.put(eegraphTMIAddress, graphTMI);
+	EEPROM.commit();
+
+	buzzerYN = 1;
+	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
 	EEPROM.commit();
 
 	eeTotalDistance = 0.00;
@@ -2556,6 +2721,22 @@ void resetSystemDemoData() {
 	EEPROM.put(eeCircAddress, eeCircSetting);
 	EEPROM.commit();
 
+	graphDM = 1000;
+	graphDMI = 200;
+	EEPROM.put(eegraphDMAddress, graphDM);
+	EEPROM.put(eegraphDMIAddress, graphDMI);
+	EEPROM.commit();
+
+	graphTM = 60;
+	graphTMI = 6;
+	EEPROM.put(eegraphTMAddress, graphTM);
+	EEPROM.put(eegraphTMIAddress, graphTMI);
+	EEPROM.commit();
+
+	buzzerYN = 1;
+	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
+	EEPROM.commit();
+
 	eeTotalDistance = 5000.00;
 	EEPROM.put(eeTotalDistanceAddress, eeTotalDistance);
 	EEPROM.commit();
@@ -2577,7 +2758,7 @@ void resetSystemDemoData() {
 	EEPROM.put(eeSessionDistanceArray3Address, 400);
 	EEPROM.put(eeSessionDistanceArray4Address, 600);
 	EEPROM.put(eeSessionDistanceArray5Address, 800);
-	EEPROM.put(eeSessionDistanceArray6Address, 990);
+	EEPROM.put(eeSessionDistanceArray6Address, 900);
 	EEPROM.put(eeSessionDistanceArray7Address, 1200);
 	EEPROM.commit();
 
@@ -2603,13 +2784,13 @@ void resetSystemDemoData() {
 
 	EEPROM.commit();
 
-	sessionTimeArray1 = sessionTimeArray[0] / 100 / 60;							// Times to be updated, needs to be divided by 1000.
-	sessionTimeArray2 = sessionTimeArray[1] / 100 / 60;
-	sessionTimeArray3 = sessionTimeArray[2] / 100 / 60;
-	sessionTimeArray4 = sessionTimeArray[3] / 100 / 60;
-	sessionTimeArray5 = sessionTimeArray[4] / 100 / 60;
-	sessionTimeArray6 = sessionTimeArray[5] / 100 / 60;
-	sessionTimeArray7 = sessionTimeArray[6] / 100 / 60;
+	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;							// Times to be updated, needs to be divided by 1000.
+	sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
+	sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
+	sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
+	sessionTimeArray5 = sessionTimeArray[4] / 1000 / 60;
+	sessionTimeArray6 = sessionTimeArray[5] / 1000 / 60;
+	sessionTimeArray7 = sessionTimeArray[6] / 1000 / 60;
 
 	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[0]);
 	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[1]);
@@ -2632,3 +2813,4 @@ void resetSystemDemoData() {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+

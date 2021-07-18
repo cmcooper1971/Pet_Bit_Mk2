@@ -38,8 +38,13 @@
 #define BUTTON4_W 50
 #define BUTTON4_H 50
 
+// Sensor icon position and size.
+#define SENSOR_ICON_X 196
+#define SENSOR_ICON_Y 20
+#define SENSOR_ICON_R 6
+
 // WiFi icon position and size.
-#define WIFI_ICON_X 207
+#define WIFI_ICON_X 210
 #define WIFI_ICON_Y 13
 #define WIFI_ICON_W 16
 #define WIFI_ICON_H 16
