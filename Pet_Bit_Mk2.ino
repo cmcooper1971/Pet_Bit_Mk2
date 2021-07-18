@@ -47,11 +47,7 @@
 
 // Pin out Configuration.
 
-const byte sDCS = 33;						// SD Card chip select pin.
-const int interruptWheelSensor = 39;		// Reed swtich sensor.
-
-byte bPlus = 1;						// Button +
-byte bMinus = 3;					// Button -
+const int interruptWheelSensor = 39;// Reed swtich sensor.
 
 // Configure ILI9341 display.
 
@@ -60,7 +56,7 @@ boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen
 
 // Configure sound.
 
-const byte buzzerP = 21;					// Buzzer pin.
+const byte buzzerP = 21;			// Buzzer pin.
 int buzzerF = 1000;					// Set frequency of the buzzer beep.
 int buzzerD = 75;					// Buzzer delay.
 
@@ -74,27 +70,27 @@ int			localTimeInterval = 60000;
 
 // Web Server configuration.
 
-// Create AsyncWebServer object on port 80
-AsyncWebServer server(80);
-
-// Create an Event Source on /events
-AsyncEventSource events("/events");
+AsyncWebServer server(80);			// Create AsyncWebServer object on port 80
+AsyncEventSource events("/events");	// Create an Event Source on /events
 
 // WiFi Configuration.
 
 boolean apMode = false;
 
-// Search for parameter in HTTP POST request
+// Search for parameter in HTTP POST request.
+
 const char* PARAM_INPUT_1 = "ssid";
 const char* PARAM_INPUT_2 = "pass";
 const char* PARAM_INPUT_3 = "ip";
 
-//Variables to save values from HTML form
+//Variables to save values from HTML form.
+
 String ssid;
 String pass;
 String ip;
 
-// File paths to save input values permanently
+// File paths to save input values permanently.
+
 const char* ssidPath = "/ssid.txt";
 const char* passPath = "/pass.txt";
 const char* ipPath = "/ip.txt";
@@ -102,16 +98,18 @@ const char* ipPath = "/ip.txt";
 IPAddress localIP;
 //IPAddress localIP(192, 168, 1, 200); // hardcoded
 
-// Set your Gateway IP address
+// Set your Gateway IP address.
+
 IPAddress gateway(192, 168, 1, 254);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns1(192, 168, 1, 254);
 
-// Timer variables (check wifi)
+// Timer variables (check wifi).
+
 volatile bool disconnectWiFi = false;
 volatile bool disconnectWiFiFlag = false;
 unsigned long previousMillis = 0;
-const long interval = 10000;  // interval to wait for Wi-Fi connection (milliseconds)
+const long interval = 10000;				// interval to wait for Wi-Fi connection (milliseconds)
 
 // Data variables.
 
@@ -159,46 +157,20 @@ unsigned long eeTotalDistance;				// Actual commit for writing, 4 bytes.
 boolean eeTotalDistanceChange = false;		// Used for total distance before committing to save EEPROM writes.
 
 int eeSessionTimeArray1Address = 16;		// EEPROM address for session time 1
-unsigned long eeSessionTime1;				// Actual commit for writing, 4 bytes.
-
 int eeSessionTimeArray2Address = 20;		// EEPROM address for session time 2
-unsigned long eeSessionTime2;				// Actual commit for writing, 4 bytes.
-
 int eeSessionTimeArray3Address = 24;		// EEPROM address for session time 3
-unsigned long eeSessionTime3;				// Actual commit for writing, 4 bytes.
-
 int eeSessionTimeArray4Address = 28;		// EEPROM address for session time 4
-unsigned long eeSessionTime4;				// Actual commit for writing, 4 bytes.
-
 int eeSessionTimeArray5Address = 32;		// EEPROM address for session time 5
-unsigned long eeSessionTime5;				// Actual commit for writing, 4 bytes.
-
 int eeSessionTimeArray6Address = 36;		// EEPROM address for session time 6
-unsigned long eeSessionTime6;				// Actual commit for writing, 4 bytes.
-
 int eeSessionTimeArray7Address = 40;		// EEPROM address for session time 7
-unsigned long eeSessionTime7;				// Actual commit for writing, 4 bytes.
 
 int eeSessionDistanceArray1Address = 44;	// EEPROM address for session distance 1
-unsigned int eeSessionDistance1;			// Actual commit for writing, 4 bytes.
-
 int eeSessionDistanceArray2Address = 48;	// EEPROM address for session distance 2
-unsigned int eeSessionDistance2;			// Actual commit for writing, 4 bytes.
-
 int eeSessionDistanceArray3Address = 52;	// EEPROM address for session distance 3
-unsigned int eeSessionDistance3;			// Actual commit for writing, 4 bytes.
-
 int eeSessionDistanceArray4Address = 56;	// EEPROM address for session distance 4
-unsigned int eeSessionDistance4;			// Actual commit for writing, 4 bytes.
-
 int eeSessionDistanceArray5Address = 60;	// EEPROM address for session distance 5
-unsigned int eeSessionDistance5;			// Actual commit for writing, 4 bytes.
-
 int eeSessionDistanceArray6Address = 64;	// EEPROM address for session distance 6
-unsigned int eeSessionDistance6;			// Actual commit for writing, 4 bytes.
-
 int eeSessionDistanceArray7Address = 68;	// EEPROM address for session distance 7
-unsigned int eeSessionDistance7;			// Actual commit for writing, 4 bytes.
 
 boolean eeSessionChange = false;			// Used for session time before committing to save EEPROM writes.
 
@@ -209,11 +181,16 @@ boolean eeResetSettingChange = false;		// Used for reset setting change before c
 int eeSessionArrayPositionAddress = 76;		// EEPROM address for array position.
 unsigned int eeSessionArrayPosition;		// Actual commit for writing, 4 bytes.
 
+int eegraphDMAddress = 80;					// EEPROM address for graph distance scale.
+int eegraphDMIAddress = 84;					// EEPROM address for graph distance increment scale level.
+int eegraphDAPAddress = 88;					// EEPROM address for graph distance array position.
+
 // Misc arrays.
 
 char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " }; // Spaces to over write previous screen draw/
 char* resetArray[3] = { "None      ", "Full Reset", "Demo Data " };
 char* dayArray[9] = { "","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
+char* dayShortArray[9] = { "","Su","Mo","Tu","We","Th","Fr","Sa" };
 
 // Average speed calculation variables.
 
@@ -258,15 +235,6 @@ unsigned int distanceTravelledArray5;
 unsigned int distanceTravelledArray6;
 unsigned int distanceTravelledArray7;
 
-// Battery measurement variables.
-
-#define sensitivity (4 / 1024.0)				// Battery sensitivity setting.
-unsigned long batteryMeasureInterval = 600000;	// Battery measuring interval.
-unsigned long batteryMeasureNow;
-float sensorValue;
-float sensorValueVolts;
-float sensorValuePerc;
-
 // Menu positions and refresh.
 
 byte screenMenu = 4;				// Screen menu selection.
@@ -292,12 +260,12 @@ boolean graph_12 = true;
 boolean graph_13 = true;
 boolean graph_14 = true;
 
-int graphDM = 1000;					// Configure later to recall from EEPROM
-int graphDMI = 200;					// Configure later to recall from EEPROM
-boolean graphDSC = false;			// 
-int graphDAP = 0;
-const int graphDAM [4] = { 500, 1000, 1500, 2000 };
-const int graphDAI[4] = { 100, 200, 300, 400 };
+int graphDM;						// Graph distance measurement scale.
+int graphDMI;						// Graph distance measurement scale increment setting.
+boolean graphDSC = false;			// Flag to trigger the recording of settings to EEPROM. 
+int graphDAP;						// Graph distance array position.
+const int graphDAM[4] = { 500, 1000, 1500, 2000 };		// Graph array distance scale options.
+const int graphDAI[4] = { 100, 200, 300, 400 };			// Graph array distance scale increment options.
 
 /*-----------------------------------------------------------------*/
 
@@ -316,15 +284,15 @@ void IRAM_ATTR rotationInterruptISR() {
 		passedTime = millis() - startTime;
 		startTime = millis();
 
-		rpm = (60000 * circumference) / passedTime;			// Revs per minute.
-		speedKph = (3600 * circumference) / passedTime;		// km/h.
-		speedMph = (3600 * circImperial) / passedTime;		// Miles per hour.
+		rpm = (60000 * circumference) / passedTime;					// Revs per minute.
+		speedKph = (3600 * circumference) / passedTime;				// km/h.
+		speedMph = (3600 * circImperial) / passedTime;				// Miles per hour.
 
 		distanceCounter++;
 		eeTotalDistanceChange = true;
 		distanceTravelled = distanceCounter * circumference;
 
-		if (sessionTimeFlag == 0) {		// Set session timer to start.
+		if (sessionTimeFlag == 0) {									// Set session timer to start.
 
 			sessionTimeFlag = 1;
 			sessionStartTime = millis();
@@ -355,6 +323,8 @@ bool initWiFi() {
 	// If ESP32 inits successfully in station mode, recolour WiFi to red.
 
 	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
+
+	// Check if settings are available to connect to WiFi.
 
 	if (ssid == "" || ip == "") {
 		Serial.println("Undefined SSID or IP address.");
@@ -393,6 +363,8 @@ bool initWiFi() {
 	Serial.println("");
 	Serial.print("RRSI: ");
 	Serial.println(WiFi.RSSI());
+
+	// Update TFT with settings.
 
 	tft.setTextColor(WHITE);
 	tft.setFreeFont();
@@ -434,9 +406,7 @@ bool initWiFi() {
 
 	drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
 
-	uint16_t x, y;		// variables for touch data.
-
-	// See if there's any touch data for us
+	// Update message to advise unit is starting.
 
 	tft.setFreeFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -445,10 +415,10 @@ bool initWiFi() {
 	tft.setCursor(20, 175);
 	tft.print("Unit is starting...");
 	tft.setFreeFont();
-	
+
 	screenRedraw = 1;
 
-	delay(3000);
+	delay(3000);	// Wait a moment.
 
 	return true;
 
@@ -456,7 +426,7 @@ bool initWiFi() {
 
 /*-----------------------------------------------------------------*/
 
-// Initialize SPIFFS
+// Initialize SPIFFS.
 
 void initSPIFFS() {
 
@@ -471,7 +441,7 @@ void initSPIFFS() {
 
 /*-----------------------------------------------------------------*/
 
-// Read File from SPIFFS
+// Read File from SPIFFS.
 
 String readFile(fs::FS& fs, const char* path) {
 	Serial.printf("Reading file: %s\r\n", path);
@@ -493,7 +463,7 @@ String readFile(fs::FS& fs, const char* path) {
 
 /*-----------------------------------------------------------------*/
 
-// Write file to SPIFFS
+// Write file to SPIFFS.
 
 void writeFile(fs::FS& fs, const char* path, const char* message) {
 
@@ -540,12 +510,14 @@ void printLocalTime()
 
 /*-----------------------------------------------------------------*/
 
+// Buzzer tone for touch screen.
+
 void tone(byte pin, int freq) {
 
 	ledcSetup(0, freq, 8);		// setup buzzer.
 	ledcAttachPin(pin, 0);		// attach buzzer.
 	ledcWriteTone(0, freq);		// play tone.
-	delay(buzzerD);					// Wait a moment.
+	delay(buzzerD);				// Wait a moment.
 	ledcWriteTone(0, 0);		// Stop tone.
 
 } // Close function.
@@ -565,7 +537,6 @@ void setup() {
 	// Set pin modes.
 
 	pinMode(TFT_LED, OUTPUT);				// Output for LCD back light.
-	pinMode(sDCS, OUTPUT);					// Output for chip select for SD SPI bus.
 	pinMode(interruptWheelSensor, INPUT);	// Wheel sensor (REED switch).
 	digitalWrite(TFT_LED, HIGH);			// Outout for LCD back light.
 
@@ -573,7 +544,6 @@ void setup() {
 
 	digitalWrite(TOUCH_CS, HIGH);			// Touch controller chip select.
 	digitalWrite(TFT_CS, HIGH);				// TFT screen chip select.
-	digitalWrite(sDCS, HIGH);				// SD card chips select.
 
 	// Configure interupt.
 
@@ -610,8 +580,18 @@ void setup() {
 	EEPROM.get(eeCircAddress, circumference);
 	EEPROM.get(eeTotalDistanceAddress, distanceCounter);
 	EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
+	EEPROM.get(eegraphDMAddress, graphDM);
+	EEPROM.get(eegraphDMIAddress, graphDMI);
+	EEPROM.get(eegraphDAPAddress, graphDAP);
 
 	EEPROM.commit();
+
+	Serial.print("Distance Scale: ");
+	Serial.print(graphDAM[graphDAP]);
+	Serial.print(" & ");
+	Serial.print("Distance Increments: ");
+	Serial.print(graphDAI[graphDAP]);
+	Serial.println(" ");
 
 	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[0]);
 	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[1]);
@@ -710,7 +690,7 @@ void setup() {
 
 	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
 
-	// Initialize WiFi.
+	// Initialize WiFi and web services.
 
 	if (initWiFi()) {
 
@@ -733,9 +713,7 @@ void setup() {
 
 	else {
 
-		// Set mode to be in AP so loop is by past and screen stays the same
-
-		apMode = true;
+		apMode = true;	// Set mode to be in AP so loop is by passed and screen stays the same.
 
 		wiFiTitle();
 		tft.setFreeFont();
@@ -756,26 +734,30 @@ void setup() {
 		tft.print("Unit will restart when configured");
 
 		// Initialize the ESP32 in Access Point mode, recolour to WiFI red.
+
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiRed, WIFI_ICON_W, WIFI_ICON_H);
 
-		// Set Access Point
+		// Set Access Point.
 		Serial.println("Setting AP (Access Point)");
 
-		// NULL sets an open Access Point
+		// NULL sets an open Access Point.
+
 		WiFi.softAP("ESP-WIFI-MANAGER", NULL);
 
 		IPAddress IP = WiFi.softAPIP();
 		Serial.print("AP IP address: ");
 		Serial.println(IP);
 
-		// Web Server Root URL For WiFi Manager Web Page
+		// Web Server Root URL For WiFi Manager Web Page.
+
 		server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
 			request->send(SPIFFS, "/wifimanager.html", "text/html");
 			});
 
 		server.serveStatic("/", SPIFFS, "/");
 
-		// Get the parameters submited on the form 
+		// Get the parameters submited on the form.
+
 		server.on("/", HTTP_POST, [](AsyncWebServerRequest* request) {
 			int params = request->params();
 			for (int i = 0; i < params; i++) {
@@ -808,11 +790,15 @@ void setup() {
 					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 				}
 			}
+
 			request->send(200, "text/plain", "Done. ESP will restart, connect to your router and go to IP address: " + ip);
 			delay(3000);
+
 			// After saving the parameters, restart the ESP32
+
 			ESP.restart();
 			});
+
 		server.begin();
 
 	}  // Close function.
@@ -825,12 +811,12 @@ void setup() {
 
 	if (disconnectWiFi == true) {
 
-		//disconnect WiFi as it's no longer needed
+		//disconnect WiFi as it's no longer needed.
+
 		WiFi.disconnect();
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
-		//WiFi.mode(WIFI_OFF);
-	}
 
+	}
 
 } // Close setup.
 
@@ -896,7 +882,6 @@ void loop() {
 		disconnectWiFiFlag = false;
 
 	}
-
 
 	if (millis() >= LocalTime + localTimeInterval) {
 
@@ -1098,15 +1083,8 @@ void loop() {
 					screenMenu = 1;
 					menuChange = 1;
 					screenRedraw = 1;
-					graph_8 = true;
-					graph_9 = true;
-					graph_10 = true;
-					graph_11 = true;
-					graph_12 = true;
-					graph_13 = true;
-					graph_14 = true;
 					Serial.print("Button 1 hit ");
-					Serial.print("Screen Menu: ");
+					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
 
@@ -1127,15 +1105,8 @@ void loop() {
 					screenMenu = 2;
 					menuChange = 1;
 					screenRedraw = 1;
-					graph_1 = true;
-					graph_2 = true;
-					graph_3 = true;
-					graph_4 = true;
-					graph_5 = true;
-					graph_6 = true;
-					graph_7 = true;;
 					Serial.print("Button 2 hit ");
-					Serial.print("Screen Menu: ");
+					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
 
@@ -1157,7 +1128,7 @@ void loop() {
 				else if (screenMenu == 5 && configurationFlag == 4) {
 
 					tone(buzzerP, buzzerF);
-					
+
 
 				} // Close else if.
 
@@ -1197,9 +1168,8 @@ void loop() {
 					screenMenu = 3;
 					menuChange = 1;
 					screenRedraw = 1;
-					dial_1 = true;
 					Serial.print("Button 3 hit ");
-					Serial.print("Screen Menu: ");
+					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
 
@@ -1263,7 +1233,7 @@ void loop() {
 					menuChange = 1;
 					screenRedraw = 1;
 					Serial.print("Button 4 hit ");
-					Serial.print("Screen Menu: ");
+					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
 
@@ -1299,7 +1269,7 @@ void loop() {
 					menuChange = 1;
 					screenRedraw = 1;
 					Serial.print("Button 5 hit ");
-					Serial.print("Screen Menu: ");
+					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
 
@@ -1332,7 +1302,9 @@ void loop() {
 
 		if (screenRedraw == 1) {
 
+
 			drawBlackBox();
+			dial_1 = true;
 			screenRedraw = 0;
 
 		} // Close if.
@@ -1348,6 +1320,13 @@ void loop() {
 		if (screenRedraw == 1) {
 
 			drawBlackBox();
+			graph_1 = true;
+			graph_2 = true;
+			graph_3 = true;
+			graph_4 = true;
+			graph_5 = true;
+			graph_6 = true;
+			graph_7 = true;
 			screenRedraw = 0;
 
 		} // Close if.
@@ -1419,6 +1398,13 @@ void loop() {
 		if (screenRedraw == 1) {
 
 			drawBlackBox();
+			graph_8 = true;
+			graph_9 = true;
+			graph_10 = true;
+			graph_11 = true;
+			graph_12 = true;
+			graph_13 = true;
+			graph_14 = true;
 			screenRedraw = 0;
 
 		} // Close if.
@@ -1561,6 +1547,8 @@ void loop() {
 } // Close loop.
 
 /*-----------------------------------------------------------------*/
+
+// Process sensor data.
 
 void mainData() {
 
@@ -1741,6 +1729,8 @@ void mainData() {
 
 /*-----------------------------------------------------------------*/
 
+// Average speed calculation.
+
 void averageSpeed() {
 
 	// Subtract the last reading.
@@ -1770,6 +1760,8 @@ void averageSpeed() {
 }  // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// Current exercise display layout.
 
 void currentExerciseScreen() {
 
@@ -1818,9 +1810,9 @@ void currentExerciseScreen() {
 
 /*-----------------------------------------------------------------*/
 
-void configurationDisplay() {
+// Configuration display layout.
 
-	// Configuration display layout.
+void configurationDisplay() {
 
 	// Retrieve saved configuration data from EEPROM.
 
@@ -2033,7 +2025,7 @@ void distanceScaleSettingPlus() {
 	{
 		graphDAP++;
 		graphDSC = true;
-	
+
 	}
 
 	Serial.print("Distance Scale: ");
@@ -2092,9 +2084,13 @@ void distanceScaleSettingSave() {
 
 		graphDM = graphDAM[graphDAP];
 		graphDMI = graphDAI[graphDAP];
-		/*EEPROM.put(eeMenuAddress, eeMenuSetting);
-		EEPROM.commit();*/
-		graphDSC = false; 
+
+		EEPROM.put(eegraphDMAddress, graphDM);
+		EEPROM.put(eegraphDMIAddress, graphDMI);
+		EEPROM.put(eegraphDAPAddress, graphDAP);
+		EEPROM.commit();
+
+		graphDSC = false;
 
 	} // Close if.
 
@@ -2174,6 +2170,8 @@ void resetMenuSettingSave() {
 
 /*-----------------------------------------------------------------*/
 
+// Circumference setting plus changes.
+
 void circumferenceSettingPlus() {
 
 	// Incremental function to circumference setting.
@@ -2203,6 +2201,8 @@ void circumferenceSettingPlus() {
 
 /*-----------------------------------------------------------------*/
 
+// Circumference setting minus changes.
+
 void circumferenceSettingMinus() {
 
 	// Decremental function to circumference setting.
@@ -2231,6 +2231,8 @@ void circumferenceSettingMinus() {
 
 /*-----------------------------------------------------------------*/
 
+// Circumference setting save changes.
+
 void circumferenceSettingSave() {
 
 	// Write circumference setting to EEPROM.
@@ -2247,6 +2249,8 @@ void circumferenceSettingSave() {
 
 /*-----------------------------------------------------------------*/
 
+// Draw borders.
+
 void drawBorder()
 {
 	// Draw layout borders.
@@ -2257,6 +2261,8 @@ void drawBorder()
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// Draw black boxes when screens change.
 
 void drawBlackBox()
 {
@@ -2269,6 +2275,8 @@ void drawBlackBox()
 
 /*-----------------------------------------------------------------*/
 
+// Update menu flag.
+
 void menu_Change() {
 
 	menuChange = 0;
@@ -2276,6 +2284,8 @@ void menu_Change() {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// Not used any longer.
 
 void startUp() {
 
@@ -2296,6 +2306,8 @@ void startUp() {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// WiFi title page.
 
 void wiFiTitle() {
 
@@ -2324,6 +2336,8 @@ void wiFiTitle() {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// Reset all data and parametres back to factory defaults (LOL).
 
 void resetSystemData() {
 
@@ -2411,6 +2425,8 @@ void resetSystemData() {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+// Load demo data.
 
 void resetSystemDemoData() {
 
