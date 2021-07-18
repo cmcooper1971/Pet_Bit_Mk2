@@ -57,8 +57,8 @@ boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen
 // Configure sound.
 
 const byte buzzerP = 21;			// Buzzer pin.
-int buzzerF = 1000;					// Set frequency of the buzzer beep.
-int buzzerD = 75;					// Buzzer delay.
+int buzzerF = 0;					// Set frequency of the buzzer beep.
+int buzzerD = 0;					// Buzzer delay.
 
 // Configure time settings.
 
@@ -1885,6 +1885,8 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
+	if (graph)
+
 	tft.setCursor(23, 80);
 	tft.print("Distance Scale   : ");
 	tft.setCursor(150, 80);
@@ -2120,12 +2122,12 @@ void timeScaleSettingPlus() {
 	if (graphTAP == 11)
 	{
 		graphTAP = 0;
-		graphDSC = true;
+		graphTSC = true;
 	}
 	else
 	{
 		graphTAP++;
-		graphDSC = true;
+		graphTSC = true;
 
 	}
 
