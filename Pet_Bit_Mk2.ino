@@ -315,7 +315,7 @@ void IRAM_ATTR rotationInterruptISR() {
 
 		passedTime = millis() - startTime;
 		startTime = millis();
-		
+
 		sleepT = millis();											// Restart auto sleep timer.
 
 		rpm = (60000 * circumference) / passedTime;					// Revs per minute.
@@ -1319,7 +1319,7 @@ void loop() {
 					tone(buzzerP, buzzerF);
 					configurationFlag++;
 
-					if (configurationFlag == byte(7)) {
+					if (configurationFlag == byte(8)) {
 
 						configurationFlag = byte(1);
 					}
@@ -2019,6 +2019,59 @@ void configurationDisplay() {
 	tft.setCursor(150, 185);
 	tft.println(resetArray[eeResetSetting]);
 
+	// Menu option 7 is System Reset menu.
+
+	if (configurationFlag == 7) {
+
+		tft.fillRect(58, 83, 148, 74, RED);
+		tft.drawRect(57, 82, 150, 76, TFT_WHITE);
+		tft.drawRect(56, 81, 152, 78, TFT_WHITE);
+		tft.setFreeFont(&FreeSans9pt7b);
+		tft.setTextSize(1);
+		tft.setTextColor(WHITE); tft.setCursor(70, 125);
+		tft.print("Reset System?");
+
+		delay(1000); // Give the screen a moment.
+
+		while (configurationFlag == 7) {
+
+			uint16_t x, y;		// variables for touch data.
+
+			tft.getTouch(&x, &y);
+			
+			if ((x > BUTTON4_X) && (x < (BUTTON4_X + BUTTON4_W))) {
+				if ((y > BUTTON4_Y) && (y <= (BUTTON4_Y + BUTTON4_H))) {
+
+					Serial.print("Yes Reset While Ran!");
+					Serial.println(" ");
+					ESP.restart();
+
+				}
+
+			} // Close if.
+
+			if ((x > BUTTON1_X) && (x < (BUTTON1_X + BUTTON1_W))) {
+				if ((y > BUTTON1_Y) && (y <= (BUTTON1_Y + BUTTON1_H))) {
+
+					tone(buzzerP, buzzerF);
+					screenMenu = 5;
+					menuChange = 1;
+					screenRedraw = 1;
+					configurationFlag = 1;
+					Serial.print("Button 5 hit ");
+					Serial.print(" : Screen Menu: ");
+					Serial.print(screenMenu);
+					Serial.println(" ");
+					tft.setFreeFont();
+
+				} // Close if.
+
+			} // Close if.
+
+		} // Close while.
+
+	} // Close if.
+
 	// Display total distance travelled since initial start up.
 
 	tft.setTextColor(WHITE, BLACK);
@@ -2303,7 +2356,7 @@ void buzzerSettingPlus() {
 
 } // Close function.
 
-	/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
 
 void buzzerSettingMinus() {
 
@@ -2529,14 +2582,14 @@ void drawSensor()
 	// Draw sensor icon.
 
 	tft.drawCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, TFT_WHITE);
-	
+
 	if (sensorT == true) {
 
-		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R-1, TFT_GREEN);
-	
+		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, TFT_GREEN);
+
 	}
 
-	else tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R-1, TFT_BLACK);
+	else tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, TFT_BLACK);
 
 } // Close function.
 
@@ -2584,7 +2637,7 @@ void wiFiTitle() {
 	tft.setTextSize(1);
 	tft.setTextColor(WHITE);
 	tft.setCursor(13, 26);
-	tft.println("WiFi Configuration");
+	tft.println("Setting up WiFi");
 	tft.setFreeFont();
 
 	tft.setTextColor(WHITE);
