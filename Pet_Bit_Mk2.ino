@@ -2023,9 +2023,9 @@ void configurationDisplay() {
 
 	if (configurationFlag == 7) {
 
-		tft.fillRect(59, 83, 148, 74, RED);
-		tft.drawRect(58, 82, 150, 76, TFT_WHITE);
-		tft.drawRect(57, 81, 152, 78, TFT_WHITE);
+		tft.fillRect(59, 81, 148, 74, RED);
+		tft.drawRect(58, 80, 150, 76, TFT_WHITE);
+		tft.drawRect(57, 79, 152, 78, TFT_WHITE);
 		tft.setFreeFont(&FreeSans9pt7b);
 		tft.setTextSize(1);
 		tft.setTextColor(WHITE); tft.setCursor(70, 125);
