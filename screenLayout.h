@@ -39,16 +39,10 @@
 #define BUTTON4_H 50
 
 // WiFi icon position and size.
-#define WIFI_ICON_X 177
+#define WIFI_ICON_X 207
 #define WIFI_ICON_Y 13
 #define WIFI_ICON_W 16
 #define WIFI_ICON_H 16
-
-// Battery icon position and size.
-#define BATTERY_ICON_X 197
-#define BATTERY_ICON_Y 12
-#define BATTERY_ICON_W 32
-#define BATTERY_ICON_H 18
 
 // Settings Cog position and size.
 #define SETTINGS_COG_X 233

@@ -185,6 +185,10 @@ int eegraphDMAddress = 80;					// EEPROM address for graph distance scale.
 int eegraphDMIAddress = 84;					// EEPROM address for graph distance increment scale level.
 int eegraphDAPAddress = 88;					// EEPROM address for graph distance array position.
 
+int eegraphTMAddress = 92;					// EEPROM address for graph distance scale.
+int eegraphTMIAddress = 96;					// EEPROM address for graph distance increment scale level.
+int eegraphTAPAddress = 100;					// EEPROM address for graph distance array position.
+
 // Misc arrays.
 
 char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " }; // Spaces to over write previous screen draw/
@@ -210,7 +214,7 @@ volatile unsigned long sessionStartTime;	// Time each pt session starts.
 unsigned long sessionTimeArray[7];			// Array for storing 7 sessions.
 byte sessionArrayPosition = 0;				// Array position, this is also used for the distance array position.
 volatile unsigned long sessionTimeMillis;	// Time each pt session in millis.
-volatile unsigned int sessionTime;			// Time each pt session in minutes.
+volatile unsigned long sessionTime;			// Time each pt session in minutes.
 
 double sessionStartDistance = 0.00;
 double sessionDistance;						// Session distance.
@@ -251,6 +255,13 @@ boolean graph_4 = true;
 boolean graph_5 = true;
 boolean graph_6 = true;
 boolean graph_7 = true;
+
+int graphTM;						// Graph time measurement scale.
+int graphTMI;						// Graph time measurement scale increment setting.
+boolean graphTSC = false;			// Flag to trigger the recording of settings to EEPROM. 
+int graphTAP;						// Graph time array position.
+const int graphTAM[12] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120 };		// Graph array time scale options.
+const int graphTAI[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };			// Graph array time scale increment options.
 
 boolean graph_8 = true;				// Bar graph.
 boolean graph_9 = true;
@@ -580,9 +591,14 @@ void setup() {
 	EEPROM.get(eeCircAddress, circumference);
 	EEPROM.get(eeTotalDistanceAddress, distanceCounter);
 	EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
+
 	EEPROM.get(eegraphDMAddress, graphDM);
 	EEPROM.get(eegraphDMIAddress, graphDMI);
 	EEPROM.get(eegraphDAPAddress, graphDAP);
+
+	EEPROM.get(eegraphTMAddress, graphTM);
+	EEPROM.get(eegraphTMIAddress, graphTMI);
+	EEPROM.get(eegraphTAPAddress, graphTAP);
 
 	EEPROM.commit();
 
@@ -685,10 +701,6 @@ void setup() {
 
 	drawBorder();
 	startUp();
-
-	// Draw configuraton icons, battery and WiFi.
-
-	drawBitmap(tft, BATTERY_ICON_Y, BATTERY_ICON_X, ccBatt100, BATTERY_ICON_W, BATTERY_ICON_H);
 
 	// Initialize WiFi and web services.
 
@@ -1128,7 +1140,7 @@ void loop() {
 				else if (screenMenu == 5 && configurationFlag == 4) {
 
 					tone(buzzerP, buzzerF);
-
+					timeScaleSettingMinus();
 
 				} // Close else if.
 
@@ -1192,6 +1204,7 @@ void loop() {
 				else if (screenMenu == 5 && configurationFlag == 4) {
 
 					tone(buzzerP, buzzerF);
+					timeScaleSettingPlus();
 
 
 				} // Close else if.
@@ -1335,59 +1348,59 @@ void loop() {
 
 		if (sessionTimeArray1 <= 60) {
 
-			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, 60, 10, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
+			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
 
 		} // Close if.
 
-		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
+		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
 
 		if (sessionTimeArray2 <= 60) {
 
-			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, 60, 10, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
 
 		} // Close if.
 
-		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
+		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
 
 		if (sessionTimeArray3 <= 60) {
 
-			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, 60, 10, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
+			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
 
 		} // Close if.
 
-		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
+		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
 
 		if (sessionTimeArray4 <= 60) {
 
-			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, 60, 10, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
+			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
 
 		} // Close if.
 
-		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
+		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
 
 		if (sessionTimeArray5 <= 60) {
 
-			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, 60, 10, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
+			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
 
 		} // Close if.
 
-		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
+		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
 
 		if (sessionTimeArray6 <= 60) {
 
-			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, 60, 10, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
+			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
 
 		} // Close if.
 
-		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
+		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
 
 		if (sessionTimeArray7 <= 60) {
 
-			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, 60, 10, sessionTimeArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
+			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
 
 		} // Close if.
 
-		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, 60, 10, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
+		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
 
 	} // Close if.
 
@@ -1570,7 +1583,7 @@ void mainData() {
 		// Calculate current session time.
 
 		sessionTimeMillis = millis() - sessionStartTime;
-		sessionTime = sessionTimeMillis / 10 / 60;
+		sessionTime = sessionTimeMillis / 1000;
 
 	} // Close else.
 
@@ -1775,7 +1788,7 @@ void currentExerciseScreen() {
 	tft.setTextColor(WHITE);
 
 	tft.setCursor(23, 70);
-	tft.print("Xph: ");
+	tft.print("Mph: ");
 	tft.setCursor(23, 90);
 	tft.print("Ave: ");
 	tft.setCursor(23, 110);
@@ -1891,9 +1904,11 @@ void configurationDisplay() {
 	else tft.setTextColor(WHITE, BLACK);
 
 	tft.setCursor(23, 95);
-	tft.print("Another option   : ");
+	tft.print("Time Scale       : ");
 	tft.setCursor(150, 95);
-	tft.println(eeCircSetting);
+	tft.print(graphTAM[graphTAP]);
+	tft.print(" / ");
+	tft.print(graphTAI[graphTAP]);
 	tft.println();
 
 	// Menu option 5 is Another option menu.
@@ -2097,6 +2112,93 @@ void distanceScaleSettingSave() {
 }  // Close function.
 
 /*-----------------------------------------------------------------*/
+
+void timeScaleSettingPlus() {
+
+	// Incremental function to menu setting.
+
+	if (graphTAP == 11)
+	{
+		graphTAP = 0;
+		graphDSC = true;
+	}
+	else
+	{
+		graphTAP++;
+		graphDSC = true;
+
+	}
+
+	Serial.print("Time Scale: ");
+	Serial.print(graphTAM[graphTAP]);
+	Serial.print(" & ");
+	Serial.print("Time Increments: ");
+	Serial.print(graphTAI[graphTAP]);
+	Serial.println(" ");
+
+	if (graphTSC == true) {			// Write results to EEPROM to save.
+
+		timeScaleSettingSave();
+	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+void timeScaleSettingMinus() {
+
+	// Incremental function to menu setting.
+
+	if (graphTAP == 0)
+	{
+		graphTAP = 11;
+		graphTSC = true;
+	}
+	else
+	{
+		graphTAP--;
+		graphTSC = true;
+
+	}
+
+	Serial.print("Time Scale: ");
+	Serial.print(graphTAM[graphTAP]);
+	Serial.print(" & ");
+	Serial.print("Time Increments: ");
+	Serial.print(graphTAI[graphTAP]);
+	Serial.println(" ");
+
+	if (graphTSC == true) {			// Write results to EEPROM to save.
+
+		timeScaleSettingSave();
+	}
+
+} // Close function.
+
+	/*-----------------------------------------------------------------*/
+
+void timeScaleSettingSave() {
+
+	// Write menu setting to EEPROM.
+
+	if (graphTSC = true) {
+
+		graphTM = graphTAM[graphTAP];
+		graphTMI = graphTAI[graphTAP];
+
+		EEPROM.put(eegraphTMAddress, graphTM);
+		EEPROM.put(eegraphTMIAddress, graphTMI);
+		EEPROM.put(eegraphTAPAddress, graphTAP);
+		EEPROM.commit();
+
+		graphTSC = false;
+
+	} // Close if.
+
+}  // Close function.
+
+
+	/*-----------------------------------------------------------------*/
 
 void resetMenuSettingPlus() {
 
