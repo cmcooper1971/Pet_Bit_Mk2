@@ -135,15 +135,15 @@ double circImperial;						// Conversion into MPH.
 double distanceTravelled = 0.00;			// Total distance travelled.
 double speedKph = 0.00;
 double speedMph = 0.00;
-double rpm = 0.00;
 
 float maxKphSpeed = 0;						// Recording max speed.
 
-char rpmArray[7];							// Holding data in character arrays for formatting reasons.
-char kphArray[7];
+char kphArray[7];							// Holding data in character arrays for formatting reasons.
 char mphArray[7];
 char maxKphArray[7];
+char maxMphArray[7];
 char averageKphSpeedArray[7];
+char averageMphSpeedArray[7];
 char sessionDistanceArray[7];
 char currentSessionTimeArray[7];
 
@@ -197,6 +197,13 @@ int eegraphTAPAddress = 100;				// EEPROM address for graph distance array posit
 int eeBuzzerYNAddress = 200;				// EEPROM address for buzzer enabled / disabled.
 boolean eeBuzzerYNChange;					// Change flag.
 
+int eeCalYNAddress = 204;					// EEPROM address for touch screen calibration enabled disabled.
+int eeCalDataAddress0 = 208;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress1 = 212;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress2 = 216;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress3 = 220;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress4 = 224;				// EEPROM address for touch screen calibration data.
+
 // Misc arrays.
 
 char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " }; // Spaces to over write previous screen draw/
@@ -205,6 +212,9 @@ char* dayArray[9] = { "","Sunday","Monday","Tuesday","Wednesday","Thursday","Fri
 char* dayShortArray[9] = { "","Su","Mo","Tu","We","Th","Fr","Sa" };
 char* ynArray[2] = { "No", "Yes" };
 
+uint16_t calData[5];						// Touch screen calibration data.
+boolean calTouchScreen = 0;					// Change flag to trigger calibration function.
+
 // Average speed calculation variables.
 
 const int numReadings = 10;
@@ -212,7 +222,7 @@ const int numReadings = 10;
 double	readings[numReadings];				// Latest Kph readings.
 int		readIndex = 0;						// The index of the current reading.
 double	total = 0.00;						// The running total of the readings.
-double	averageKphSpeed = 0.00;				// The average speed.
+double	averageKphSpeed = 0.00;				// The average speed in Kph.
 
 // Session time variables.
 
@@ -318,7 +328,6 @@ void IRAM_ATTR rotationInterruptISR() {
 
 		sleepT = millis();											// Restart auto sleep timer.
 
-		rpm = (60000 * circumference) / passedTime;					// Revs per minute.
 		speedKph = (3600 * circumference) / passedTime;				// km/h.
 		speedMph = (3600 * circImperial) / passedTime;				// Miles per hour.
 
@@ -531,6 +540,7 @@ void printLocalTime()
 		tft.setTextSize(1);
 		tft.setCursor(13, 220);
 		tft.println("Failed to get time...");
+
 		return;
 	}
 	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M");
@@ -565,8 +575,10 @@ void setup() {
 	Serial.begin(115200);
 	delay(500);
 
+	Serial.println(" ");
 	Serial.print("Setup Running on Core : ");
 	Serial.println(xPortGetCoreID());
+	Serial.println(" ");
 
 	// Set pin modes.
 
@@ -625,8 +637,25 @@ void setup() {
 
 	EEPROM.get(eeBuzzerYNAddress, buzzerYN);
 
+	EEPROM.get(eeCalYNAddress, calTouchScreen);
+	EEPROM.get(eeCalDataAddress0, calData[0]);
+	EEPROM.get(eeCalDataAddress1, calData[1]);
+	EEPROM.get(eeCalDataAddress2, calData[2]);
+	EEPROM.get(eeCalDataAddress3, calData[3]);
+	EEPROM.get(eeCalDataAddress4, calData[4]);
+
 	EEPROM.commit();
 
+	Serial.println(" ");
+	Serial.print("Calibration Data: ");
+
+	for (uint8_t i = 0; i < 5; i++)
+	{
+		Serial.print(calData[i]);
+		if (i < 4) Serial.print(", ");
+	}
+
+	Serial.println(" ");
 	Serial.print("Distance Scale: ");
 	Serial.print(graphDAM[graphDAP]);
 	Serial.print(" & ");
@@ -678,6 +707,8 @@ void setup() {
 
 	screenMenu = eeMenuSetting;
 	circumference = eeCircSetting;
+
+	circImperial = circumference * 0.62137;		// for MPH calculation
 
 	// Buzzer settings.
 
@@ -739,8 +770,15 @@ void setup() {
 
 	// touch_calibrate(tft); // Build future meny option in settings
 
-	uint16_t calData[5] = { 365, 3511, 243, 3610, 7 };
-	tft.setTouch(calData);
+	//uint16_t calData[5] = { 365, 3511, 243, 3610, 7 };
+	
+	if (calTouchScreen == 1) {
+
+		touch_calibrate(tft);
+
+	}
+	
+	else tft.setTouch(calData);
 
 	// Draw border and buttons at start.
 
@@ -1384,7 +1422,7 @@ void loop() {
 
 		} // Close if.
 
-		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Xph", dial_1); // XPH dial screen function.
+		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Kph", dial_1); // XPH dial screen function.
 
 	} // Close if.
 
@@ -1631,7 +1669,6 @@ void mainData() {
 
 	if (lastRotation2 < millis()) {
 
-		rpm = 0.00;
 		speedKph = 0.00;
 		speedMph = 0.00;
 		recordSessions = 1;
@@ -1651,12 +1688,11 @@ void mainData() {
 
 	// Ensure data is always "0" or greater, if not set to "0"
 
-	if ((rpm >= 0) || (speedKph >= 0) || (speedMph >= 0)) {
+	if ((speedKph >= 0) || (speedMph >= 0)) {
 
 	} // Close if.
 
 	else {
-		rpm = 0.00;
 		speedKph = 0.00;
 		speedMph = 0.00;
 
@@ -1792,11 +1828,17 @@ void mainData() {
 		numVarsAfterDecimal			The number of digits after the deimal point to print.
 		charbuf						The array to store the results*/
 
-	dtostrf(rpm, 6, 2, rpmArray);
 	dtostrf(speedKph, 6, 2, kphArray);
-	dtostrf(speedMph, 6, 2, mphArray);
-	dtostrf(maxKphSpeed, 6, 2, maxKphArray);
 	dtostrf(averageKphSpeed, 6, 2, averageKphSpeedArray);
+	dtostrf(maxKphSpeed, 6, 2, maxKphArray);
+
+	float maxMphSpeed = maxKphSpeed * 0.621371;						// Max speed in Mph.
+	float averageMphSpeed = averageKphSpeed * 0.621371;				// Average speed in Mph. 
+
+	dtostrf(speedMph, 6, 2, mphArray);
+	dtostrf(averageMphSpeed, 6, 2, averageMphSpeedArray);
+	dtostrf(maxMphSpeed, 6, 2, maxMphArray);
+
 	dtostrf(sessionDistance, 6, 0, sessionDistanceArray);
 	dtostrf(sessionTime, 6, 0, currentSessionTimeArray);
 
@@ -1849,34 +1891,46 @@ void currentExerciseScreen() {
 	tft.setTextSize(1);
 	tft.setTextColor(WHITE);
 
-	tft.setCursor(23, 70);
+	tft.setCursor(23, 60);
 	tft.print("Mph: ");
-	tft.setCursor(23, 90);
-	tft.print("Ave: ");
+	tft.setCursor(23, 80);
+	tft.print("Ave Mph: ");
+	
 	tft.setCursor(23, 110);
-	tft.print("Max: ");
+	tft.print("Kph: ");
 	tft.setCursor(23, 130);
+	tft.print("Ave Kph: ");
+	
+	tft.setCursor(23, 160);
+	tft.print("Max Kph: ");
+	tft.setCursor(23, 180);
 	tft.print("Dis: ");
-	tft.setCursor(23, 150);
-	tft.print("Time: ");
-
+	tft.setCursor(23, 200);
+	tft.print("Time (s): ");
+	
 	tft.setFreeFont();
 	tft.setTextSize(2);
 	tft.setTextColor(WHITE, BLACK);
 
-	tft.setCursor(100, 57);
+	tft.setCursor(150, 47);
+	tft.println(mphArray);
+
+	tft.setCursor(150, 67);
+	tft.println(averageMphSpeedArray);
+
+	tft.setCursor(150, 97);
 	tft.println(kphArray);
 
-	tft.setCursor(100, 77);
+	tft.setCursor(150, 117);
 	tft.println(averageKphSpeedArray);
 
-	tft.setCursor(100, 97);
+	tft.setCursor(150, 147);
 	tft.println(maxKphArray);
 
-	tft.setCursor(100, 117);
+	tft.setCursor(150, 167);
 	tft.println(sessionDistanceArray);
 
-	tft.setCursor(100, 137);
+	tft.setCursor(150, 187);
 	tft.println(currentSessionTimeArray);
 
 	tft.setTextSize(1);
@@ -2028,7 +2082,7 @@ void configurationDisplay() {
 		tft.drawRect(57, 79, 152, 78, TFT_WHITE);
 		tft.setFreeFont(&FreeSans9pt7b);
 		tft.setTextSize(1);
-		tft.setTextColor(WHITE); tft.setCursor(70, 125);
+		tft.setTextColor(WHITE); tft.setCursor(72, 122);
 		tft.print("Reset System?");
 
 		delay(1000); // Give the screen a moment.
@@ -2683,6 +2737,10 @@ void resetSystemData() {
 
 	buzzerYN = 1;
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
+	EEPROM.commit();
+
+	calTouchScreen = 1;
+	EEPROM.put(eeCalYNAddress, calTouchScreen);
 	EEPROM.commit();
 
 	eeTotalDistance = 0.00;

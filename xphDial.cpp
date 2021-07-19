@@ -32,19 +32,19 @@ void XphDialScreen(TFT_eSPI& tft, int cx, int cy, int r, int loval, double hival
 		tft.drawCircle(cx, cy, r, needlecolor);
 		tft.drawCircle(cx, cy, r - 1, needlecolor);
 		tft.setTextColor(textcolor, dialcolor);
+		tft.setFreeFont(&FreeSans9pt7b);
 		tft.setTextSize(1);
-		//TFT.setFont(&FreeSans9pt7b);
 		tft.setCursor(cx - 15, cy + 30);
 		tft.println(label);
-		//TFT.setFont();
+		tft.setFreeFont();
 	}
 
-	// Draw the current value.
+	/* Draw the current value.
 
-	tft.setTextSize(1);
+	tft.setTextSize(2);
 	tft.setTextColor(textcolor, dialcolor);
-	tft.setCursor(cx - 7, cy + 40);
-	tft.println(Format(curval, dig, dec));
+	tft.setCursor(cx - 12, cy + 40);
+	tft.println(Format(curval, dig, dec));*/
 
 	// Center the scale about the vertical axis--and use this to offset the needle, and scale text.
 
