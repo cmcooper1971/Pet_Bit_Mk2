@@ -299,6 +299,8 @@ const int graphDAI[4] = { 100, 200, 300, 400 };			// Graph array distance scale 
 
 /*-----------------------------------------------------------------*/
 
+// Interrupt for detecting sensor activation.
+
 void IRAM_ATTR rotationInterruptISR() {
 
 	static unsigned long  last_interrupt_time = 0;                  // Function to solve debounce.
@@ -306,18 +308,16 @@ void IRAM_ATTR rotationInterruptISR() {
 
 	if (interrupt_time - last_interrupt_time > 50) {
 
-		detachInterrupt(interruptWheelSensor);
+		detachInterrupt(interruptWheelSensor);						// Detach interrupt.
 
-		if (sensorT == 0) {
+		if (sensorT == 0) {											// Simple indicator flag for TFT.
 
 			sensorT = 1;
-
 		}
 
 		else if (sensorT == 1) {
 
 			sensorT = 0;
-
 		}
 
 		disconnectWiFiFlag = true;									// Disable WiFi flag to stop repeat attempts.
@@ -331,9 +331,9 @@ void IRAM_ATTR rotationInterruptISR() {
 		speedKph = (3600 * circumference) / passedTime;				// km/h.
 		speedMph = (3600 * circImperial) / passedTime;				// Miles per hour.
 
-		distanceCounter++;
-		eeTotalDistanceChange = true;
-		distanceTravelled = distanceCounter * circumference;
+		distanceCounter++;											// Count rotations for distance calculations.
+		eeTotalDistanceChange = true;								// Rotation flag.
+		distanceTravelled = distanceCounter * circumference;		// Distance calculation.
 
 		if (sessionTimeFlag == 0) {									// Set session timer to start.
 
@@ -341,15 +341,14 @@ void IRAM_ATTR rotationInterruptISR() {
 			sessionStartTime = millis();
 			sessionStartDistance = distanceTravelled;
 			recordSessions = 0;
-
-		} // Close if.
+		}
 
 		lastRotation1 = millis();
 		lastRotation2 = lastRotation1 + 4000;
 
-		attachInterrupt(digitalPinToInterrupt(interruptWheelSensor), rotationInterruptISR, FALLING);
+		attachInterrupt(digitalPinToInterrupt(interruptWheelSensor), rotationInterruptISR, FALLING);	// Attach interrupt.
 
-	} // Close if.
+	}
 
 	last_interrupt_time = interrupt_time;
 
@@ -381,6 +380,7 @@ bool initWiFi() {
 		Serial.println("STA Failed to configure");
 		return false;
 	}
+
 	WiFi.begin(ssid.c_str(), pass.c_str());
 	Serial.println("Connecting to WiFi...");
 
@@ -400,6 +400,7 @@ bool initWiFi() {
 			drawBlackBox();
 			return false;
 		}
+
 	}
 
 	Serial.println(WiFi.localIP());
@@ -476,7 +477,9 @@ void initSPIFFS() {
 	if (!SPIFFS.begin(true)) {
 		Serial.println("An error has occurred while mounting SPIFFS");
 	}
-	else {
+
+	else
+	{
 		Serial.println("SPIFFS mounted successfully");
 	}
 
@@ -487,19 +490,24 @@ void initSPIFFS() {
 // Read File from SPIFFS.
 
 String readFile(fs::FS& fs, const char* path) {
+
 	Serial.printf("Reading file: %s\r\n", path);
 
 	File file = fs.open(path);
+	
 	if (!file || file.isDirectory()) {
+	
 		Serial.println("- failed to open file for reading");
 		return String();
 	}
 
 	String fileContent;
+	
 	while (file.available()) {
 		fileContent = file.readStringUntil('\n');
 		break;
 	}
+	
 	return fileContent;
 
 } // Close function.
@@ -513,15 +521,21 @@ void writeFile(fs::FS& fs, const char* path, const char* message) {
 	Serial.printf("Writing file: %s\r\n", path);
 
 	File file = fs.open(path, FILE_WRITE);
+
 	if (!file) {
+
 		Serial.println("- failed to open file for writing");
 		return;
 	}
+
 	if (file.print(message)) {
+
 		Serial.println("- file written");
 	}
-	else {
-		Serial.println("- frite failed");
+
+	else
+	{
+		Serial.println("- write failed");
 	}
 
 } // Close function.
@@ -530,9 +544,10 @@ void writeFile(fs::FS& fs, const char* path, const char* message) {
 
 // Get and print time.
 
-void printLocalTime()
-{
+void printLocalTime() {
+
 	struct tm timeinfo;
+
 	if (!getLocalTime(&timeinfo)) {
 		Serial.println("Failed to obtain time");
 		tft.setTextColor(WHITE, BLACK);
@@ -543,6 +558,7 @@ void printLocalTime()
 
 		return;
 	}
+
 	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M");
 
 	tft.setTextColor(WHITE, BLACK);
@@ -550,7 +566,8 @@ void printLocalTime()
 	tft.setTextSize(1);
 	tft.setCursor(13, 220);
 	tft.println(&timeinfo, "%A, %B %d %Y %H:%M");
-}
+
+} // Close function.
 
 /*-----------------------------------------------------------------*/
 
@@ -558,9 +575,9 @@ void printLocalTime()
 
 void tone(byte pin, int freq) {
 
-	ledcSetup(0, freq, 8);		// setup buzzer.
-	ledcAttachPin(pin, 0);		// attach buzzer.
-	ledcWriteTone(0, freq);		// play tone.
+	ledcSetup(0, freq, 8);		// Setup buzzer.
+	ledcAttachPin(pin, 0);		// Attach buzzer.
+	ledcWriteTone(0, freq);		// Play tone.
 	delay(buzzerD);				// Wait a moment.
 	ledcWriteTone(0, 0);		// Stop tone.
 
@@ -573,7 +590,9 @@ void setup() {
 	//Begin serial mode.
 
 	Serial.begin(115200);
-	delay(500);
+	delay(100);
+
+	// Identify Arduino sketch core being used.
 
 	Serial.println(" ");
 	Serial.print("Setup Running on Core : ");
@@ -584,6 +603,9 @@ void setup() {
 
 	pinMode(TFT_LED, OUTPUT);				// Output for LCD back light.
 	pinMode(interruptWheelSensor, INPUT);	// Wheel sensor (REED switch).
+	
+	// Switch on TFT LED back light.
+
 	digitalWrite(TFT_LED, HIGH);			// Output for LCD back light.
 
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
@@ -602,11 +624,13 @@ void setup() {
 
 	/*
 	*
-	* This line is used for initial ESP8266 power on from manufacture to set EEPROM, comment out once uploaded and re-upload.
+	* This line is used for initial ESP power on from manufacture to set EEPROM, comment out once uploaded and re-upload.
 	*
 	* resetSystemDemoData();
 	*
 	*/
+
+	// Check reset flag and either reset all settings back to new or load demo data.
 
 	if (eeResetSetting == 1) {
 
@@ -620,24 +644,24 @@ void setup() {
 
 	// Load previous settings and last recorded data.
 
-	EEPROM.get(eeMenuAddress, eeMenuSetting);
+	EEPROM.get(eeMenuAddress, eeMenuSetting);				// Load system settings.
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
 	EEPROM.get(eeTotalDistanceAddress, distanceCounter);
 	EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
 
-	EEPROM.get(eegraphTMAddress, graphTM);
+	EEPROM.get(eegraphTMAddress, graphTM);					// Load graph time scale settings.
 	EEPROM.get(eegraphTMIAddress, graphTMI);
 	EEPROM.get(eegraphTAPAddress, graphTAP);
 
-	EEPROM.get(eegraphDMAddress, graphDM);
+	EEPROM.get(eegraphDMAddress, graphDM);					// Load graph distance scale settings.
 	EEPROM.get(eegraphDMIAddress, graphDMI);
 	EEPROM.get(eegraphDAPAddress, graphDAP);
 
-	EEPROM.get(eeBuzzerYNAddress, buzzerYN);
+	EEPROM.get(eeBuzzerYNAddress, buzzerYN);				// Load buzzer setting.
 
-	EEPROM.get(eeCalYNAddress, calTouchScreen);
+	EEPROM.get(eeCalYNAddress, calTouchScreen);				// Load touch screen calibration data.
 	EEPROM.get(eeCalDataAddress0, calData[0]);
 	EEPROM.get(eeCalDataAddress1, calData[1]);
 	EEPROM.get(eeCalDataAddress2, calData[2]);
@@ -646,14 +670,18 @@ void setup() {
 
 	EEPROM.commit();
 
+	// Output calibration data to serial for checking.
+
 	Serial.println(" ");
 	Serial.print("Calibration Data: ");
 
-	for (uint8_t i = 0; i < 5; i++)
-	{
+	for (uint8_t i = 0; i < 5; i++) {
+
 		Serial.print(calData[i]);
 		if (i < 4) Serial.print(", ");
 	}
+
+	// Out graph scale data to serial for checking.
 
 	Serial.println(" ");
 	Serial.print("Distance Scale: ");
@@ -663,7 +691,7 @@ void setup() {
 	Serial.print(graphDAI[graphDAP]);
 	Serial.println(" ");
 
-	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[0]);
+	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[0]);				// Load previous session times into arrays.
 	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[1]);
 	EEPROM.get(eeSessionTimeArray3Address, sessionTimeArray[2]);
 	EEPROM.get(eeSessionTimeArray4Address, sessionTimeArray[3]);
@@ -675,7 +703,7 @@ void setup() {
 
 	sessionTimeCap = graphTM;
 
-	sessionTimeArray1 = sessionTimeArray[0] / 100 / 60;
+	sessionTimeArray1 = sessionTimeArray[0] / 100 / 60;							// Update chart variables from arrays.
 	sessionTimeArray2 = sessionTimeArray[1] / 100 / 60;
 	sessionTimeArray3 = sessionTimeArray[2] / 100 / 60;
 	sessionTimeArray4 = sessionTimeArray[3] / 100 / 60;
@@ -683,7 +711,7 @@ void setup() {
 	sessionTimeArray6 = sessionTimeArray[5] / 100 / 60;
 	sessionTimeArray7 = sessionTimeArray[6] / 100 / 60;
 
-	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[0]);
+	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[0]);		// Load previous session distance's into arrays.
 	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[1]);
 	EEPROM.get(eeSessionDistanceArray3Address, distanceTravelledArray[2]);
 	EEPROM.get(eeSessionDistanceArray4Address, distanceTravelledArray[3]);
@@ -691,11 +719,11 @@ void setup() {
 	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[5]);
 	EEPROM.get(eeSessionDistanceArray7Address, distanceTravelledArray[6]);
 
-	distanceGraphCap = graphDM;
+	distanceGraphCap = graphDM;													// Update graph cap to stop value exceeding chart level.
 
 	EEPROM.commit();
 
-	distanceTravelledArray1 = distanceTravelledArray[0];
+	distanceTravelledArray1 = distanceTravelledArray[0];						// Update chart variables from arrays.
 	distanceTravelledArray2 = distanceTravelledArray[1];
 	distanceTravelledArray3 = distanceTravelledArray[2];
 	distanceTravelledArray4 = distanceTravelledArray[3];
@@ -710,20 +738,18 @@ void setup() {
 
 	circImperial = circumference * 0.62137;		// for MPH calculation
 
-	// Buzzer settings.
+	// Configure buzzer settings for touch screen.
 
 	if (buzzerYN == 0) {
 
 		buzzerF = 0;	// Set frequency of the buzzer beep.
 		buzzerD = 0;	// Set delay of the buzzer beep.
-
 	}
 
-	else {
-
+	else
+	{
 		buzzerF = 1000;	// Set frequency of the buzzer beep.
 		buzzerD = 75;	// Set deelay of the buzzer beep.
-
 	}
 
 	// Initialise TFT display.
@@ -736,7 +762,7 @@ void setup() {
 	digitalWrite(TFT_LED, LOW);				// LOW to turn backlight on.
 	delay(500);
 
-	// Start up screen.
+	// Start up screen image and title.
 
 	tft.fillScreen(ILI9341_WHITE);
 	startUpScreen(tft);
@@ -756,7 +782,7 @@ void setup() {
 
 	initSPIFFS();
 
-	// Load values saved in SPIFFS
+	// Load values saved in SPIFFS.
 
 	ssid = readFile(SPIFFS, ssidPath);
 	pass = readFile(SPIFFS, passPath);
@@ -766,35 +792,30 @@ void setup() {
 	Serial.println(pass);
 	Serial.println(ip);
 
-	// Calibrate touch screen.
+	// Check if screen calibration flag is set to yes, if not, load previous saved calibration data.
 
-	// touch_calibrate(tft); // Build future meny option in settings
-
-	//uint16_t calData[5] = { 365, 3511, 243, 3610, 7 };
-	
 	if (calTouchScreen == 1) {
 
 		touch_calibrate(tft);
-
 	}
 	
 	else tft.setTouch(calData);
 
 	// Draw border and buttons at start.
 
-	drawBorder();
-	tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, TFT_ORANGE);		// Draw initial sensor
-	startUp();
+	drawBorder();																	// Screen border layouts.
+	tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, TFT_ORANGE);		// Draw initial sensor.
 
 	// Initialize WiFi and web services.
 
 	if (initWiFi()) {
 
-		//Handle the Web Server in Station Mode
-		// Route for root / web page
+		// Handle the Web Server in Station Mode and route for root / web page.
+
 		server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
 			request->send(SPIFFS, "/index.html", "text/html");
 			});
+
 		server.serveStatic("/", SPIFFS, "/");
 
 		events.onConnect([](AsyncEventSourceClient* client) {
@@ -802,16 +823,22 @@ void setup() {
 				Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
 			}
 			});
+
 		server.addHandler(&events);
 
 		server.begin();
 	}
 
-	else {
+	else
+	
+	{ 	apMode = true;	// Set variable to be true so void loop is by passed and doesnt run until false.
 
-		apMode = true;	// Set mode to be in AP so loop is by passed and screen stays the same.
+		// WiFi title page.
 
 		wiFiTitle();
+		
+		// Update display with help text.
+
 		tft.setFreeFont();
 		tft.setTextColor(WHITE);
 		tft.setCursor(23, 130);
@@ -899,11 +926,13 @@ void setup() {
 
 	}  // Close function.
 
-// initialize time and get the time.
+	// initialize time and get the time.
 
 	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 	printLocalTime();
 	LocalTime = millis();
+
+	// Check if WiFi is disabled, technically it wont be unless the interupt sensor has triggered during start up.
 
 	if (disconnectWiFi == true) {
 
@@ -911,7 +940,6 @@ void setup() {
 
 		WiFi.disconnect();
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
-
 	}
 
 } // Close setup.
@@ -925,7 +953,6 @@ void loop() {
 	if (millis() >= sleepT + sleepTime) {
 
 		digitalWrite(TFT_LED, HIGH);			// Output for LCD back light.
-
 	}
 
 	else 	digitalWrite(TFT_LED, LOW);			// Output for LCD back light.
@@ -938,17 +965,16 @@ void loop() {
 
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
 
-		// Write over time text to hide it.
+		// Write over time text in black to hide it.
 
 		tft.setTextColor(BLACK);
 		tft.setFreeFont();
 		tft.setTextSize(1);
 		tft.setCursor(13, 220);
 		tft.println("Failed to get time...");
+	}
 
-	} // Close While.
-
-	// Main functions, checking menu, calculations & average speed.
+	// Identify Arduino sketch core being used.
 
 	if (loopCoreID == true) {
 
@@ -956,8 +982,9 @@ void loop() {
 		Serial.println(xPortGetCoreID());
 
 		loopCoreID = false;
-
 	}
+
+	// Main functions, checking menu, calculations & average speed.
 
 	menu_Change();		// Reset menu change at each pass after touch is pressed.
 	mainData();			// Calculates main data.
@@ -971,7 +998,6 @@ void loop() {
 		if (WiFi.status() == WL_CONNECTED);
 		WiFi.disconnect();
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
-
 	}
 
 	else if (disconnectWiFi == false && disconnectWiFiFlag == true) {
@@ -987,18 +1013,19 @@ void loop() {
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
 
 		disconnectWiFiFlag = false;
-
 	}
+
+	// Update time from Internet time server.
 
 	if (millis() >= LocalTime + localTimeInterval) {
 
-		printLocalTime();	// Get time and update display.
+		printLocalTime();			// Get time and update display.
 		LocalTime = millis();
 	}
 
 	// Draw screen icons and button images.
 
-	if (screenMenu == 5) {			// Draw configuration buttons.
+	if (screenMenu == 5) {
 
 		drawBitmap(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsRed, SETTINGS_COG_W, SETTINGS_COG_H);
 		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, configSet, BUTTON4_W - 2, BUTTON4_H - 2);
@@ -1029,16 +1056,14 @@ void loop() {
 		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_BLACK);
 		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_WHITE);
 		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y + 49, BUTTON4_H + 7, TFT_BLACK);
-
 	}
 
 	else drawBitmap(tft, SETTINGS_COG_Y, SETTINGS_COG_X, settingsWhite, SETTINGS_COG_W, SETTINGS_COG_H);
 
-	if (screenMenu == 4) {			// Draw session distance icons, red / white.
+	if (screenMenu == 4) {
 
 		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconWhite, BUTTON4_W - 2, BUTTON4_H - 2);
-		//tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
-
+	
 		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
@@ -1058,7 +1083,6 @@ void loop() {
 		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_WHITE);
 		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_BLACK);
 		tft.drawFastHLine(BUTTON4_X - 8, BUTTON4_Y + 49, BUTTON4_H + 8, TFT_WHITE);
-
 	}
 
 	else if (screenMenu != 5) {
@@ -1067,10 +1091,9 @@ void loop() {
 		tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_BLACK);
 	}
 
-	if (screenMenu == 3) {			// Draw session time icons, red / white.
+	if (screenMenu == 3) {
 
 		drawBitmap(tft, BUTTON3_Y + 1, BUTTON3_X + 1, timeIconWhite, BUTTON3_W - 2, BUTTON4_H - 2);
-		//tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_RED);
 
 		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
@@ -1099,11 +1122,10 @@ void loop() {
 		tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_BLACK);
 	}
 
-	if (screenMenu == 2) {			// Draw odometer icons, red / white.
+	if (screenMenu == 2) {
 
 		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconWhite, BUTTON2_W - 2, BUTTON2_H - 2);
-		//tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_RED);
-
+		
 		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
@@ -1123,7 +1145,6 @@ void loop() {
 		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_BLACK);
 		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_WHITE);
 		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y + 49, BUTTON4_H + 7, TFT_BLACK);
-
 	}
 
 	else if (screenMenu != 5) {
@@ -1132,11 +1153,10 @@ void loop() {
 		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_BLACK);
 	}
 
-	if (screenMenu == 1) {			// Draw current session icons, red / white.
+	if (screenMenu == 1) {	
 
 		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconWhite, BUTTON1_W - 2, BUTTON1_H - 2);
-		//tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
-
+		
 		tft.drawFastHLine(BUTTON1_X - 8, BUTTON1_Y, BUTTON1_H + 8, TFT_WHITE);
 		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_WHITE);
 		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_BLACK);
@@ -1156,7 +1176,6 @@ void loop() {
 		tft.drawFastVLine(BUTTON4_X + 50, BUTTON4_Y, BUTTON4_H, TFT_BLACK);
 		tft.drawFastVLine(BUTTON4_X - 8, BUTTON4_Y + 1, BUTTON4_H - 2, TFT_WHITE);
 		tft.drawFastHLine(BUTTON4_X - 7, BUTTON4_Y + 49, BUTTON4_H + 7, TFT_BLACK);
-
 	}
 
 	else if (screenMenu != 5) {
@@ -1169,19 +1188,13 @@ void loop() {
 
 	uint16_t x, y;		// variables for touch data.
 
-	// See if there's any touch data for us
+	// See if there's any touch data for us.
 
 	if (tft.getTouch(&x, &y)) {
 
-		// Restart auto sleep timer.
+		// Restart sleep timer.
 
 		sleepT = millis();
-
-		// Draw a block spot to show where touch was calculated to be
-
-#ifdef BLACK_SPOT
-		tft.fillCircle(x, y, 2, TFT_BLACK);
-#endif
 
 		// Button one.
 
@@ -1198,12 +1211,11 @@ void loop() {
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
+				}
 
-				} // Close if.
+			}
 
-			} // Close if.
-
-		} // Close if.
+		}
 
 		// Button two.
 
@@ -1220,54 +1232,47 @@ void loop() {
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
-
-				} // Close if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 6) {
 
 					tone(buzzerP, buzzerF);
 					resetMenuSettingMinus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 5) {
 
 					tone(buzzerP, buzzerF);
 					buzzerSettingMinus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 4) {
 
 					tone(buzzerP, buzzerF);
 					timeScaleSettingMinus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 3) {
 
 					tone(buzzerP, buzzerF);
 					distanceScaleSettingMinus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 2) {
 
 					tone(buzzerP, buzzerF);
 					circumferenceSettingMinus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 1) {
 
 					tone(buzzerP, buzzerF);
 					menuSettingMinus();
+				}
 
-				} // Close else if.
+			}
 
-			} // Close if.
-
-		} // Close if.
+		}
 
 		// Button three.
 
@@ -1284,55 +1289,47 @@ void loop() {
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
-
-				} // Close if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 6) {
 
 					tone(buzzerP, buzzerF);
 					resetMenuSettingPlus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 5) {
 
 					tone(buzzerP, buzzerF);
 					buzzerSettingPlus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 4) {
 
 					tone(buzzerP, buzzerF);
 					timeScaleSettingPlus();
-
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 3) {
 
 					tone(buzzerP, buzzerF);
 					distanceScaleSettingPlus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 2) {
 
 					tone(buzzerP, buzzerF);
 					circumferenceSettingPlus();
-
-				} // Close else if.
+				}
 
 				else if (screenMenu == 5 && configurationFlag == 1) {
 
 					tone(buzzerP, buzzerF);
 					menuSettingPlus();
+				}
 
-				} // Close else if.
+			}
 
-			} // Close if.
-
-		} // Close if.
+		}
 
 		// Button four.
 
@@ -1349,8 +1346,7 @@ void loop() {
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
-
-				} // Close if.
+				}
 
 				else if (screenMenu == 5) {
 
@@ -1365,12 +1361,11 @@ void loop() {
 					Serial.print("Configuration Flag After If: ");
 					Serial.print(configurationFlag);
 					Serial.println(" ");
-
 				}
 
-			} // Close if.
+			}
 
-		} // Close if.
+		}
 
 		if ((x > SETTINGS_COG_X) && (x < (SETTINGS_COG_X + SETTINGS_COG_W))) {
 			if ((y > SETTINGS_COG_Y) && (y <= (SETTINGS_COG_Y + SETTINGS_COG_H))) {
@@ -1385,14 +1380,13 @@ void loop() {
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
 					Serial.println(" ");
+				}
 
-				} // Close if.
+			}
 
-			} // Close if.
+		}
 
-		} // Close if.
-
-	} // Close if.
+	}
 
 	// Trigger screen choice - Current exercise screen.
 
@@ -1402,12 +1396,10 @@ void loop() {
 
 			drawBlackBox();
 			screenRedraw = 0;
-
-		} // Close if.
+		}
 
 		currentExerciseScreen();
-
-	} // Close if.
+	}
 
 	// Trigger screen choice - Odometer screen.
 
@@ -1419,12 +1411,11 @@ void loop() {
 			drawBlackBox();
 			dial_1 = true;
 			screenRedraw = 0;
-
-		} // Close if.
+		}
 
 		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Kph", dial_1); // XPH dial screen function.
-
-	} // Close if.
+	
+	}
 
 	// Trigger screen choice - Distance sessions screen.
 
@@ -1441,68 +1432,60 @@ void loop() {
 			graph_6 = true;
 			graph_7 = true;
 			screenRedraw = 0;
-
-		} // Close if.
+		}
 
 		// Session time bar graphs.
 
 		if (sessionTimeArray1 <= sessionTimeCap) {
 
 			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
-
-		} // Close if.
+		}
 
 		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
 
 		if (sessionTimeArray2 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
-
-		} // Close if.
+		}
 
 		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
 
 		if (sessionTimeArray3 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
-
-		} // Close if.
+		}
 
 		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
 
 		if (sessionTimeArray4 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
-
-		} // Close if.
+		}
 
 		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
 
 		if (sessionTimeArray5 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
-
-		} // Close if.
+		}
 
 		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
 
 		if (sessionTimeArray6 <= sessionTimeCap) {
 
 			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
-
-		} // Close if.
+		}
 
 		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
 
 		if (sessionTimeArray7 <= sessionTimeCap) {
 
 			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
-
-		} // Close if.
+		}
 
 		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
 
-	} // Close if.
+	}
 
 	// Trigger screen choice - Time sessions screen.
 
@@ -1519,110 +1502,95 @@ void loop() {
 			graph_13 = true;
 			graph_14 = true;
 			screenRedraw = 0;
-
-		} // Close if.
+		}
 
 		// Distance bar graphs.
 
 		if (distanceTravelledArray1 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
-
-		} // Close if.
+		}
 
 		else if (distanceTravelledArray1 >= distanceGraphCap) {
 
 			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
-
-		} // Close else if.
+		}
 
 		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8)));
 
 		if (distanceTravelledArray2 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
-
-		} // Close if.
+		}
 
 		else if (distanceTravelledArray2 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
-
-		} // Close else if.
+		}
 
 		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9)));
 
 		if (distanceTravelledArray3 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
-
-		} // Close if.
+		}
 
 		else if (distanceTravelledArray3 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
-
-		} // Close else if.
+		}
 
 		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10)));
 
 		if (distanceTravelledArray4 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
-
-		} // Close if.
+		}
 
 		else if (distanceTravelledArray4 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
-
-		} // Close else if.
+		}
 
 		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11)));
 
 		if (distanceTravelledArray5 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
-
-		} // Close if.
+		}
 
 		else if (distanceTravelledArray5 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
-
-		} // Close else if.
+		}
 
 		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12)));
 
 		if (distanceTravelledArray6 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
-
-		} // Close if.
+		}
 
 		else if (distanceTravelledArray6 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
-
-		} // Close else if.
+		}
 
 		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13)));
 
 		if (distanceTravelledArray7 <= (distanceGraphCap * 0.8)) {
 
 			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
-
-		} // Close if.
+		}
 
 		else if (distanceTravelledArray7 >= distanceGraphCap) {
 
 			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
-
-		} // Close else if.
+		}
 
 		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray7, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14)));
 
-	} // Close if.
+	}
 
 	// Trigger screen choice - Configuration screen.
 
@@ -1632,20 +1600,18 @@ void loop() {
 
 			drawBlackBox();
 			screenRedraw = 0;
-
-		} // Close if.
+		}
 
 		configurationDisplay();
 
-	} // Close if.
-
-		// Check for new max speed.
+	}
+	
+	// Check for new max speed.
 
 	if (speedKph > maxKphSpeed) {
 
 		maxKphSpeed = speedKph;
-
-	} // Close if.
+	}
 
 	// Calculate average speed & remove any minus calculations.
 
@@ -1654,8 +1620,7 @@ void loop() {
 	if (averageKphSpeed < 0.99) {
 
 		averageKphSpeed = 0.00;
-
-	}  // Close if.
+	}
 
 } // Close loop.
 
@@ -1674,29 +1639,28 @@ void mainData() {
 		recordSessions = 1;
 		eeSessionChange = true;
 		disconnectWiFi = false;
+	}
 
-	} // Close if.
-
-	else {
-
+	else
+	{
 		// Calculate current session time.
 
 		sessionTimeMillis = millis() - sessionStartTime;
 		sessionTime = sessionTimeMillis / 1000;
-
-	} // Close else.
+	}
 
 	// Ensure data is always "0" or greater, if not set to "0"
 
 	if ((speedKph >= 0) || (speedMph >= 0)) {
 
-	} // Close if.
+		// Do nothing.
+	}
 
-	else {
+	else
+	{
 		speedKph = 0.00;
 		speedMph = 0.00;
-
-	} // Close else.
+	}
 
 	if ((sessionTimeFlag == 1) && (recordSessions == 1)) {							// Calculate session duration.
 
@@ -1769,18 +1733,16 @@ void mainData() {
 				EEPROM.put(eeSessionDistanceArray7Address, distanceTravelledArray[6]);
 				EEPROM.commit();
 				eeSessionChange = false;
+			}
 
-			} // Close switch case.
-
-		} // Close if.
+		}
 
 		sessionArrayPosition++;													// Increment sessionTimeArrayPosition.
 
 		if (sessionArrayPosition >= 7) {										// Check array position is within parametres.
 
 			sessionArrayPosition = 0;
-
-		} // Close if.
+		}
 
 		EEPROM.put(eeSessionArrayPositionAddress, sessionArrayPosition);		// Record the next array position in EEPROM.
 		EEPROM.commit();
@@ -1793,10 +1755,9 @@ void mainData() {
 			EEPROM.put(eeTotalDistanceAddress, distanceCounter);
 			EEPROM.commit();
 			eeTotalDistanceChange = false;
+		}
 
-		} // Close if.
-
-	} // Close if.
+	}
 
 	// Calculate current session distance travelled.
 
@@ -1805,19 +1766,16 @@ void mainData() {
 	if (maxKphSpeed == 0) {				// Reset start up session distance displayed to zero, otherwise it displays current total distance.
 
 		sessionDistance = 0;
-
-	} // Close if.
+	}
 
 	if (sessionTime == 0) {
 
 		// Reset max speed.
 
 		maxKphSpeed = 0;
+	}
 
-	} // Close if.
-
-	/*
-	Configure speed varibales to the same format for screen layout using dtostrf.
+	/* Configure speed varibales to the same format for screen layout using dtostrf.
 
 	dtostrf(floatvar, StringLengthIncDecimalPoint, numVarsAfterDecimal, charbuf);
 
@@ -1826,7 +1784,7 @@ void mainData() {
 		floatvar					float variable.
 		StringLengthIncDecimalPoint	This is the length of the string that will be created.
 		numVarsAfterDecimal			The number of digits after the deimal point to print.
-		charbuf						The array to store the results*/
+		charbuf						The array to store the results */
 
 	dtostrf(speedKph, 6, 2, kphArray);
 	dtostrf(averageKphSpeed, 6, 2, averageKphSpeedArray);
@@ -1871,8 +1829,7 @@ void averageSpeed() {
 	if (readIndex >= numReadings) {
 
 		readIndex = 0;
-
-	} // Close if.
+	}
 
 }  // Close function.
 
@@ -2096,6 +2053,7 @@ void configurationDisplay() {
 			if ((x > BUTTON4_X) && (x < (BUTTON4_X + BUTTON4_W))) {
 				if ((y > BUTTON4_Y) && (y <= (BUTTON4_Y + BUTTON4_H))) {
 
+					tone(buzzerP, buzzerF);
 					Serial.print("Yes Reset While Ran!");
 					Serial.println(" ");
 					ESP.restart();
@@ -2117,6 +2075,7 @@ void configurationDisplay() {
 					Serial.print(screenMenu);
 					Serial.println(" ");
 					tft.setFreeFont();
+					delay(1000);
 
 				} // Close if.
 
@@ -2138,16 +2097,18 @@ void configurationDisplay() {
 
 /*-----------------------------------------------------------------*/
 
+// Menu setting plus.
+
 void menuSettingPlus() {
 
 	// Incremental function to menu setting.
 
-	if (eeMenuSetting == 5)
-	{
+	if (eeMenuSetting == 5) {
+
 		eeMenuSetting = 1;
 		eeMenuSettingChange = true;
-
 	}
+	
 	else
 	{
 		eeMenuSetting++;
@@ -2167,15 +2128,18 @@ void menuSettingPlus() {
 
 	/*-----------------------------------------------------------------*/
 
+// Menu setting minus.
+
 void menuSettingMinus() {
 
 	// Incremental function to menu setting.
 
-	if (eeMenuSetting == 1)
-	{
+	if (eeMenuSetting == 1) 	{
+
 		eeMenuSetting = 5;
 		eeMenuSettingChange = true;
 	}
+
 	else
 	{
 		eeMenuSetting--;
@@ -2195,6 +2159,8 @@ void menuSettingMinus() {
 
 /*-----------------------------------------------------------------*/
 
+// Save menu setting.
+
 void menuSettingSave() {
 
 	// Write menu setting to EEPROM.
@@ -2204,27 +2170,28 @@ void menuSettingSave() {
 		EEPROM.put(eeMenuAddress, eeMenuSetting);
 		EEPROM.commit();
 		eeMenuSettingChange = false;
-
-	} // Close if.
+	}
 
 }  // Close function.
 
 /*-----------------------------------------------------------------*/
 
+// Graph distance scale menu plus.
+
 void distanceScaleSettingPlus() {
 
 	// Incremental function to menu setting.
 
-	if (graphDAP == 3)
-	{
+	if (graphDAP == 3) {
+
 		graphDAP = 0;
 		graphDSC = true;
 	}
+
 	else
 	{
 		graphDAP++;
 		graphDSC = true;
-
 	}
 
 	Serial.print("Distance Scale: ");
@@ -2241,22 +2208,24 @@ void distanceScaleSettingPlus() {
 
 } // Close function.
 
-	/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
+// Graph distance scale menu plus.
 
 void distanceScaleSettingMinus() {
 
 	// Incremental function to menu setting.
 
-	if (graphDAP == 0)
-	{
+	if (graphDAP == 0) {
+		
 		graphDAP = 3;
 		graphDSC = true;
 	}
+
 	else
 	{
 		graphDAP--;
 		graphDSC = true;
-
 	}
 
 	Serial.print("Distance Scale: ");
@@ -2273,7 +2242,9 @@ void distanceScaleSettingMinus() {
 
 } // Close function.
 
-	/*-----------------------------------------------------------------*/
+/*-----------------------------------------------------------------*/
+
+// Save graph distance scale.
 
 void distanceScaleSettingSave() {
 
@@ -2292,27 +2263,28 @@ void distanceScaleSettingSave() {
 		EEPROM.commit();
 
 		graphDSC = false;
-
-	} // Close if.
+	}
 
 }  // Close function.
 
 /*-----------------------------------------------------------------*/
 
+// Graph time scale menu plus.
+
 void timeScaleSettingPlus() {
 
 	// Incremental function to menu setting.
 
-	if (graphTAP == 11)
-	{
+	if (graphTAP == 11) 	{
+
 		graphTAP = 0;
 		graphTSC = true;
 	}
+
 	else
 	{
 		graphTAP++;
 		graphTSC = true;
-
 	}
 
 	Serial.print("Time Scale: ");
@@ -2331,20 +2303,22 @@ void timeScaleSettingPlus() {
 
 /*-----------------------------------------------------------------*/
 
+// Graph time scale menu minus.
+
 void timeScaleSettingMinus() {
 
-	// Incremental function to menu setting.
+	// Decremental function to menu setting.
 
-	if (graphTAP == 0)
-	{
+	if (graphTAP == 0) 	{
+
 		graphTAP = 11;
 		graphTSC = true;
 	}
+
 	else
 	{
 		graphTAP--;
 		graphTSC = true;
-
 	}
 
 	Serial.print("Time Scale: ");
@@ -2363,6 +2337,8 @@ void timeScaleSettingMinus() {
 
 	/*-----------------------------------------------------------------*/
 
+// Save graph time scale.
+
 void timeScaleSettingSave() {
 
 	// Write menu setting to EEPROM.
@@ -2380,13 +2356,13 @@ void timeScaleSettingSave() {
 		EEPROM.commit();
 
 		graphTSC = false;
-
-	} // Close if.
+	}
 
 }  // Close function.
 
-
 /*-----------------------------------------------------------------*/
+
+// Buzzer setting plus changes.
 
 void buzzerSettingPlus() {
 
@@ -2412,6 +2388,8 @@ void buzzerSettingPlus() {
 
 /*-----------------------------------------------------------------*/
 
+// Buzzer setting minus changes.
+
 void buzzerSettingMinus() {
 
 	// Y/N function change to buzzer setting.
@@ -2436,6 +2414,8 @@ void buzzerSettingMinus() {
 
 /*-----------------------------------------------------------------*/
 
+// Buzzer setting save changes.
+
 void buzzerSettingSave() {
 
 	// Write buzzer setting to EEPROM.
@@ -2445,23 +2425,24 @@ void buzzerSettingSave() {
 		EEPROM.put(eeBuzzerYNAddress, buzzerYN);
 		EEPROM.commit();
 		eeBuzzerYNChange = false;
-
-	} // Close if.
+	}
 
 }  // Close function.
 
 /*-----------------------------------------------------------------*/
 
+// Reset setting plus changes.
+
 void resetMenuSettingPlus() {
 
 	// Incremental function to reset setting.
 
-	if (eeResetSetting == 2)
-	{
+	if (eeResetSetting == 2) {
+
 		eeResetSetting = 0;
 		eeResetSettingChange = true;
-
 	}
+	
 	else
 	{
 		eeResetSetting++;
@@ -2481,15 +2462,18 @@ void resetMenuSettingPlus() {
 
 /*-----------------------------------------------------------------*/
 
+// Reset setting plus changes.
+
 void resetMenuSettingMinus() {
 
 	// Decremental function to reset setting.
 
-	if (eeResetSetting == 0)
-	{
+	if (eeResetSetting == 0) {
+
 		eeResetSetting = 2;
 		eeResetSettingChange = true;
 	}
+
 	else
 	{
 		eeResetSetting--;
@@ -2508,6 +2492,8 @@ void resetMenuSettingMinus() {
 } // Close function.
 /*-----------------------------------------------------------------*/
 
+// Reset setting save changes.
+
 void resetMenuSettingSave() {
 
 	// Write reset setting to EEPROM.
@@ -2517,8 +2503,7 @@ void resetMenuSettingSave() {
 		EEPROM.put(eeResetSettingAddress, eeResetSetting);
 		EEPROM.commit();
 		eeResetSettingChange = false;
-
-	} // Close if.
+	}
 
 } // Close function.
 
@@ -2530,13 +2515,13 @@ void circumferenceSettingPlus() {
 
 	// Incremental function to circumference setting.
 
-	if (eeCircSetting >= 2.00)
-	{
+	if (eeCircSetting >= 2.00)	{
+
 		eeCircSetting = 0.01;
 		eeCircSettingChange = true;
-
 	}
-	else
+	
+	else 
 	{
 		eeCircSetting = eeCircSetting + 0.01;
 		eeCircSettingChange = true;
@@ -2549,6 +2534,7 @@ void circumferenceSettingPlus() {
 	if (eeCircSettingChange == true) {			// Write results to EEPROM to save.
 
 		circumferenceSettingSave();
+
 	}
 
 }  // Close function.
@@ -2561,11 +2547,12 @@ void circumferenceSettingMinus() {
 
 	// Decremental function to circumference setting.
 
-	if (eeCircSetting <= 0.01)
-	{
+	if (eeCircSetting <= 0.01) 	{
+
 		eeCircSetting = 2.00;
 		eeCircSettingChange = true;
 	}
+
 	else
 	{
 		eeCircSetting = eeCircSetting - 0.01;
@@ -2579,6 +2566,7 @@ void circumferenceSettingMinus() {
 	if (eeCircSettingChange == true) {			// Write results to EEPROM to save.
 
 		circumferenceSettingSave();
+
 	}
 
 } // Close function.
@@ -2596,8 +2584,7 @@ void circumferenceSettingSave() {
 		EEPROM.put(eeCircAddress, eeCircSetting);
 		EEPROM.commit();
 		eeCircSettingChange = false;
-
-	} // Close if.
+	}
 
 }  // Close function.
 
@@ -2605,8 +2592,8 @@ void circumferenceSettingSave() {
 
 // Draw borders.
 
-void drawBorder()
-{
+void drawBorder() {
+
 	// Draw layout borders.
 
 	tft.drawRect(FRAME1_X, FRAME1_Y, FRAME1_W, FRAME1_H, TFT_WHITE);
@@ -2618,8 +2605,8 @@ void drawBorder()
 
 // Draw black boxes when screens change.
 
-void drawBlackBox()
-{
+void drawBlackBox() {
+
 	// Clear screen by using a black box.
 
 	tft.fillRect(FRAME2_X + 1, FRAME2_Y + 25, FRAME2_W - 2, FRAME2_H - 40, TFT_BLACK);		// This covers only the graphs and charts, not the system icons to save refresh flicker.
@@ -2631,8 +2618,8 @@ void drawBlackBox()
 
 // Draw sensor circle.
 
-void drawSensor()
-{
+void drawSensor() {
+
 	// Draw sensor icon.
 
 	tft.drawCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R, TFT_WHITE);
@@ -2640,7 +2627,6 @@ void drawSensor()
 	if (sensorT == true) {
 
 		tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, TFT_GREEN);
-
 	}
 
 	else tft.fillCircle(SENSOR_ICON_X, SENSOR_ICON_Y, SENSOR_ICON_R - 1, TFT_BLACK);
@@ -2659,33 +2645,11 @@ void menu_Change() {
 
 /*-----------------------------------------------------------------*/
 
-// Not used any longer.
-
-void startUp() {
-
-	// Draw buttons at startup.
-
-	//tft.fillRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_RED);
-	//tft.drawRect(BUTTON1_X, BUTTON1_Y, BUTTON1_W, BUTTON1_H, TFT_WHITE);
-
-	//tft.fillRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, LTBLUE);
-	//tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_WHITE);
-
-	//tft.fillRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, LTBLUE);
-	//tft.drawRect(BUTTON3_X, BUTTON3_Y, BUTTON3_W, BUTTON3_H, TFT_WHITE);
-
-	//tft.fillRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, LTBLUE);
-	//tft.drawRect(BUTTON4_X, BUTTON4_Y, BUTTON4_W, BUTTON4_H, TFT_WHITE);
-
-} // Close function.
-
-/*-----------------------------------------------------------------*/
-
 // WiFi title page.
 
 void wiFiTitle() {
 
-	// Title WiFi screen.
+	// WiFi title screen.
 
 	tft.setFreeFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -2715,39 +2679,39 @@ void wiFiTitle() {
 
 void resetSystemData() {
 
-	eeMenuSetting = 2;
+	eeMenuSetting = 2;															// Default menu setting.
 	EEPROM.put(eeMenuAddress, eeMenuSetting);
 	EEPROM.commit();
 
-	eeCircSetting = 1.00;
+	eeCircSetting = 1.00;														// Curcumference.
 	EEPROM.put(eeCircAddress, eeCircSetting);
 	EEPROM.commit();
 
-	graphDM = 1000;
+	graphDM = 1000;																// Graph distance scale.
 	graphDMI = 200;
 	EEPROM.put(eegraphDMAddress, graphDM);
 	EEPROM.put(eegraphDMIAddress, graphDMI);
 	EEPROM.commit();
 
-	graphTM = 60;
+	graphTM = 60;																// Graph time scale.
 	graphTMI = 6;
 	EEPROM.put(eegraphTMAddress, graphTM);
 	EEPROM.put(eegraphTMIAddress, graphTMI);
 	EEPROM.commit();
 
-	buzzerYN = 1;
+	buzzerYN = 1;																// Buzzer flag.
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
 	EEPROM.commit();
 
-	calTouchScreen = 1;
+	calTouchScreen = 1;															// Calibration flag.
 	EEPROM.put(eeCalYNAddress, calTouchScreen);
 	EEPROM.commit();
 
-	eeTotalDistance = 0.00;
+	eeTotalDistance = 0.00;														// Total distance travelled.
 	EEPROM.put(eeTotalDistanceAddress, eeTotalDistance);
 	EEPROM.commit();
 
-	eeSessionArrayPosition = 0;
+	eeSessionArrayPosition = 0;													// Last saved array position.
 	EEPROM.put(eeSessionArrayPositionAddress, eeSessionArrayPosition);
 
 	EEPROM.put(eeSessionTimeArray1Address, 0);									// Populate arrays with zero data.
@@ -2768,11 +2732,11 @@ void resetSystemData() {
 	EEPROM.put(eeSessionDistanceArray7Address, 0);
 	EEPROM.commit();
 
-	eeResetSetting = 0;
+	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
 	EEPROM.put(eeResetSettingAddress, 0);
 	EEPROM.commit();
 
-	EEPROM.get(eeMenuAddress, eeMenuSetting);
+	EEPROM.get(eeMenuAddress, eeMenuSetting);									// Load data from EEPROM.
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
@@ -2790,7 +2754,7 @@ void resetSystemData() {
 
 	EEPROM.commit();
 
-	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;							// Times to be updated, needs to be divided by 1000.
+	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;						// Times to be updated, needs to be divided by 1000.
 	sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
 	sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
 	sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
@@ -2824,35 +2788,35 @@ void resetSystemData() {
 
 void resetSystemDemoData() {
 
-	eeMenuSetting = 2;
+	eeMenuSetting = 2;															// Default menu setting.
 	EEPROM.put(eeMenuAddress, eeMenuSetting);
 	EEPROM.commit();
 
-	eeCircSetting = 2.00;
+	eeCircSetting = 2.00;														// Curcumference.
 	EEPROM.put(eeCircAddress, eeCircSetting);
 	EEPROM.commit();
 
-	graphDM = 1000;
+	graphDM = 1000;																// Graph distance scale.
 	graphDMI = 200;
 	EEPROM.put(eegraphDMAddress, graphDM);
 	EEPROM.put(eegraphDMIAddress, graphDMI);
 	EEPROM.commit();
 
-	graphTM = 60;
+	graphTM = 60;																// Graph time scale.
 	graphTMI = 6;
 	EEPROM.put(eegraphTMAddress, graphTM);
 	EEPROM.put(eegraphTMIAddress, graphTMI);
 	EEPROM.commit();
-
-	buzzerYN = 1;
+		
+	buzzerYN = 1;																// Buzzer flag.
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
 	EEPROM.commit();
 
-	eeTotalDistance = 5000.00;
+	eeTotalDistance = 5000.00;													// Total distance travelled.
 	EEPROM.put(eeTotalDistanceAddress, eeTotalDistance);
 	EEPROM.commit();
 
-	eeSessionArrayPosition = 0;
+	eeSessionArrayPosition = 0;													// Last saved array position.
 	EEPROM.put(eeSessionArrayPositionAddress, eeSessionArrayPosition);
 
 	EEPROM.put(eeSessionTimeArray1Address, 0);									// Populate arrays with demo data.
@@ -2873,11 +2837,11 @@ void resetSystemDemoData() {
 	EEPROM.put(eeSessionDistanceArray7Address, 1200);
 	EEPROM.commit();
 
-	eeResetSetting = 0;
+	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
 	EEPROM.put(eeResetSettingAddress, 0);
 	EEPROM.commit();
 
-	EEPROM.get(eeMenuAddress, eeMenuSetting);
+	EEPROM.get(eeMenuAddress, eeMenuSetting);									// Load data from EEPROM.
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
@@ -2895,7 +2859,7 @@ void resetSystemDemoData() {
 
 	EEPROM.commit();
 
-	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;							// Times to be updated, needs to be divided by 1000.
+	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;						// Times to be updated, needs to be divided by 1000.
 	sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
 	sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
 	sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
@@ -2924,4 +2888,3 @@ void resetSystemDemoData() {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
-

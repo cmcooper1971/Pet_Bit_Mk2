@@ -18,8 +18,8 @@ void startUpScreen(TFT_eSPI& tft) {
 			tft.drawPixel(col, row, pgm_read_word(startScreen + buffidx));
 			buffidx++;
 
-		} // End for loop.
+		}
 
-	} // End for loop.
+	}
 
 }  // Close function.

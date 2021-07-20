@@ -10,8 +10,7 @@
 
 /*-----------------------------------------------------------------*/
 
-void ptSessionDistanceV1(TFT_eSPI& tft, double x, double y, double w, double h, double loval, double hival, double inc, double curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw)
-{
+void ptSessionDistanceV1(TFT_eSPI& tft, double x, double y, double w, double h, double loval, double hival, double inc, double curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw) {
 
 	tft.setFreeFont(&FreeSans9pt7b);
 	tft.setTextSize(1);
@@ -23,9 +22,12 @@ void ptSessionDistanceV1(TFT_eSPI& tft, double x, double y, double w, double h, 
 	double stepval, range;
 	double my, level;
 	double i, data;
+
 	// draw the border, scale, and label once.
 	// avoid doing this on every update to minimize flicker.
+	
 	if (redraw == true) {
+
 		redraw = false;
 
 		tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
@@ -33,10 +35,13 @@ void ptSessionDistanceV1(TFT_eSPI& tft, double x, double y, double w, double h, 
 		tft.setTextSize(1);
 		tft.setCursor(x + 2, y + 7);
 		tft.println(label);
+		
 		// step val basically scales the hival and low val to the height
 		// deducting a small value to eliminate round off errors
 		// this val may need to be adjusted.
+
 		stepval = (inc) * (double(h) / (double(hival - loval))) - 0;
+		
 		for (i = 0; i <= h; i += stepval) {
 			my = y - h + i;
 			tft.drawFastHLine(x + w + 1, my, 5, textcolor);
@@ -48,14 +53,20 @@ void ptSessionDistanceV1(TFT_eSPI& tft, double x, double y, double w, double h, 
 			tft.println(Format(data, dig, dec));
 			//Screen.setFont();
 		}
+
 	}
+
 	// compute level of bar graph that is scaled to the  height and the hi and low vals
 	// this is needed to accompdate for +/- range
+
 	level = (h * (((curval - loval) / (hival - loval))));
+	
 	// draw the bar graph
 	// write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
+	
 	tft.fillRect(x, y - h, w, h - level, voidcolor);
 	tft.fillRect(x, y - level + 1, w, level, barcolor);
+	
 	// write the current value
 	/*
 	  tft.setTextColor(textcolor, backcolor);
@@ -68,15 +79,17 @@ void ptSessionDistanceV1(TFT_eSPI& tft, double x, double y, double w, double h, 
 
 /*-----------------------------------------------------------------*/
 
-void ptSessionDistanceV2(TFT_eSPI& tft, double x, double y, double w, double h, double loval, double hival, double inc, double curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw)
-{
+void ptSessionDistanceV2(TFT_eSPI& tft, double x, double y, double w, double h, double loval, double hival, double inc, double curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw) {
 
 	double stepval, range;
 	double my, level;
 	double i, data;
+
 	// draw the border, scale, and label once
 	// avoid doing this on every update to minimize flicker
+
 	if (redraw == true) {
+
 		redraw = false;
 
 		tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
@@ -84,10 +97,13 @@ void ptSessionDistanceV2(TFT_eSPI& tft, double x, double y, double w, double h, 
 		tft.setTextSize(1);
 		tft.setCursor(x + 2, y + 7);
 		tft.println(label);
+
 		// step val basically scales the hival and low val to the height
 		// deducting a small value to eliminate round off errors
 		// this val may need to be adjusted
+		
 		stepval = (inc) * (double(h) / (double(hival - loval))) - 0;
+		
 		for (i = 0; i <= h; i += stepval) {
 			my = y - h + i;
 			tft.drawFastHLine(x + w + 1, my, 5, textcolor);
@@ -98,14 +114,20 @@ void ptSessionDistanceV2(TFT_eSPI& tft, double x, double y, double w, double h, 
 			data = hival - (i * (inc / stepval));
 			tft.println(Format(data, dig, dec));
 		}
+	
 	}
+
 	// compute level of bar graph that is scaled to the  height and the hi and low vals
 	// this is needed to accompdate for +/- range
+	
 	level = (h * (((curval - loval) / (hival - loval))));
+	
 	// draw the bar graph
 	// write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
+	
 	tft.fillRect(x, y - h, w, h - level, voidcolor);
 	tft.fillRect(x, y - level + 1, w, level, barcolor);
+	
 	// write the current value
 	/*
 	  tft.setTextColor(textcolor, backcolor);
@@ -118,15 +140,17 @@ void ptSessionDistanceV2(TFT_eSPI& tft, double x, double y, double w, double h, 
 
 /*-----------------------------------------------------------------*/
 
-void ptSessionDistanceV3(TFT_eSPI& tft, double x, double y, double w, double h, double loval, double hival, double inc, double curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw)
-{
+void ptSessionDistanceV3(TFT_eSPI& tft, double x, double y, double w, double h, double loval, double hival, double inc, double curval, int dig, int dec, unsigned int barcolor, unsigned int voidcolor, unsigned int bordercolor, unsigned int textcolor, unsigned int backcolor, String label, boolean& redraw) {
 
 	double stepval, range;
 	double my, level;
 	double i, data;
+
 	// draw the border, scale, and label once
 	// avoid doing this on every update to minimize flicker
+
 	if (redraw == true) {
+
 		redraw = false;
 
 		tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
@@ -134,10 +158,13 @@ void ptSessionDistanceV3(TFT_eSPI& tft, double x, double y, double w, double h, 
 		tft.setTextSize(1);
 		tft.setCursor(x + 2, y + 7);
 		tft.println(label);
+
 		// step val basically scales the hival and low val to the height
 		// deducting a small value to eliminate round off errors
 		// this val may need to be adjusted
+		
 		stepval = (inc) * (double(h) / (double(hival - loval))) - 0;
+		
 		for (i = 0; i <= h; i += stepval) {
 			my = y - h + i;
 			tft.drawFastHLine(x + w + 1, my, 5, textcolor);
@@ -148,14 +175,20 @@ void ptSessionDistanceV3(TFT_eSPI& tft, double x, double y, double w, double h, 
 			data = hival - (i * (inc / stepval));
 			tft.println(Format(data, dig, dec));
 		}
+
 	}
+
 	// compute level of bar graph that is scaled to the  height and the hi and low vals
 	// this is needed to accompdate for +/- range
+
 	level = (h * (((curval - loval) / (hival - loval))));
+
 	// draw the bar graph
 	// write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
+
 	tft.fillRect(x, y - h, w, h - level, voidcolor);
 	tft.fillRect(x, y - level + 1, w, level, barcolor);
+
 	// write the current value
 	/*
 	  tft.setTextColor(textcolor, backcolor);

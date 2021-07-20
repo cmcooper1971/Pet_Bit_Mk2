@@ -31,14 +31,14 @@ void touch_calibrate(TFT_eSPI& tft) {
     tft.setFreeFont(&FreeSans9pt7b);
     tft.setTextSize(1);
     tft.setTextColor(WHITE);
-    tft.setCursor(25, 30);
+    tft.setCursor(60, 105);
     tft.println("Touch Screen Calibration");
     tft.setFreeFont();
     
     tft.setTextFont(2);
     tft.setTextSize(1);
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setCursor(30, 40);
+    tft.setCursor(80, 115);
     tft.println("Touch corners as indicated");
 
     tft.setTextFont(1);
@@ -61,9 +61,9 @@ void touch_calibrate(TFT_eSPI& tft) {
     tft.setFreeFont(&FreeSans9pt7b);
     tft.setTextSize(1);
     tft.setTextColor(WHITE);
-    tft.setCursor(25, 30);
+    tft.setCursor(70, 105);
     tft.println("Calibration Complete");
-    tft.setFreeFont();
+    //tft.setFreeFont();
 
     delay(500);
     
@@ -79,13 +79,13 @@ void touch_calibrate(TFT_eSPI& tft) {
     tft.setTextFont(2);
     tft.setTextSize(1);
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.setCursor(30, 40);
+    tft.setCursor(70, 115);
     tft.println("Writing settings to EEPROM");   
     delay(1000);
 
-    tft.setCursor(30, 60);
+    tft.setCursor(130, 135);
     tft.println("Success!");
-    delay(2000);
+    delay(3000);
     
     tft.fillScreen(ILI9341_BLACK);
 
