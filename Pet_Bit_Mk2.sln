@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AsyncTCP-master", "Librarie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESPAsyncWebServer-master", "Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems", "{1751CB50-4C0E-4E81-869F-EBB622929899}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESP32Time", "Libraries\ESP32Time\ESP32Time.vcxitems", "{A11E4EF5-39FE-4B4E-98EA-CFC18E0FB434}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Libraries\SPI\SPI.vcxitems*{0045052c-42b2-4d47-8260-252518218d33}*SharedItemsImports = 9
@@ -29,10 +31,12 @@ Global
 		Libraries\TFT_eSPI\TFT_eSPI.vcxitems*{3cdf696d-1dc6-4efd-be3d-d1f3393bfd11}*SharedItemsImports = 9
 		Libraries\FS\FS.vcxitems*{7449d5d4-0bfd-4537-b022-d230a93db316}*SharedItemsImports = 9
 		Libraries\EEPROM\EEPROM.vcxitems*{a1198025-c119-4f38-ac85-3f4abfecaec0}*SharedItemsImports = 9
+		Libraries\ESP32Time\ESP32Time.vcxitems*{a11e4ef5-39fe-4b4e-98ea-cfc18e0fb434}*SharedItemsImports = 9
 		Libraries\arduino_83418\arduino_83418.vcxitems*{a3d09c5f-6c62-4708-b7da-aa758d9a747e}*SharedItemsImports = 9
 		Libraries\arduino_83418\arduino_83418.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\AsyncTCP-master\AsyncTCP-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\EEPROM\EEPROM.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
+		Libraries\ESP32Time\ESP32Time.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\ESPAsyncWebServer-master\ESPAsyncWebServer-master.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\FS\FS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4
 		Libraries\SPIFFS\SPIFFS.vcxitems*{c5f80730-f44f-4478-bdae-6634efc2ca88}*SharedItemsImports = 4

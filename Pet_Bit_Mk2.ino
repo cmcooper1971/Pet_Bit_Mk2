@@ -7,7 +7,7 @@
 // Libraries.
 
 #include <WiFi.h>					// Arduino WiFi library.
-#include "time.h"					// Arduino standard time library
+#include <ESP32Time.h>				// F Biego ESp32 time library.
 #include <AsyncTCP.h>				// Random Nerd library.
 #include <ESPAsyncWebServer.h>		// Random Nerd library.
 #include <SPIFFS.h>					// File store.
@@ -67,6 +67,8 @@ int buzzerD;						// Buzzer delay.
 
 // Configure time settings.
 
+ESP32Time rtc;
+
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 0;
 const int   daylightOffset_sec = 3600;
@@ -87,27 +89,34 @@ boolean apMode = false;
 const char* PARAM_INPUT_1 = "ssid";
 const char* PARAM_INPUT_2 = "pass";
 const char* PARAM_INPUT_3 = "ip";
+const char* PARAM_INPUT_4 = "subnet";
+const char* PARAM_INPUT_5 = "gateway";
+const char* PARAM_INPUT_6 = "dns";
 
 //Variables to save values from HTML form.
 
 String ssid;
 String pass;
 String ip;
+String subnet;
+String gateway;
+String dns;
 
 // File paths to save input values permanently.
 
 const char* ssidPath = "/ssid.txt";
 const char* passPath = "/pass.txt";
 const char* ipPath = "/ip.txt";
+const char* subnetPath = "/subnet.txt";
+const char* gatewayPath = "/gateway.txt";
+const char* dnsPath = "/dns.txt";
+
+// Network variables.
 
 IPAddress localIP;
-//IPAddress localIP(192, 168, 1, 200); // hardcoded
-
-// Set your Gateway IP address.
-
-IPAddress gateway(192, 168, 1, 254);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress dns1(192, 168, 1, 254);
+IPAddress Gateway;
+IPAddress Subnet;
+IPAddress dns1;
 
 // Timer variables (check wifi).
 
@@ -204,13 +213,13 @@ int eeCalDataAddress2 = 216;				// EEPROM address for touch screen calibration d
 int eeCalDataAddress3 = 220;				// EEPROM address for touch screen calibration data.
 int eeCalDataAddress4 = 224;				// EEPROM address for touch screen calibration data.
 
-// Misc arrays.
+// Misc array and character spaces are to over write previous screen draw
 
-char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " }; // Spaces to over write previous screen draw/
-char* resetArray[3] = { "None      ", "Full Reset", "Demo Data " };
-char* dayArray[9] = { "","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
-char* dayShortArray[9] = { "","Su","Mo","Tu","We","Th","Fr","Sa" };
-char* ynArray[2] = { "No", "Yes" };
+char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " };	// Default menu options.
+char* resetArray[3] = { "None      ", "Full Reset", "Demo Data " };														// Reset options.
+char* dayArray[9] = { "","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };						// Days of the week.
+char* dayShortArray[9] = { "","Su","Mo","Tu","We","Th","Fr","Sa" };														// Short days of the week.
+char* ynArray[2] = { "No", "Yes" };																						// Yes / No options.
 
 uint16_t calData[5];						// Touch screen calibration data.
 boolean calTouchScreen = 0;					// Change flag to trigger calibration function.
@@ -226,7 +235,7 @@ double	averageKphSpeed = 0.00;				// The average speed in Kph.
 
 // Session time variables.
 
-unsigned long sessionTimeCap;			// Set cap for graph if statements.
+unsigned long sessionTimeCap;				// Set cap for graph if statements.
 boolean recordSessions = 0;					// Flag to trigger the recording of each session.
 volatile boolean sessionTimeFlag = 0;		// Flag to trigger the recording of each session.
 volatile unsigned long sessionStartTime;	// Time each pt session starts.
@@ -238,7 +247,7 @@ volatile unsigned long sessionTime;			// Time each pt session in minutes.
 double sessionStartDistance = 0.00;
 double sessionDistance;						// Session distance.
 
-unsigned int distanceGraphCap;		// Set cap for graph if statements.
+unsigned int distanceGraphCap;				// Set cap for graph if statements.
 
 unsigned int sessionTimeArray1;				// These variables are needed for the Kris Kasprzak charts.
 unsigned int sessionTimeArray2;
@@ -279,8 +288,9 @@ int graphTM;						// Graph time measurement scale.
 int graphTMI;						// Graph time measurement scale increment setting.
 boolean graphTSC = false;			// Flag to trigger the recording of settings to EEPROM. 
 int graphTAP;						// Graph time array position.
+
 const int graphTAM[12] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120 };		// Graph array time scale options.
-const int graphTAI[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };			// Graph array time scale increment options.
+const int graphTAI[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };					// Graph array time scale increment options.
 
 boolean graph_8 = true;				// Bar graph.
 boolean graph_9 = true;
@@ -294,6 +304,7 @@ int graphDM;						// Graph distance measurement scale.
 int graphDMI;						// Graph distance measurement scale increment setting.
 boolean graphDSC = false;			// Flag to trigger the recording of settings to EEPROM. 
 int graphDAP;						// Graph distance array position.
+
 const int graphDAM[4] = { 500, 1000, 1500, 2000 };		// Graph array distance scale options.
 const int graphDAI[4] = { 100, 200, 300, 400 };			// Graph array distance scale increment options.
 
@@ -375,8 +386,11 @@ bool initWiFi() {
 
 	WiFi.mode(WIFI_STA);
 	localIP.fromString(ip.c_str());
+	Gateway.fromString(gateway.c_str());
+	Subnet.fromString(subnet.c_str());
+	dns1.fromString(dns.c_str());
 
-	if (!WiFi.config(localIP, gateway, subnet, dns1)) {
+	if (!WiFi.config(localIP, Gateway, Subnet, dns1)) {
 		Serial.println("STA Failed to configure");
 		return false;
 	}
@@ -418,6 +432,7 @@ bool initWiFi() {
 	tft.setCursor(150, 50);
 	tft.print(WiFi.status());
 	tft.println("");
+
 	tft.setCursor(23, 65);
 	tft.setTextColor(WHITE);
 	tft.print("SSID: ");
@@ -425,6 +440,7 @@ bool initWiFi() {
 	tft.setCursor(150, 65);
 	tft.print(WiFi.SSID());
 	tft.println("");
+
 	tft.setCursor(23, 80);
 	tft.setTextColor(WHITE);
 	tft.print("IP Address: ");
@@ -432,18 +448,36 @@ bool initWiFi() {
 	tft.setCursor(150, 80);
 	tft.print(WiFi.localIP());
 	tft.println("");
+
 	tft.setCursor(23, 95);
+	tft.setTextColor(WHITE);
+	tft.print("DNS Address: ");
+	tft.setTextColor(LTBLUE);
+	tft.setCursor(150, 95);
+	tft.print(WiFi.dnsIP());
+	tft.println("");
+
+	tft.setCursor(23, 110);
+	tft.setTextColor(WHITE);
+	tft.print("Gateway Address: ");
+	tft.setTextColor(LTBLUE);
+	tft.setCursor(150, 110);
+	tft.print(WiFi.gatewayIP());
+	tft.println("");
+
+	tft.setCursor(23, 125);
 	tft.setTextColor(WHITE);
 	tft.print("Signal Strenght: ");
 	tft.setTextColor(LTBLUE);
-	tft.setCursor(150, 95);
+	tft.setCursor(150, 125);
 	tft.print(WiFi.RSSI());
 	tft.println("");
-	tft.setCursor(23, 110);
+
+	tft.setCursor(23, 140);
 	tft.setTextColor(WHITE);
 	tft.print("Time Server: ");
 	tft.setTextColor(LTBLUE);
-	tft.setCursor(150, 110);
+	tft.setCursor(150, 140);
 	tft.print(ntpServer);
 
 	// If ESP32 inits successfully in station mode, recolour WiFi to green.
@@ -494,20 +528,20 @@ String readFile(fs::FS& fs, const char* path) {
 	Serial.printf("Reading file: %s\r\n", path);
 
 	File file = fs.open(path);
-	
+
 	if (!file || file.isDirectory()) {
-	
+
 		Serial.println("- failed to open file for reading");
 		return String();
 	}
 
 	String fileContent;
-	
+
 	while (file.available()) {
 		fileContent = file.readStringUntil('\n');
 		break;
 	}
-	
+
 	return fileContent;
 
 } // Close function.
@@ -549,12 +583,17 @@ void printLocalTime() {
 	struct tm timeinfo;
 
 	if (!getLocalTime(&timeinfo)) {
-		Serial.println("Failed to obtain time");
+		Serial.println("Failed, time set to default.");
+
+		// Set time manually.
+
+		rtc.setTime(00, 00, 00, 01, 01, 2021);
+
 		tft.setTextColor(WHITE, BLACK);
 		tft.setFreeFont();
 		tft.setTextSize(1);
 		tft.setCursor(13, 220);
-		tft.println("Failed to get time...");
+		tft.println("Failed, time set to default.");
 
 		return;
 	}
@@ -603,7 +642,7 @@ void setup() {
 
 	pinMode(TFT_LED, OUTPUT);				// Output for LCD back light.
 	pinMode(interruptWheelSensor, INPUT);	// Wheel sensor (REED switch).
-	
+
 	// Switch on TFT LED back light.
 
 	digitalWrite(TFT_LED, HIGH);			// Output for LCD back light.
@@ -787,10 +826,16 @@ void setup() {
 	ssid = readFile(SPIFFS, ssidPath);
 	pass = readFile(SPIFFS, passPath);
 	ip = readFile(SPIFFS, ipPath);
+	subnet = readFile(SPIFFS, subnetPath);
+	gateway = readFile(SPIFFS, gatewayPath);
+	dns = readFile(SPIFFS, dnsPath);
 
 	Serial.println(ssid);
 	Serial.println(pass);
 	Serial.println(ip);
+	Serial.println(subnet);
+	Serial.println(gateway);
+	Serial.println(dns);
 
 	// Check if screen calibration flag is set to yes, if not, load previous saved calibration data.
 
@@ -798,7 +843,7 @@ void setup() {
 
 		touch_calibrate(tft);
 	}
-	
+
 	else tft.setTouch(calData);
 
 	// Draw border and buttons at start.
@@ -830,16 +875,17 @@ void setup() {
 	}
 
 	else
-	
-	{ 	apMode = true;	// Set variable to be true so void loop is by passed and doesnt run until false.
 
-		// WiFi title page.
+	{
+		apMode = true;	// Set variable to be true so void loop is by passed and doesnt run until false.
+
+	// WiFi title page.
 
 		wiFiTitle();
-		
+
 		// Update display with help text.
 
-		tft.setFreeFont();
+		/*tft.setFreeFont();
 		tft.setTextColor(WHITE);
 		tft.setCursor(23, 130);
 		tft.print("Could not connect to WiFi");
@@ -854,7 +900,7 @@ void setup() {
 		tft.setCursor(23, 180);
 		tft.print("Enter your network settings");
 		tft.setCursor(23, 210);
-		tft.print("Unit will restart when configured");
+		tft.print("Unit will restart when configured");*/
 
 		// Initialize the ESP32 in Access Point mode, recolour to WiFI red.
 
@@ -910,6 +956,30 @@ void setup() {
 						// Write file to save value
 						writeFile(SPIFFS, ipPath, ip.c_str());
 					}
+					// HTTP POST ip value
+					if (p->name() == PARAM_INPUT_4) {
+						subnet = p->value().c_str();
+						Serial.print("Subnet Address: ");
+						Serial.println(subnet);
+						// Write file to save value
+						writeFile(SPIFFS, subnetPath, subnet.c_str());
+					}
+					// HTTP POST ip value
+					if (p->name() == PARAM_INPUT_5) {
+						gateway = p->value().c_str();
+						Serial.print("Gateway set to: ");
+						Serial.println(gateway);
+						// Write file to save value
+						writeFile(SPIFFS, gatewayPath, gateway.c_str());
+					}
+					// HTTP POST ip value
+					if (p->name() == PARAM_INPUT_6) {
+						dns = p->value().c_str();
+						Serial.print("DNS Address set to: ");
+						Serial.println(dns);
+						// Write file to save value
+						writeFile(SPIFFS, dnsPath, dns.c_str());
+					}
 					//Serial.printf("POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
 				}
 			}
@@ -924,13 +994,56 @@ void setup() {
 
 		server.begin();
 
-	}  // Close function.
+		tft.fillRect(39, 60, 183, 109, RED);
+		tft.drawRect(38, 59, 185, 111, WHITE);
+		tft.drawRect(37, 58, 187, 113, WHITE);
+		tft.setFreeFont(&FreeSans9pt7b);
+		tft.setTextSize(1);
+		tft.setTextColor(WHITE); tft.setCursor(50, 78);
+		tft.print("Access Point Mode");
+
+		tft.setFreeFont();
+		tft.setTextColor(WHITE);
+		tft.setCursor(50, 90);
+		tft.print("Could not connect to WiFi");
+		tft.setCursor(50, 106);
+		tft.print("1) Using your mobile phone");
+		tft.setCursor(50, 118);
+		tft.print("2) Connect to WiFI Manager");
+		tft.setCursor(50, 130);
+		tft.print("3) Browse to 192.168.4.1");
+		tft.setCursor(50, 142);
+		tft.print("4) Enter network settings");
+		tft.setCursor(50, 154);
+		tft.print("5) Unit will then restart");
+
+		while (1) {
+
+			// Do nothing...
+		}
+
+	}
 
 	// initialize time and get the time.
 
 	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 	printLocalTime();
 	LocalTime = millis();
+
+	Serial.println("");
+	Serial.print("SSID set to: ");
+	Serial.println(ssid);
+	Serial.print("Password set to: ");
+	Serial.println(pass);
+	Serial.print("IP Address set to: ");
+	Serial.println(ip);
+	Serial.print("Subnet Address set to: ");
+	Serial.println(subnet);
+	Serial.print("Gateway Address set to: ");
+	Serial.println(gateway);
+	Serial.print("DNS Address set to: ");
+	Serial.println(dns);
+	Serial.println("");
 
 	// Check if WiFi is disabled, technically it wont be unless the interupt sensor has triggered during start up.
 
@@ -971,7 +1084,7 @@ void loop() {
 		tft.setFreeFont();
 		tft.setTextSize(1);
 		tft.setCursor(13, 220);
-		tft.println("Failed to get time...");
+		tft.println("Failed, time set to default.");
 	}
 
 	// Identify Arduino sketch core being used.
@@ -1063,7 +1176,7 @@ void loop() {
 	if (screenMenu == 4) {
 
 		drawBitmap(tft, BUTTON4_Y + 1, BUTTON4_X + 1, distanceIconWhite, BUTTON4_W - 2, BUTTON4_H - 2);
-	
+
 		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
@@ -1125,7 +1238,7 @@ void loop() {
 	if (screenMenu == 2) {
 
 		drawBitmap(tft, BUTTON2_Y + 1, BUTTON2_X + 1, speedIconWhite, BUTTON2_W - 2, BUTTON2_H - 2);
-		
+
 		tft.drawFastHLine(BUTTON1_X - 7, BUTTON1_Y, BUTTON1_H + 7, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_BLACK);
 		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_WHITE);
@@ -1153,10 +1266,10 @@ void loop() {
 		tft.drawRect(BUTTON2_X, BUTTON2_Y, BUTTON2_W, BUTTON2_H, TFT_BLACK);
 	}
 
-	if (screenMenu == 1) {	
+	if (screenMenu == 1) {
 
 		drawBitmap(tft, BUTTON1_Y + 1, BUTTON1_X + 1, sessionIconWhite, BUTTON1_W - 2, BUTTON1_H - 2);
-		
+
 		tft.drawFastHLine(BUTTON1_X - 8, BUTTON1_Y, BUTTON1_H + 8, TFT_WHITE);
 		tft.drawFastVLine(BUTTON1_X + 50, BUTTON1_Y, BUTTON1_H, TFT_WHITE);
 		tft.drawFastVLine(BUTTON1_X - 8, BUTTON1_Y + 1, BUTTON1_H - 2, TFT_BLACK);
@@ -1414,7 +1527,7 @@ void loop() {
 		}
 
 		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Kph", dial_1); // XPH dial screen function.
-	
+
 	}
 
 	// Trigger screen choice - Distance sessions screen.
@@ -1605,7 +1718,7 @@ void loop() {
 		configurationDisplay();
 
 	}
-	
+
 	// Check for new max speed.
 
 	if (speedKph > maxKphSpeed) {
@@ -1852,19 +1965,19 @@ void currentExerciseScreen() {
 	tft.print("Mph: ");
 	tft.setCursor(23, 80);
 	tft.print("Ave Mph: ");
-	
+
 	tft.setCursor(23, 110);
 	tft.print("Kph: ");
 	tft.setCursor(23, 130);
 	tft.print("Ave Kph: ");
-	
+
 	tft.setCursor(23, 160);
 	tft.print("Max Kph: ");
 	tft.setCursor(23, 180);
 	tft.print("Dis: ");
 	tft.setCursor(23, 200);
 	tft.print("Time (s): ");
-	
+
 	tft.setFreeFont();
 	tft.setTextSize(2);
 	tft.setTextColor(WHITE, BLACK);
@@ -1923,8 +2036,7 @@ void configurationDisplay() {
 	if (configurationFlag == 1) {
 
 		tft.setTextColor(TFT_RED, BLACK);
-
-	} // Close if.
+	}
 
 	else tft.setTextColor(WHITE, BLACK);
 
@@ -1938,8 +2050,7 @@ void configurationDisplay() {
 	if (configurationFlag == 2) {
 
 		tft.setTextColor(TFT_RED, BLACK);
-
-	} // Close if.
+	}
 
 	else tft.setTextColor(WHITE, BLACK);
 
@@ -1954,8 +2065,7 @@ void configurationDisplay() {
 	if (configurationFlag == 3) {
 
 		tft.setTextColor(TFT_RED, BLACK);
-
-	} // Close if.
+	}
 
 	else tft.setTextColor(WHITE, BLACK);
 
@@ -1976,8 +2086,7 @@ void configurationDisplay() {
 	if (configurationFlag == 4) {
 
 		tft.setTextColor(TFT_RED, BLACK);
-
-	} // Close if.
+	}
 
 	else tft.setTextColor(WHITE, BLACK);
 
@@ -1998,8 +2107,7 @@ void configurationDisplay() {
 	if (configurationFlag == 5) {
 
 		tft.setTextColor(TFT_RED, BLACK);
-
-	} // Close if.
+	}
 
 	else tft.setTextColor(WHITE, BLACK);
 
@@ -2020,8 +2128,7 @@ void configurationDisplay() {
 	if (configurationFlag == 6) {
 
 		tft.setTextColor(TFT_RED, BLACK);
-
-	} // Close if.
+	}
 
 	else tft.setTextColor(WHITE, BLACK);
 
@@ -2049,7 +2156,7 @@ void configurationDisplay() {
 			uint16_t x, y;		// variables for touch data.
 
 			tft.getTouch(&x, &y);
-			
+
 			if ((x > BUTTON4_X) && (x < (BUTTON4_X + BUTTON4_W))) {
 				if ((y > BUTTON4_Y) && (y <= (BUTTON4_Y + BUTTON4_H))) {
 
@@ -2060,7 +2167,7 @@ void configurationDisplay() {
 
 				}
 
-			} // Close if.
+			}
 
 			if ((x > BUTTON1_X) && (x < (BUTTON1_X + BUTTON1_W))) {
 				if ((y > BUTTON1_Y) && (y <= (BUTTON1_Y + BUTTON1_H))) {
@@ -2077,13 +2184,13 @@ void configurationDisplay() {
 					tft.setFreeFont();
 					delay(1000);
 
-				} // Close if.
+				}
 
-			} // Close if.
+			}
 
-		} // Close while.
+		}
 
-	} // Close if.
+	}
 
 	// Display total distance travelled since initial start up.
 
@@ -2108,7 +2215,7 @@ void menuSettingPlus() {
 		eeMenuSetting = 1;
 		eeMenuSettingChange = true;
 	}
-	
+
 	else
 	{
 		eeMenuSetting++;
@@ -2134,7 +2241,7 @@ void menuSettingMinus() {
 
 	// Incremental function to menu setting.
 
-	if (eeMenuSetting == 1) 	{
+	if (eeMenuSetting == 1) {
 
 		eeMenuSetting = 5;
 		eeMenuSettingChange = true;
@@ -2217,7 +2324,7 @@ void distanceScaleSettingMinus() {
 	// Incremental function to menu setting.
 
 	if (graphDAP == 0) {
-		
+
 		graphDAP = 3;
 		graphDSC = true;
 	}
@@ -2275,7 +2382,7 @@ void timeScaleSettingPlus() {
 
 	// Incremental function to menu setting.
 
-	if (graphTAP == 11) 	{
+	if (graphTAP == 11) {
 
 		graphTAP = 0;
 		graphTSC = true;
@@ -2309,7 +2416,7 @@ void timeScaleSettingMinus() {
 
 	// Decremental function to menu setting.
 
-	if (graphTAP == 0) 	{
+	if (graphTAP == 0) {
 
 		graphTAP = 11;
 		graphTSC = true;
@@ -2442,7 +2549,7 @@ void resetMenuSettingPlus() {
 		eeResetSetting = 0;
 		eeResetSettingChange = true;
 	}
-	
+
 	else
 	{
 		eeResetSetting++;
@@ -2515,13 +2622,13 @@ void circumferenceSettingPlus() {
 
 	// Incremental function to circumference setting.
 
-	if (eeCircSetting >= 2.00)	{
+	if (eeCircSetting >= 2.00) {
 
 		eeCircSetting = 0.01;
 		eeCircSettingChange = true;
 	}
-	
-	else 
+
+	else
 	{
 		eeCircSetting = eeCircSetting + 0.01;
 		eeCircSettingChange = true;
@@ -2547,7 +2654,7 @@ void circumferenceSettingMinus() {
 
 	// Decremental function to circumference setting.
 
-	if (eeCircSetting <= 0.01) 	{
+	if (eeCircSetting <= 0.01) {
 
 		eeCircSetting = 2.00;
 		eeCircSettingChange = true;
@@ -2667,8 +2774,12 @@ void wiFiTitle() {
 	tft.setCursor(23, 80);
 	tft.print("IP Address: ");
 	tft.setCursor(23, 95);
-	tft.print("Signal Strenght: ");
+	tft.print("DNS Address: ");
 	tft.setCursor(23, 110);
+	tft.print("Gateway Address: ");
+	tft.setCursor(23, 125);
+	tft.print("Signal Strenght: ");
+	tft.setCursor(23, 140);
 	tft.print("Time Server: ");
 
 } // Close function.
@@ -2807,7 +2918,7 @@ void resetSystemDemoData() {
 	EEPROM.put(eegraphTMAddress, graphTM);
 	EEPROM.put(eegraphTMIAddress, graphTMI);
 	EEPROM.commit();
-		
+
 	buzzerYN = 1;																// Buzzer flag.
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
 	EEPROM.commit();
