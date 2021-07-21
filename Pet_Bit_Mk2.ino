@@ -2106,13 +2106,13 @@ void configurationDisplay() {
 	EEPROM.get(eeResetSettingAddress, eeResetSetting);
 	EEPROM.get(eeBuzzerYNAddress, buzzerYN);
 
-	EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
-	EEPROM.get(eegraphDMIAddress, graphDMI);
-	EEPROM.get(eegraphDAPAddress, graphDAP);
+	//EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
+	//EEPROM.get(eegraphDMIAddress, graphDMI);
+	//EEPROM.get(eegraphDAPAddress, graphDAP);
 
-	EEPROM.get(eegraphTMAddress, graphTM);										// Graph time scale.
-	EEPROM.get(eegraphTMIAddress, graphTMI);
-	EEPROM.get(eegraphTAPAddress, graphTAP);
+	//EEPROM.get(eegraphTMAddress, graphTM);										// Graph time scale.
+	//EEPROM.get(eegraphTMIAddress, graphTMI);
+	//EEPROM.get(eegraphTAPAddress, graphTAP);
 
 	// Display configuration data and selection options.
 
@@ -2478,7 +2478,7 @@ void distanceScaleSettingSave() {
 
 	// Write menu setting to EEPROM.
 
-	if (graphDSC = true) {
+	if (graphDSC == true) {
 
 		graphDM = graphDAM[graphDAP];
 		graphDMI = graphDAI[graphDAP];
@@ -2587,7 +2587,7 @@ void timeScaleSettingSave() {
 
 	// Write menu setting to EEPROM.
 
-	if (graphTSC = true) {
+	if (graphTSC == true) {
 
 		graphTM = graphTAM[graphTAP];
 		graphTMI = graphTAI[graphTAP];
