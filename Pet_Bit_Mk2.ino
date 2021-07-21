@@ -82,6 +82,7 @@ AsyncEventSource events("/events");	// Create an Event Source on /events
 
 // WiFi Configuration.
 
+int wiFiYN;							// WiFi reset.
 boolean apMode = false;
 
 // Search for parameter in HTTP POST request.
@@ -120,10 +121,12 @@ IPAddress dns1;
 
 // Timer variables (check wifi).
 
-volatile bool disconnectWiFi = false;
-volatile bool disconnectWiFiFlag = false;
-unsigned long previousMillis = 0;
-const long interval = 10000;				// interval to wait for Wi-Fi connection (milliseconds)
+unsigned long wiFiR = 0;					// WiFi retry (wiFiR) to attempt connecting to the last known WiFi if connection lost.
+unsigned long wiFiRI = 60000;				// WiFi retry Interval (wiFiRI) used to retry connecting to the last known WiFi if connection lost.
+volatile bool disconnectWiFi = false;		// Used in the sensor interrupt function to disable WiFi.
+volatile bool disconnectWiFiFlag = false;	// Used in the sensor interrupt function to disable WiFi.
+unsigned long previousMillis = 0;			// Used in the WiFI Init function.
+const long interval = 10000;				// Interval to wait for Wi-Fi connection (milliseconds).
 
 // Data variables.
 
@@ -212,6 +215,9 @@ int eeCalDataAddress1 = 212;				// EEPROM address for touch screen calibration d
 int eeCalDataAddress2 = 216;				// EEPROM address for touch screen calibration data.
 int eeCalDataAddress3 = 220;				// EEPROM address for touch screen calibration data.
 int eeCalDataAddress4 = 224;				// EEPROM address for touch screen calibration data.
+
+int eeWiFiYNAddress = 228;					// EEPROM address for WiFi reset.
+boolean eeWiFiYNChange;						// Change flag.
 
 // Misc array and character spaces are to over write previous screen draw
 
@@ -700,6 +706,17 @@ void setup() {
 
 	EEPROM.get(eeBuzzerYNAddress, buzzerYN);				// Load buzzer setting.
 
+	EEPROM.get(eeWiFiYNAddress, wiFiYN);					// Load WiFi reset flag.
+
+	// Output variables to serial for checking.
+
+	Serial.println(" ");
+	Serial.print("Beep Flag: ");
+	Serial.println(buzzerYN);
+	Serial.print("WiFi Flag: ");
+	Serial.println(wiFiYN);
+	Serial.println();
+
 	EEPROM.get(eeCalYNAddress, calTouchScreen);				// Load touch screen calibration data.
 	EEPROM.get(eeCalDataAddress0, calData[0]);
 	EEPROM.get(eeCalDataAddress1, calData[1]);
@@ -821,8 +838,22 @@ void setup() {
 
 	initSPIFFS();
 
+	// Check if WiFi is to be reset.
+
+	if (wiFiYN == true) {
+
+		ssid = "blank";
+				
+		writeFile(SPIFFS, ssidPath, ssid.c_str());
+
+		wiFiYN = false;
+		EEPROM.put(eeWiFiYNAddress, wiFiYN);
+		EEPROM.commit();
+	}
+
 	// Load values saved in SPIFFS.
 
+	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
 	pass = readFile(SPIFFS, passPath);
 	ip = readFile(SPIFFS, ipPath);
@@ -830,12 +861,14 @@ void setup() {
 	gateway = readFile(SPIFFS, gatewayPath);
 	dns = readFile(SPIFFS, dnsPath);
 
+	Serial.println();
 	Serial.println(ssid);
 	Serial.println(pass);
 	Serial.println(ip);
 	Serial.println(subnet);
 	Serial.println(gateway);
 	Serial.println(dns);
+	Serial.println();
 
 	// Check if screen calibration flag is set to yes, if not, load previous saved calibration data.
 
@@ -879,28 +912,9 @@ void setup() {
 	{
 		apMode = true;	// Set variable to be true so void loop is by passed and doesnt run until false.
 
-	// WiFi title page.
+		// WiFi title page.
 
 		wiFiTitle();
-
-		// Update display with help text.
-
-		/*tft.setFreeFont();
-		tft.setTextColor(WHITE);
-		tft.setCursor(23, 130);
-		tft.print("Could not connect to WiFi");
-		tft.setCursor(23, 140);
-		tft.print("Pet Bit now in in Access Point Mode");
-		tft.setCursor(23, 150);
-		tft.print("Using your mobile phone");
-		tft.setCursor(23, 160);
-		tft.print("Connect to ESP WiFI Manager");
-		tft.setCursor(23, 170);
-		tft.print("Browse to 192.168.4.1");
-		tft.setCursor(23, 180);
-		tft.print("Enter your network settings");
-		tft.setCursor(23, 210);
-		tft.print("Unit will restart when configured");*/
 
 		// Initialize the ESP32 in Access Point mode, recolour to WiFI red.
 
@@ -1128,6 +1142,19 @@ void loop() {
 		disconnectWiFiFlag = false;
 	}
 
+	// Retry connecting to WiFi if connection is lost at all other times.
+
+	unsigned long wiFiRC = millis();
+
+	if ((WiFi.status() != WL_CONNECTED) && (disconnectWiFi == false) && (wiFiRC - wiFiR >= wiFiRI)) {
+
+		Serial.print(millis());
+		Serial.println("Reconnecting to WiFi...");
+		WiFi.disconnect();
+		WiFi.reconnect();
+		wiFiR = wiFiRC;
+	}
+
 	// Update time from Internet time server.
 
 	if (millis() >= LocalTime + localTimeInterval) {
@@ -1347,10 +1374,16 @@ void loop() {
 					Serial.println(" ");
 				}
 
-				else if (screenMenu == 5 && configurationFlag == 6) {
+				else if (screenMenu == 5 && configurationFlag == 7) {
 
 					tone(buzzerP, buzzerF);
 					resetMenuSettingMinus();
+				}
+
+				else if (screenMenu == 5 && configurationFlag == 6) {
+
+					tone(buzzerP, buzzerF);
+					wiFiSettingMinus();
 				}
 
 				else if (screenMenu == 5 && configurationFlag == 5) {
@@ -1404,10 +1437,16 @@ void loop() {
 					Serial.println(" ");
 				}
 
-				else if (screenMenu == 5 && configurationFlag == 6) {
+				else if (screenMenu == 5 && configurationFlag == 7) {
 
 					tone(buzzerP, buzzerF);
 					resetMenuSettingPlus();
+				}
+
+				else if (screenMenu == 5 && configurationFlag == 6) {
+
+					tone(buzzerP, buzzerF);
+					wiFiSettingPlus();
 				}
 
 				else if (screenMenu == 5 && configurationFlag == 5) {
@@ -1466,7 +1505,7 @@ void loop() {
 					tone(buzzerP, buzzerF);
 					configurationFlag++;
 
-					if (configurationFlag == byte(8)) {
+					if (configurationFlag == byte(9)) {
 
 						configurationFlag = byte(1);
 					}
@@ -2123,9 +2162,30 @@ void configurationDisplay() {
 	tft.println(ynArray[buzzerYN]);
 	tft.println();
 
-	// Menu option 6 is System Reset menu.
+	// Menu option 6 is WiFi reset menu.
 
 	if (configurationFlag == 6) {
+
+		tft.setTextColor(TFT_RED, BLACK);
+	}
+
+	else tft.setTextColor(WHITE, BLACK);
+
+	if (wiFiYN == 0) {	// Used to blank out figure from screen draw.
+
+		tft.setCursor(161, 170);
+		tft.print(" ");
+	}
+
+	tft.setCursor(23, 170);
+	tft.print("WiFi Reset       : ");
+	tft.setCursor(150, 170);
+	tft.println(ynArray[wiFiYN]);
+	tft.println();
+
+	// Menu option 7 is System Reset menu.
+
+	if (configurationFlag == 7) {
 
 		tft.setTextColor(TFT_RED, BLACK);
 	}
@@ -2137,9 +2197,9 @@ void configurationDisplay() {
 	tft.setCursor(150, 185);
 	tft.println(resetArray[eeResetSetting]);
 
-	// Menu option 7 is System Reset menu.
+	// Menu option 8 is System Reset menu.
 
-	if (configurationFlag == 7) {
+	if (configurationFlag == 8) {
 
 		tft.fillRect(59, 81, 148, 74, RED);
 		tft.drawRect(58, 80, 150, 76, TFT_WHITE);
@@ -2151,7 +2211,7 @@ void configurationDisplay() {
 
 		delay(1000); // Give the screen a moment.
 
-		while (configurationFlag == 7) {
+		while (configurationFlag == 8) {
 
 			uint16_t x, y;		// variables for touch data.
 
@@ -2538,6 +2598,73 @@ void buzzerSettingSave() {
 
 /*-----------------------------------------------------------------*/
 
+// WiFi setting plus changes.
+
+void wiFiSettingPlus() {
+
+	// Y/N function change to WiFi setting.
+
+	if (wiFiYN == false) {
+
+		wiFiYN = true;
+		eeWiFiYNChange = true;
+	}
+
+	Serial.print("WiFi Reset: ");
+	Serial.print(wiFiYN);
+	Serial.println(" ");
+
+	if (eeWiFiYNChange == true) {			// Write results to EEPROM to save.
+
+		wiFiSettingSave();
+	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// WiFi setting minus changes.
+
+void wiFiSettingMinus() {
+
+	// Y/N function change to WiFi setting.
+
+	if (wiFiYN == true) 	{
+
+		wiFiYN = false;
+		eeWiFiYNChange = true;
+	}
+
+	Serial.print("WiFi Reset: ");
+	Serial.print(wiFiYN);
+	Serial.println(" ");
+
+	if (eeWiFiYNChange == true) {			// Write results to EEPROM to save.
+
+		wiFiSettingSave();
+	}
+
+}  // Close function. 
+
+/*-----------------------------------------------------------------*/
+
+// WiFi setting save changes.
+
+void wiFiSettingSave() {
+
+	// Write WiFi setting to EEPROM.
+
+	if (eeWiFiYNChange == true) {
+
+		EEPROM.put(eeWiFiYNAddress, wiFiYN);
+		EEPROM.commit();
+		eeWiFiYNChange = false;
+	}
+
+}  // Close function.
+
+/*-----------------------------------------------------------------*/
+
 // Reset setting plus changes.
 
 void resetMenuSettingPlus() {
@@ -2814,6 +2941,10 @@ void resetSystemData() {
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
 	EEPROM.commit();
 
+	wiFiYN = 0;																	// WiFi reset flag.
+	EEPROM.put(eeWiFiYNAddress, wiFiYN);
+	EEPROM.commit();
+
 	calTouchScreen = 1;															// Calibration flag.
 	EEPROM.put(eeCalYNAddress, calTouchScreen);
 	EEPROM.commit();
@@ -2921,6 +3052,10 @@ void resetSystemDemoData() {
 
 	buzzerYN = 1;																// Buzzer flag.
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
+	EEPROM.commit();
+
+	wiFiYN = 0;																	// WiFi reset flag.
+	EEPROM.put(eeWiFiYNAddress, wiFiYN);
 	EEPROM.commit();
 
 	eeTotalDistance = 5000.00;													// Total distance travelled.
