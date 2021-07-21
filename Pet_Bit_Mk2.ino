@@ -199,12 +199,12 @@ int eeSessionArrayPositionAddress = 76;		// EEPROM address for array position.
 unsigned int eeSessionArrayPosition;		// Actual commit for writing, 4 bytes.
 
 int eegraphDMAddress = 80;					// EEPROM address for graph distance scale.
-int eegraphDMIAddress = 84;					// EEPROM address for graph distance increment scale level.
-int eegraphDAPAddress = 88;					// EEPROM address for graph distance array position.
+int eegraphDMIAddress = 88;					// EEPROM address for graph distance increment scale level.
+int eegraphDAPAddress = 96;					// EEPROM address for graph distance array position.
 
-int eegraphTMAddress = 92;					// EEPROM address for graph distance scale.
-int eegraphTMIAddress = 96;					// EEPROM address for graph distance increment scale level.
-int eegraphTAPAddress = 100;				// EEPROM address for graph distance array position.
+int eegraphTMAddress = 104;					// EEPROM address for graph distance scale.
+int eegraphTMIAddress = 112;					// EEPROM address for graph distance increment scale level.
+int eegraphTAPAddress = 120;				// EEPROM address for graph distance array position.
 
 int eeBuzzerYNAddress = 200;				// EEPROM address for buzzer enabled / disabled.
 boolean eeBuzzerYNChange;					// Change flag.
@@ -711,24 +711,7 @@ void setup() {
 	EEPROM.get(eegraphTMIAddress, graphTMI);
 	EEPROM.get(eegraphTAPAddress, graphTAP);
 
-	Serial.println("Output from Setup");
-	Serial.print("Distance Scale: ");
-	Serial.print(graphDM);
-	Serial.print(" & ");
-	Serial.print("Increments: ");
-	Serial.print(graphDMI);
-	Serial.print(" & ");
-	Serial.print("Position: ");
-	Serial.print(graphDAP);
-	Serial.println(" ");
-
-	EEPROM.commit();
-
-	EEPROM.get(eegraphDMAddress, graphDM);					// Load graph distance scale settings.
-	EEPROM.get(eegraphDMIAddress, graphDMI);
-	EEPROM.get(eegraphDAPAddress, graphDAP);
-
-	Serial.println("Output from Setup");
+	Serial.println("Time graph settings output from Setup");
 	Serial.print("Time Scale: ");
 	Serial.print(graphTM);
 	Serial.print(" & ");
@@ -737,6 +720,23 @@ void setup() {
 	Serial.print(" & ");
 	Serial.print("Position: ");
 	Serial.println(graphTAP);
+	Serial.println(" ");
+
+	EEPROM.commit();
+
+	EEPROM.get(eegraphDMAddress, graphDM);					// Load graph distance scale settings.
+	EEPROM.get(eegraphDMIAddress, graphDMI);
+	EEPROM.get(eegraphDAPAddress, graphDAP);
+
+	Serial.println("Distance graph output from Setup");
+	Serial.print("Distance Scale: ");
+	Serial.print(graphDM);
+	Serial.print(" & ");
+	Serial.print("Increments: ");
+	Serial.print(graphDMI);
+	Serial.print(" & ");
+	Serial.print("Position: ");
+	Serial.print(graphDAP);
 	Serial.println(" ");
 
 	EEPROM.commit();
@@ -750,6 +750,7 @@ void setup() {
 
 	// Output variables to serial for checking.
 
+	Serial.println();
 	Serial.print("Beep Flag: ");
 	Serial.println(buzzerYN);
 	Serial.print("WiFi Flag: ");
@@ -788,8 +789,9 @@ void setup() {
 
 	sessionTimeCap = graphTM;
 
+	Serial.println();
 	Serial.print("Time Cap: ");
-	Serial.println(graphTM);
+	Serial.println(sessionTimeCap);
 	Serial.println(" ");
 
 	sessionTimeArray1 = sessionTimeArray[0] / 100 / 60;							// Update chart variables from arrays.
@@ -811,7 +813,7 @@ void setup() {
 	distanceGraphCap = graphDM;													// Update graph cap to stop value exceeding chart level.
 
 	Serial.print("Distance Cap: ");
-	Serial.println(graphDM);
+	Serial.println(distanceGraphCap);
 	Serial.println(" ");
 
 	EEPROM.commit();
@@ -899,6 +901,20 @@ void setup() {
 	}
 
 	// Load values saved in SPIFFS.
+
+	//ssid = "BT-7FA3K5";
+	//pass = "iKD94Y3K4Qvkck";
+	//ip = "192.168.1.200";
+	//subnet = "255.255.255.0";
+	//gateway = "192.168.1.254";
+	//dns = "192.168.1.254";
+
+	//writeFile(SPIFFS, ssidPath, ssid.c_str());
+	//writeFile(SPIFFS, passPath, pass.c_str());
+	//writeFile(SPIFFS, ipPath, ip.c_str());
+	//writeFile(SPIFFS, subnetPath, subnet.c_str());
+	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	//writeFile(SPIFFS, dnsPath, dns.c_str());
 
 	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
@@ -3017,7 +3033,7 @@ void resetSystemData() {
 	graphDAP = 1;
 	EEPROM.put(eegraphDMAddress, graphDM);
 	EEPROM.put(eegraphDMIAddress, graphDMI);
-	EEPROM.put(eegraphDMIAddress, graphDAP);
+	EEPROM.put(eegraphDAPAddress, graphDAP);
 	EEPROM.commit();
 
 	graphTM = 60;																// Graph time scale.
@@ -3025,10 +3041,10 @@ void resetSystemData() {
 	graphTAP = 5;
 	EEPROM.put(eegraphTMAddress, graphTM);
 	EEPROM.put(eegraphTMIAddress, graphTMI);
-	EEPROM.put(eegraphTMIAddress, graphTAP);
+	EEPROM.put(eegraphTAPAddress, graphTAP);
 	EEPROM.commit();
 
-	Serial.println("Output from reset system data");
+	Serial.println("Output from reset system data after EEPROM write");
 	Serial.print("Distance Scale: ");
 	Serial.print(graphDM);
 	Serial.print(" & ");
@@ -3097,11 +3113,11 @@ void resetSystemData() {
 
 	EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
 	EEPROM.get(eegraphDMIAddress, graphDMI);
-	EEPROM.get(eegraphDMIAddress, graphDAP);
+	EEPROM.get(eegraphDAPAddress, graphDAP);
 
 	EEPROM.get(eegraphTMAddress, graphTM);										// Graph time scale.
 	EEPROM.get(eegraphTMIAddress, graphTMI);
-	EEPROM.get(eegraphTMIAddress, graphTAP);
+	EEPROM.get(eegraphTAPAddress, graphTAP);
 
 	EEPROM.commit();
 
@@ -3141,6 +3157,26 @@ void resetSystemData() {
 	distanceTravelledArray6 = distanceTravelledArray[5];
 	distanceTravelledArray7 = distanceTravelledArray[6];
 
+	Serial.println("Output from reset system data after EEPROM get");
+	Serial.print("Distance Scale: ");
+	Serial.print(graphDM);
+	Serial.print(" & ");
+	Serial.print("Increments: ");
+	Serial.print(graphDMI);
+	Serial.print(" & ");
+	Serial.print("Position: ");
+	Serial.print(graphDAP);
+	Serial.println(" ");
+	Serial.print("Time Scale: ");
+	Serial.print(graphTM);
+	Serial.print(" & ");
+	Serial.print("Increments: ");
+	Serial.print(graphTMI);
+	Serial.print(" & ");
+	Serial.print("Position: ");
+	Serial.println(graphTAP);
+	Serial.println(" ");
+
 } // Close function.
 
 /*-----------------------------------------------------------------*/
@@ -3162,7 +3198,7 @@ void resetSystemDemoData() {
 	graphDAP = 1;
 	EEPROM.put(eegraphDMAddress, graphDM);
 	EEPROM.put(eegraphDMIAddress, graphDMI);
-	EEPROM.put(eegraphDMIAddress, graphDAP);
+	EEPROM.put(eegraphDAPAddress, graphDAP);
 	EEPROM.commit();
 
 	graphTM = 60;																// Graph time scale.
@@ -3170,10 +3206,10 @@ void resetSystemDemoData() {
 	graphTAP = 5;
 	EEPROM.put(eegraphTMAddress, graphTM);
 	EEPROM.put(eegraphTMIAddress, graphTMI);
-	EEPROM.put(eegraphTMIAddress, graphTAP);
+	EEPROM.put(eegraphTAPAddress, graphTAP);
 	EEPROM.commit();
 
-	Serial.println("Output from reset system demo data");
+	Serial.println("Output from reset system data after EEPROM write");
 	Serial.print("Distance Scale: ");
 	Serial.print(graphDM);
 	Serial.print(" & ");
@@ -3238,11 +3274,11 @@ void resetSystemDemoData() {
 
 	EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
 	EEPROM.get(eegraphDMIAddress, graphDMI);
-	EEPROM.get(eegraphDMIAddress, graphDAP);
+	EEPROM.get(eegraphDAPAddress, graphDAP);
 
 	EEPROM.get(eegraphTMAddress, graphTM);										// Graph time scale.
 	EEPROM.get(eegraphTMIAddress, graphTMI);
-	EEPROM.get(eegraphTMIAddress, graphTAP);
+	EEPROM.get(eegraphTAPAddress, graphTAP);
 
 	EEPROM.commit();
 
@@ -3281,6 +3317,26 @@ void resetSystemDemoData() {
 	distanceTravelledArray5 = distanceTravelledArray[4];
 	distanceTravelledArray6 = distanceTravelledArray[5];
 	distanceTravelledArray7 = distanceTravelledArray[6];
+
+	Serial.println("Output from reset system data after EEPROM get");
+	Serial.print("Distance Scale: ");
+	Serial.print(graphDM);
+	Serial.print(" & ");
+	Serial.print("Increments: ");
+	Serial.print(graphDMI);
+	Serial.print(" & ");
+	Serial.print("Position: ");
+	Serial.print(graphDAP);
+	Serial.println(" ");
+	Serial.print("Time Scale: ");
+	Serial.print(graphTM);
+	Serial.print(" & ");
+	Serial.print("Increments: ");
+	Serial.print(graphTMI);
+	Serial.print(" & ");
+	Serial.print("Position: ");
+	Serial.println(graphTAP);
+	Serial.println(" ");
 
 } // Close function.
 
