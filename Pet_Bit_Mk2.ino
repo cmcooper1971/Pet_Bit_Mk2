@@ -1001,7 +1001,7 @@ void setup() {
 		tft.setTextSize(1);
 		tft.setTextColor(WHITE); tft.setCursor(50, 78);
 		tft.print("Access Point Mode");
-
+		 
 		tft.setFreeFont();
 		tft.setTextColor(WHITE);
 		tft.setCursor(50, 90);
