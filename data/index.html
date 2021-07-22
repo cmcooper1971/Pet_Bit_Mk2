@@ -1,43 +1,101 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>ESP IOT DASHBOARD</title>
+    <title>Pet-Bit</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="favicon.png">
       <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <div class="topnav">
-      <h1>ESP WEB SERVER SENSOR READINGS</h1>
-    </div>
-    <div class="content">
-      <div class="card-grid">
-        <div class="card">
-          <p class="card-title">BME280 Sensor Readings</p>
-          <p>
-            <table>
-              <tr>
-                <th>READING</th>
-                <th>VALUE</th>
-              </tr>
-              <tr>
-                <td>Temperature</td>
-                <td><span id="temp"></span> &deg;C</td>
-              </tr>
-              <tr>
-                <td>Humidity</td>
-                <td><span id="hum"></span> &percnt;</td>
-              </tr>
-              <tr>
-                <td>Pressure</td>
-                <td><span id="pres"></span> hPa</td>
-              </tr>
-            </table>
-          </p>
+      <div class="topnav">
+          <h1>Pet-Bit Activity Data</h1>
+      </div>
+      <div class="content">
+          <div class="card-grid">
+              <div class="card">
+                  <p class="card-title">Daily Time Activity</p>
+                  <p>
+                      <table>
+                          <tr>
+                              <th>DAY</th>
+                              <th>Time (minutes)</th>
+                          </tr>
+                          <tr>
+                              <td>Monday</td>
+                              <td><span id="sessionTimeArray1"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Tuesday</td>
+                              <td><span id="sessionTimeArray2"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Wednesday</td>
+                              <td><span id="sessionTimeArray3"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Thursday</td>
+                              <td><span id="sessionTimeArray4"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Friday</td>
+                              <td><span id="sessionTimeArray5"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Saturday</td>
+                              <td><span id="sessionTimeArray6"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Sunday</td>
+                              <td><span id="sessionTimeArray7"></span></td>
+                          </tr>
+                      </table>
+                  </p>
+              </div>
           </div>
       </div>
-    </div>
-    <script src="script.js"></script>
+      <div class="content">
+          <div class="card-grid">
+              <div class="card">
+                  <p class="card-title">Daily Distance Activity</p>
+                  <p>
+                      <table>
+                          <tr>
+                              <th>DAY</th>
+                              <th>Distance (meters)</th>
+                          </tr>
+                          <tr>
+                              <td>Monday</td>
+                              <td><span id="distanceTravelledArray1"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Tuesday</td>
+                              <td><span id="distanceTravelledArray2"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Wednesday</td>
+                              <td><span id="distanceTravelledArray3"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Thursday</td>
+                              <td><span id="distanceTravelledArray4"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Friday</td>
+                              <td><span id="distanceTravelledArray5"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Saturday</td>
+                              <td><span id="distanceTravelledArray6"></span></td>
+                          </tr>
+                          <tr>
+                              <td>Sunday</td>
+                              <td><span id="distanceTravelledArray7"></span></td>
+                          </tr>
+                      </table>
+                  </p>
+              </div>
+          </div>
+          <script src="script.js"></script>
   </body>
 </html>

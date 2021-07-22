@@ -119,6 +119,10 @@ IPAddress Gateway;
 IPAddress Subnet;
 IPAddress dns1;
 
+// Json Variable to Hold Sensor Readings
+
+JSONVar readings;
+
 // Timer variables (check wifi).
 
 unsigned long wiFiR = 0;					// WiFi retry (wiFiR) to attempt connecting to the last known WiFi if connection lost.
@@ -127,6 +131,11 @@ volatile bool disconnectWiFi = false;		// Used in the sensor interrupt function 
 volatile bool disconnectWiFiFlag = false;	// Used in the sensor interrupt function to disable WiFi.
 unsigned long previousMillis = 0;			// Used in the WiFI Init function.
 const long interval = 10000;				// Interval to wait for Wi-Fi connection (milliseconds).
+
+// Timer variables (to update web server).
+
+unsigned long lastTime = 0;
+unsigned long timerDelay = 30000;
 
 // Data variables.
 
@@ -234,7 +243,7 @@ boolean calTouchScreen = 0;					// Change flag to trigger calibration function.
 
 const int numReadings = 10;
 
-double	readings[numReadings];				// Latest Kph readings.
+double	readingsAV[numReadings];				// Latest Kph readings.
 int		readIndex = 0;						// The index of the current reading.
 double	total = 0.00;						// The running total of the readings.
 double	averageKphSpeed = 0.00;				// The average speed in Kph.
@@ -632,6 +641,37 @@ void tone(byte pin, int freq) {
 
 /*-----------------------------------------------------------------*/
 
+// Return JSON String from sensor Readings
+
+String getJSONReadings() {
+
+	// Get daily time activity.
+
+	readings["sessionTimeArray1"] = String(sessionTimeArray1);
+	readings["sessionTimeArray2"] = String(sessionTimeArray2);
+	readings["sessionTimeArray3"] = String(sessionTimeArray3);
+	readings["sessionTimeArray4"] = String(sessionTimeArray4);
+	readings["sessionTimeArray5"] = String(sessionTimeArray5);
+	readings["sessionTimeArray6"] = String(sessionTimeArray6);
+	readings["sessionTimeArray7"] = String(sessionTimeArray7);
+	
+	// Get daily distance activity.
+	
+	readings["distanceTravelledArray1"] = String(distanceTravelledArray1);
+	readings["distanceTravelledArray2"] = String(distanceTravelledArray2);
+	readings["distanceTravelledArray3"] = String(distanceTravelledArray3);
+	readings["distanceTravelledArray4"] = String(distanceTravelledArray4);
+	readings["distanceTravelledArray5"] = String(distanceTravelledArray5);
+	readings["distanceTravelledArray6"] = String(distanceTravelledArray6);
+	readings["distanceTravelledArray7"] = String(distanceTravelledArray7);
+
+	String jsonString = JSON.stringify(readings);
+	return jsonString;
+
+}  // Close function.
+
+/*-----------------------------------------------------------------*/
+
 void setup() {
 
 	//Begin serial mode.
@@ -906,7 +946,7 @@ void setup() {
 
 	// Load values saved in SPIFFS.
 
-	/*ssid = "BT-7FA3K5";									// Remove these lines before final build.
+	ssid = "BT-7FA3K5";									// Remove these lines before final build.
 	pass = "iKD94Y3K4Qvkck";
 	ip = "192.168.1.200";
 	subnet = "255.255.255.0";
@@ -918,7 +958,7 @@ void setup() {
 	writeFile(SPIFFS, ipPath, ip.c_str());
 	writeFile(SPIFFS, subnetPath, subnet.c_str());
 	writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	writeFile(SPIFFS, dnsPath, dns.c_str());*/
+	writeFile(SPIFFS, dnsPath, dns.c_str());
 
 	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
@@ -958,12 +998,23 @@ void setup() {
 		// Handle the Web Server in Station Mode and route for root / web page.
 
 		server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+
 			request->send(SPIFFS, "/index.html", "text/html");
 			});
 
 		server.serveStatic("/", SPIFFS, "/");
 
+		// Request for the latest data readings.
+
+		server.on("/readings", HTTP_GET, [](AsyncWebServerRequest* request) {
+
+			String json = getJSONReadings();
+			request->send(200, "application/json", json);
+			json = String();
+			});
+
 		events.onConnect([](AsyncEventSourceClient* client) {
+
 			if (client->lastId()) {
 				Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
 			}
@@ -1242,6 +1293,15 @@ void loop() {
 
 		printLocalTime();			// Get time and update display.
 		LocalTime = millis();
+	}
+
+	//...Send Events to the client with sensor readins and update colors every 30 seconds
+
+	if (millis() - lastTime > timerDelay) {
+
+		String message = getJSONReadings();
+		events.send(message.c_str(), "new_readings", millis());
+		lastTime = millis();
 	}
 
 	// Draw screen icons and button images.
@@ -2043,15 +2103,15 @@ void averageSpeed() {
 
 	// Subtract the last reading.
 
-	total = total - readings[readIndex];
+	total = total - readingsAV[readIndex];
 
 	// Get latest Kph.
 
-	readings[readIndex] = speedKph;
+	readingsAV[readIndex] = speedKph;
 
 	// Add the reading to the total.
 
-	total = total + readings[readIndex];
+	total = total + readingsAV[readIndex];
 
 	// Advance to the next position in the average array.
 

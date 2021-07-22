@@ -12,7 +12,7 @@ p {
 }
 .topnav { 
   overflow: hidden; 
-  background-color: #0A1128;
+  background-color: #f59f2f;
 }
 body {  
   margin: 0;
@@ -47,7 +47,7 @@ tr:hover {
   background-color: #ddd;
 }  
 th {
-  background-color: #50b8b4;
+  background-color: #dc5a64;
   color: white;
 }
 table {
