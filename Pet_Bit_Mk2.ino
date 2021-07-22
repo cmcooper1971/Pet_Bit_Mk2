@@ -838,13 +838,13 @@ void setup() {
 	Serial.println(sessionTimeCap);
 	Serial.println(" ");
 
-	sessionTimeArray1 = sessionTimeArray[0] / 100 / 60;							// Update chart variables from arrays.
-	sessionTimeArray2 = sessionTimeArray[1] / 100 / 60;
-	sessionTimeArray3 = sessionTimeArray[2] / 100 / 60;
-	sessionTimeArray4 = sessionTimeArray[3] / 100 / 60;
-	sessionTimeArray5 = sessionTimeArray[4] / 100 / 60;
-	sessionTimeArray6 = sessionTimeArray[5] / 100 / 60;
-	sessionTimeArray7 = sessionTimeArray[6] / 100 / 60;
+	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;							// Update chart variables from arrays.
+	sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
+	sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
+	sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
+	sessionTimeArray5 = sessionTimeArray[4] / 1000 / 60;
+	sessionTimeArray6 = sessionTimeArray[5] / 1000 / 60;
+	sessionTimeArray7 = sessionTimeArray[6] / 1000 / 60;
 
 	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[0]);		// Load previous session distance's into arrays.
 	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[1]);
@@ -1729,54 +1729,89 @@ void loop() {
 
 		// Session time bar graphs.
 
-		if (sessionTimeArray1 <= sessionTimeCap) {
+		if (sessionTimeArray1 <= (sessionTimeCap * 0.8)) {
 
 			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
 		}
 
-		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
+		else if (sessionTimeArray1 >= sessionTimeCap) {
 
-		if (sessionTimeArray2 <= sessionTimeCap) {
+			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
+		}
+
+		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
+	
+		if (sessionTimeArray2 <= (sessionTimeCap * 0.8)) {
 
 			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
+		else if (sessionTimeArray2 >= sessionTimeCap) {
 
-		if (sessionTimeArray3 <= sessionTimeCap) {
+			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+		}
+		
+		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
+	
+		if (sessionTimeArray3 <= (sessionTimeCap * 0.8)) {
 
 			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
+		else if (sessionTimeArray3 >= sessionTimeCap) {
 
-		if (sessionTimeArray4 <= sessionTimeCap) {
+			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
+		}
+				
+		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
+
+		if (sessionTimeArray4 <= (sessionTimeCap * 0.8)) {
 
 			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
+		else if (sessionTimeArray4 >= sessionTimeCap) {
 
-		if (sessionTimeArray5 <= sessionTimeCap) {
+			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
+		}
+		
+		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
+
+		if (sessionTimeArray5 <= (sessionTimeCap * 0.8)) {
 
 			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
+		else if (sessionTimeArray5 >= sessionTimeCap) {
 
-		if (sessionTimeArray6 <= sessionTimeCap) {
+			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
+		}
+
+		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
+
+		if (sessionTimeArray6 <= (sessionTimeCap * 0.8)) {
 
 			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
+		else if (sessionTimeArray6 >= sessionTimeCap) {
 
-		if (sessionTimeArray7 <= sessionTimeCap) {
+			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
+		}
+
+		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
+
+		if (sessionTimeArray7 <= (sessionTimeCap * 0.8)) {
 
 			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
 		}
 
-		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
+		else if (sessionTimeArray7 >= sessionTimeCap) {
+
+			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
+		}
+
+		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray7, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
 
 	}
 
