@@ -620,6 +620,8 @@ void printLocalTime() {
 
 void tone(byte pin, int freq) {
 
+	//ESP8266 and ESP32 specific functions.
+
 	ledcSetup(0, freq, 8);		// Setup buzzer.
 	ledcAttachPin(pin, 0);		// Attach buzzer.
 	ledcWriteTone(0, freq);		// Play tone.
@@ -651,7 +653,7 @@ void setup() {
 
 	// Switch on TFT LED back light.
 
-	digitalWrite(TFT_LED, HIGH);			// Output for LCD back light.
+	digitalWrite(TFT_LED, HIGH);			// Output for LCD back light (high is off).
 
 	// Set all SPI chip selects to HIGH to stablise SPI bus.
 
@@ -711,6 +713,8 @@ void setup() {
 	EEPROM.get(eegraphTMIAddress, graphTMI);
 	EEPROM.get(eegraphTAPAddress, graphTAP);
 
+	// Output graph time scale data to serial for checking.
+
 	Serial.println("Time graph settings output from Setup");
 	Serial.print("Time Scale: ");
 	Serial.print(graphTM);
@@ -728,6 +732,8 @@ void setup() {
 	EEPROM.get(eegraphDMIAddress, graphDMI);
 	EEPROM.get(eegraphDAPAddress, graphDAP);
 
+	// Output graph distance data to serial for checking.
+
 	Serial.println("Distance graph output from Setup");
 	Serial.print("Distance Scale: ");
 	Serial.print(graphDM);
@@ -741,14 +747,12 @@ void setup() {
 
 	EEPROM.commit();
 
-	// Out graph scale data to serial for checking.
-	
 	EEPROM.get(eeBuzzerYNAddress, buzzerYN);				// Load buzzer setting.
 	EEPROM.get(eeWiFiYNAddress, wiFiYN);					// Load WiFi reset flag.
 
 	EEPROM.commit();
 
-	// Output variables to serial for checking.
+	// Output variables data to serial for checking.
 
 	Serial.println();
 	Serial.print("Beep Flag: ");
@@ -902,19 +906,19 @@ void setup() {
 
 	// Load values saved in SPIFFS.
 
-	//ssid = "BT-7FA3K5";
-	//pass = "iKD94Y3K4Qvkck";
-	//ip = "192.168.1.200";
-	//subnet = "255.255.255.0";
-	//gateway = "192.168.1.254";
-	//dns = "192.168.1.254";
-
-	//writeFile(SPIFFS, ssidPath, ssid.c_str());
-	//writeFile(SPIFFS, passPath, pass.c_str());
-	//writeFile(SPIFFS, ipPath, ip.c_str());
-	//writeFile(SPIFFS, subnetPath, subnet.c_str());
-	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	//writeFile(SPIFFS, dnsPath, dns.c_str());
+	/*ssid = "BT-7FA3K5";									// Remove these lines before final build.
+	pass = "iKD94Y3K4Qvkck";
+	ip = "192.168.1.200";
+	subnet = "255.255.255.0";
+	gateway = "192.168.1.254";
+	dns = "192.168.1.254";
+	
+	writeFile(SPIFFS, ssidPath, ssid.c_str());
+	writeFile(SPIFFS, passPath, pass.c_str());
+	writeFile(SPIFFS, ipPath, ip.c_str());
+	writeFile(SPIFFS, subnetPath, subnet.c_str());
+	writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	writeFile(SPIFFS, dnsPath, dns.c_str());*/
 
 	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
@@ -988,7 +992,7 @@ void setup() {
 
 		// NULL sets an open Access Point.
 
-		WiFi.softAP("ESP-WIFI-MANAGER", NULL);
+		WiFi.softAP("WIFI-MANAGER", NULL);
 
 		IPAddress IP = WiFi.softAPIP();
 		Serial.print("AP IP address: ");
@@ -1094,9 +1098,23 @@ void setup() {
 		tft.setCursor(50, 154);
 		tft.print("5) Unit will then restart");
 
+		unsigned long previousMillis = millis();
+		unsigned long interval = 120000;
+		
 		while (1) {
 
-			// Do nothing...
+			// Hold from starting loop while in AP mode.
+
+			unsigned long currentMillis = millis();
+			
+			// Restart after 2 minutes in case of failed reconnection with correc WiFi details.
+
+			if (currentMillis - previousMillis >= interval) {
+
+				ESP.restart();
+
+			}
+
 		}
 
 	}
@@ -1138,7 +1156,7 @@ void setup() {
 
 void loop() {
 
-	// Light sleep mode.
+	// Light sleep mode (LED back light off after x seconds).
 
 	if (millis() >= sleepT + sleepTime) {
 
@@ -2353,10 +2371,6 @@ void menuSettingPlus() {
 		eeMenuSettingChange = true;
 	}
 
-	Serial.print("Menu Setting: ");
-	Serial.print(eeMenuSetting);
-	Serial.println(" ");
-
 	if (eeMenuSettingChange == true) {			// Write results to EEPROM to save.
 
 		menuSettingSave();
@@ -2384,10 +2398,6 @@ void menuSettingMinus() {
 		eeMenuSettingChange = true;
 	}
 
-	Serial.print("Menu Setting: ");
-	Serial.print(eeMenuSetting);
-	Serial.println(" ");
-
 	if (eeMenuSettingChange == true) {			// Write results to EEPROM to save.
 
 		menuSettingSave();
@@ -2408,6 +2418,10 @@ void menuSettingSave() {
 		EEPROM.put(eeMenuAddress, eeMenuSetting);
 		EEPROM.commit();
 		eeMenuSettingChange = false;
+
+		Serial.print("Menu Setting: ");
+		Serial.print(eeMenuSetting);
+		Serial.println(" ");
 	}
 
 }  // Close function.
@@ -2431,16 +2445,6 @@ void distanceScaleSettingPlus() {
 		graphDAP++;
 		graphDSC = true;
 	}
-
-	Serial.print("Distance Scale: ");
-	Serial.print(graphDAM[graphDAP]);
-	Serial.print(" & ");
-	Serial.print("Distance Increments: ");
-	Serial.print(graphDAI[graphDAP]);
-	Serial.print(" & ");
-	Serial.print("Distance Array Position: ");
-	Serial.print(graphDAP);
-	Serial.println(" ");
 
 	if (graphDSC == true) {			// Write results to EEPROM to save.
 
@@ -2468,16 +2472,6 @@ void distanceScaleSettingMinus() {
 		graphDAP--;
 		graphDSC = true;
 	}
-
-	Serial.print("Distance Scale: ");
-	Serial.print(graphDAM[graphDAP]);
-	Serial.print(" & ");
-	Serial.print("Distance Increments: ");
-	Serial.print(graphDAI[graphDAP]);
-	Serial.print(" & ");
-	Serial.print("Distance Array Position: ");
-	Serial.print(graphDAP);
-	Serial.println(" ");
 
 	if (graphDSC == true) {			// Write results to EEPROM to save.
 
@@ -2509,10 +2503,10 @@ void distanceScaleSettingSave() {
 		Serial.print("Distance Scale: ");
 		Serial.print(graphDAM[graphDAP]);
 		Serial.print(" & ");
-		Serial.print("Distance Increments: ");
+		Serial.print("Increments: ");
 		Serial.print(graphDAI[graphDAP]);
 		Serial.print(" & ");
-		Serial.print("Distance Array Position: ");
+		Serial.print("Position: ");
 		Serial.print(graphDAP);
 		Serial.println(" ");
 
@@ -2541,16 +2535,6 @@ void timeScaleSettingPlus() {
 		graphTSC = true;
 	}
 
-	Serial.print("Time Scale: ");
-	Serial.print(graphTAM[graphTAP]);
-	Serial.print(" & ");
-	Serial.print("Time Increments: ");
-	Serial.print(graphTAI[graphTAP]);
-	Serial.print(" & ");
-	Serial.print("Time Array Position: ");
-	Serial.print(graphTAP);
-	Serial.println(" ");
-
 	if (graphTSC == true) {			// Write results to EEPROM to save.
 
 		timeScaleSettingSave();
@@ -2577,16 +2561,6 @@ void timeScaleSettingMinus() {
 		graphTAP--;
 		graphTSC = true;
 	}
-
-	Serial.print("Time Scale: ");
-	Serial.print(graphTAM[graphTAP]);
-	Serial.print(" & ");
-	Serial.print("Time Increments: ");
-	Serial.print(graphTAI[graphTAP]);
-	Serial.print(" & ");
-	Serial.print("Time Array Position: ");
-	Serial.print(graphTAP);
-	Serial.println(" ");
 
 	if (graphTSC == true) {			// Write results to EEPROM to save.
 
@@ -2618,10 +2592,10 @@ void timeScaleSettingSave() {
 		Serial.print("Time Scale: ");
 		Serial.print(graphTAM[graphTAP]);
 		Serial.print(" & ");
-		Serial.print("Time Increments: ");
+		Serial.print("Increments: ");
 		Serial.print(graphTAI[graphTAP]);
 		Serial.print(" & ");
-		Serial.print("Time Array Position: ");
+		Serial.print("Position: ");
 		Serial.print(graphTAP);
 		Serial.println(" ");
 
@@ -2645,10 +2619,6 @@ void buzzerSettingPlus() {
 
 	}
 
-	Serial.print("Buzzer Enabled: ");
-	Serial.print(buzzerYN);
-	Serial.println(" ");
-
 	if (eeBuzzerYNChange == true) {			// Write results to EEPROM to save.
 
 		buzzerSettingSave();
@@ -2671,10 +2641,6 @@ void buzzerSettingMinus() {
 
 	}
 
-	Serial.print("Buzzer Enabled: ");
-	Serial.print(buzzerYN);
-	Serial.println(" ");
-
 	if (eeBuzzerYNChange == true) {			// Write results to EEPROM to save.
 
 		buzzerSettingSave();
@@ -2695,6 +2661,10 @@ void buzzerSettingSave() {
 		EEPROM.put(eeBuzzerYNAddress, buzzerYN);
 		EEPROM.commit();
 		eeBuzzerYNChange = false;
+
+		Serial.print("Buzzer Enabled: ");
+		Serial.print(buzzerYN);
+		Serial.println(" ");
 	}
 
 }  // Close function.
@@ -2712,10 +2682,6 @@ void wiFiSettingPlus() {
 		wiFiYN = true;
 		eeWiFiYNChange = true;
 	}
-
-	Serial.print("WiFi Reset: ");
-	Serial.print(wiFiYN);
-	Serial.println(" ");
 
 	if (eeWiFiYNChange == true) {			// Write results to EEPROM to save.
 
@@ -2738,10 +2704,6 @@ void wiFiSettingMinus() {
 		eeWiFiYNChange = true;
 	}
 
-	Serial.print("WiFi Reset: ");
-	Serial.print(wiFiYN);
-	Serial.println(" ");
-
 	if (eeWiFiYNChange == true) {			// Write results to EEPROM to save.
 
 		wiFiSettingSave();
@@ -2762,6 +2724,10 @@ void wiFiSettingSave() {
 		EEPROM.put(eeWiFiYNAddress, wiFiYN);
 		EEPROM.commit();
 		eeWiFiYNChange = false;
+
+		Serial.print("WiFi Reset: ");
+		Serial.print(wiFiYN);
+		Serial.println(" ");
 	}
 
 }  // Close function.
@@ -2785,10 +2751,6 @@ void resetMenuSettingPlus() {
 		eeResetSetting++;
 		eeResetSettingChange = true;
 	}
-
-	Serial.print("Reset Setting: ");
-	Serial.print(eeResetSetting);
-	Serial.println(" ");
 
 	if (eeResetSettingChange == true) {			// Write results to EEPROM to save.
 
@@ -2817,10 +2779,6 @@ void resetMenuSettingMinus() {
 		eeResetSettingChange = true;
 	}
 
-	Serial.print("Reset Setting: ");
-	Serial.print(eeResetSetting);
-	Serial.println(" ");
-
 	if (eeResetSettingChange == true) {			// Write results to EEPROM to save.
 
 		resetMenuSettingSave();
@@ -2840,6 +2798,10 @@ void resetMenuSettingSave() {
 		EEPROM.put(eeResetSettingAddress, eeResetSetting);
 		EEPROM.commit();
 		eeResetSettingChange = false;
+
+		Serial.print("Reset Setting: ");
+		Serial.print(eeResetSetting);
+		Serial.println(" ");
 	}
 
 } // Close function.
@@ -2863,10 +2825,6 @@ void circumferenceSettingPlus() {
 		eeCircSetting = eeCircSetting + 0.01;
 		eeCircSettingChange = true;
 	}
-
-	Serial.print("Circumference Setting: ");
-	Serial.print(eeCircSetting);
-	Serial.println(" ");
 
 	if (eeCircSettingChange == true) {			// Write results to EEPROM to save.
 
@@ -2896,10 +2854,6 @@ void circumferenceSettingMinus() {
 		eeCircSettingChange = true;
 	}
 
-	Serial.print("Circumference Setting: ");
-	Serial.print(eeCircSetting);
-	Serial.println(" ");
-
 	if (eeCircSettingChange == true) {			// Write results to EEPROM to save.
 
 		circumferenceSettingSave();
@@ -2921,6 +2875,10 @@ void circumferenceSettingSave() {
 		EEPROM.put(eeCircAddress, eeCircSetting);
 		EEPROM.commit();
 		eeCircSettingChange = false;
+
+		Serial.print("Circumference Setting: ");
+		Serial.print(eeCircSetting);
+		Serial.println(" ");
 	}
 
 }  // Close function.
@@ -3043,26 +3001,6 @@ void resetSystemData() {
 	EEPROM.put(eegraphTMIAddress, graphTMI);
 	EEPROM.put(eegraphTAPAddress, graphTAP);
 	EEPROM.commit();
-
-	Serial.println("Output from reset system data after EEPROM write");
-	Serial.print("Distance Scale: ");
-	Serial.print(graphDM);
-	Serial.print(" & ");
-	Serial.print("Increments: ");
-	Serial.print(graphDMI);
-	Serial.print(" & ");
-	Serial.print("Position: ");
-	Serial.print(graphDAP);
-	Serial.println(" ");
-	Serial.print("Time Scale: ");
-	Serial.print(graphTM);
-	Serial.print(" & ");
-	Serial.print("Increments: ");
-	Serial.print(graphTMI);
-	Serial.print(" & ");
-	Serial.print("Position: ");
-	Serial.println(graphTAP);
-	Serial.println(" ");
 
 	buzzerYN = 1;																// Buzzer flag.
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
@@ -3208,26 +3146,6 @@ void resetSystemDemoData() {
 	EEPROM.put(eegraphTMIAddress, graphTMI);
 	EEPROM.put(eegraphTAPAddress, graphTAP);
 	EEPROM.commit();
-
-	Serial.println("Output from reset system data after EEPROM write");
-	Serial.print("Distance Scale: ");
-	Serial.print(graphDM);
-	Serial.print(" & ");
-	Serial.print("Increments: ");
-	Serial.print(graphDMI);
-	Serial.print(" & ");
-	Serial.print("Position: ");
-	Serial.print(graphDAP);
-	Serial.println(" ");
-	Serial.print("Time Scale: ");
-	Serial.print(graphTM);
-	Serial.print(" & ");
-	Serial.print("Increments: ");
-	Serial.print(graphTMI);
-	Serial.print(" & ");
-	Serial.print("Position: ");
-	Serial.println(graphTAP);
-	Serial.println(" ");
 
 	buzzerYN = 1;																// Buzzer flag.
 	EEPROM.put(eeBuzzerYNAddress, buzzerYN);
