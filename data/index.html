@@ -1,118 +1,121 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <title>Pet-Bit</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/png" href="hamster.png">
-      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="style.css">
-    </head>
-  <body>
-      <div class="topnav">
-          <h1>Pet-Bit Activity Data</h1>
-          <img src="session.png">
-          <img src="distance.png">
-          <img src="speed.png">
-          <img src="time.png">
-          <br>
-          <br>
-      </div>
-      <div class="content">
-          <div class="card-grid">
-              <div class="card">
-                  <p class="card-title">Daily Time Activity</p>
-                  <p>
-                      <table>
-                          <tr>
-                              <th>Day</th>
-                              <th>Time (minutes)</th>
-                          </tr>
-                          <tr>
-                              <td>Monday</td>
-                              <td><span id="sessionTimeArray1"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Tuesday</td>
-                              <td><span id="sessionTimeArray2"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Wednesday</td>
-                              <td><span id="sessionTimeArray3"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Thursday</td>
-                              <td><span id="sessionTimeArray4"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Friday</td>
-                              <td><span id="sessionTimeArray5"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Saturday</td>
-                              <td><span id="sessionTimeArray6"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Sunday</td>
-                              <td><span id="sessionTimeArray7"></span></td>
-                          </tr>
-                      </table>
-                  </p>
-              </div>
-          </div>
-      </div>
-      <div class="content">
-          <div class="card-grid">
-              <div class="card">
-                  <p class="card-title">Daily Distance Activity</p>
-                  <p>
-                      <table>
-                          <tr>
-                              <th style="background-color: #65b0b6;">Day</th>
-                              <th style="background-color: #65b0b6;">Distance (meters)</th>
-                          </tr>
-                          <tr>
-                              <td>Monday</td>
-                              <td><span id="distanceTravelledArray1"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Tuesday</td>
-                              <td><span id="distanceTravelledArray2"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Wednesday</td>
-                              <td><span id="distanceTravelledArray3"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Thursday</td>
-                              <td><span id="distanceTravelledArray4"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Friday</td>
-                              <td><span id="distanceTravelledArray5"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Saturday</td>
-                              <td><span id="distanceTravelledArray6"></span></td>
-                          </tr>
-                          <tr>
-                              <td>Sunday</td>
-                              <td><span id="distanceTravelledArray7"></span></td>
-                          </tr>
-                      </table>
-                  </p>
-              </div>
-          </div>
-          <script src="script.js"></script>
+</head>
 
-          <br>
-          <br>
-
-
-  </body>
+<body>
+    <div class="topnav">
+        <h1>Pet-Bit Activity Data</h1>
+        <img src="hamster_large.png" width="64" height="64">
+        <img src="gerbil_large.png" width="64" height="64">
+        <img src="cat_large.png" width="64" height="64">
+        <!--<img src="session.png">
+         <img src="speed.png">
+          -->
+        <br>
+        <br>
+    </div>
+    <div class="content">
+        <div class="card-grid">
+            <div class="card">
+                <p class="card-title">Daily Time Activity</p>
+                <table>
+                    <tr>
+                        <th>Day</th>
+                        <th>Time (minutes)</th>
+                    </tr>
+                    <tr>
+                        <td>Monday</td>
+                        <td><span id="sessionTimeArray1"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Tuesday</td>
+                        <td><span id="sessionTimeArray2"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Wednesday</td>
+                        <td><span id="sessionTimeArray3"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Thursday</td>
+                        <td><span id="sessionTimeArray4"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Friday</td>
+                        <td><span id="sessionTimeArray5"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Saturday</td>
+                        <td><span id="sessionTimeArray6"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Sunday</td>
+                        <td><span id="sessionTimeArray7"></span></td>
+                    </tr>
+                </table>
+                <p><img src="time.png"></p>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="card-grid">
+            <div class="card">
+                <p class="card-title">Daily Distance Activity</p>
+                <table>
+                    <tr>
+                        <th style="background-color: #65b0b6;">Day</th>
+                        <th style="background-color: #65b0b6;">Distance (meters)</th>
+                    </tr>
+                    <tr>
+                        <td>Monday</td>
+                        <td><span id="distanceTravelledArray1"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Tuesday</td>
+                        <td><span id="distanceTravelledArray2"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Wednesday</td>
+                        <td><span id="distanceTravelledArray3"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Thursday</td>
+                        <td><span id="distanceTravelledArray4"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Friday</td>
+                        <td><span id="distanceTravelledArray5"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Saturday</td>
+                        <td><span id="distanceTravelledArray6"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Sunday</td>
+                        <td><span id="distanceTravelledArray7"></span></td>
+                    </tr>
+                </table>
+                <p> <img src="distance.png"></p>
+                </p>
+            </div>
+        </div>
+        <script src="script.js"></script>
+        <br>
+</body>
 <footer>
     <br>
-     <p>Pet-Bit</p>
-     <p>Year 2021</p>
+    <p style="font-size:80%">Last update: <span id="update-time"></span></p>
+    <p style="font-size:80%">Pet-Bit 2021</style>
+    </p>
+    <p style="font-size:80%">Design by Clarke & Cooper</style>
+    </p>
 </footer>
 
 </html>
