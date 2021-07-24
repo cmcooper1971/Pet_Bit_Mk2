@@ -615,6 +615,16 @@ void printLocalTime() {
 
 	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M");
 
+	// Text block to over write characters from longer dates.
+
+	tft.setTextColor(BLACK);
+	tft.setFreeFont();
+	tft.setTextSize(1);
+	tft.setCursor(150, 220);
+	tft.println("XXXXXXXX");
+
+	// Actual date time to display.
+
 	tft.setTextColor(WHITE, BLACK);
 	tft.setFreeFont();
 	tft.setTextSize(1);
@@ -2235,13 +2245,13 @@ void configurationDisplay() {
 	EEPROM.get(eeResetSettingAddress, eeResetSetting);
 	EEPROM.get(eeBuzzerYNAddress, buzzerYN);
 
-	//EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
-	//EEPROM.get(eegraphDMIAddress, graphDMI);
-	//EEPROM.get(eegraphDAPAddress, graphDAP);
+	EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
+	EEPROM.get(eegraphDMIAddress, graphDMI);
+	EEPROM.get(eegraphDAPAddress, graphDAP);
 
-	//EEPROM.get(eegraphTMAddress, graphTM);										// Graph time scale.
-	//EEPROM.get(eegraphTMIAddress, graphTMI);
-	//EEPROM.get(eegraphTAPAddress, graphTAP);
+	EEPROM.get(eegraphTMAddress, graphTM);										// Graph time scale.
+	EEPROM.get(eegraphTMIAddress, graphTMI);
+	EEPROM.get(eegraphTAPAddress, graphTAP);
 
 	// Display configuration data and selection options.
 
