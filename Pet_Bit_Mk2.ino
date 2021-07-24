@@ -212,8 +212,23 @@ int eegraphDMIAddress = 88;					// EEPROM address for graph distance increment s
 int eegraphDAPAddress = 96;					// EEPROM address for graph distance array position.
 
 int eegraphTMAddress = 104;					// EEPROM address for graph distance scale.
-int eegraphTMIAddress = 112;					// EEPROM address for graph distance increment scale level.
+int eegraphTMIAddress = 112;				// EEPROM address for graph distance increment scale level.
 int eegraphTAPAddress = 120;				// EEPROM address for graph distance array position.
+	
+int eeBestMaxSpeed = 124;					// EEPRPOM address for best ever max speed recording.
+int eeBestMaxSpeedDay = 128;
+int eeBestMaxSpeedMonth = 132;
+int eeBestMaxSpeedYear = 136;
+
+int eeBestDistance = 140;					// EEPRPOM address for best ever distance recording.
+int eeBestDistanceDay = 144;
+int eeBestDistanceMonth = 148;
+int eeBestDistanceYear = 152;
+
+int eeBestTime = 156;						// EEPRPOM address for best ever time recording.
+int eeBestTimeDay = 160;
+int eeBestTimeMonth = 164;
+int eeBestTimeYear = 168;
 
 int eeBuzzerYNAddress = 200;				// EEPROM address for buzzer enabled / disabled.
 boolean eeBuzzerYNChange;					// Change flag.
@@ -615,7 +630,7 @@ void printLocalTime() {
 
 	Serial.println(&timeinfo, "%A, %B %d %Y %H:%M");
 
-	// Text block to over write characters from longer dates.
+	// Text block to over write characters from longer dates when date changes and unit has been running.
 
 	tft.setTextColor(BLACK);
 	tft.setFreeFont();
