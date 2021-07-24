@@ -1,7 +1,9 @@
-// Get current sensor readings when the page loads  
+
+// Get current readings when the page loads.
+
 window.addEventListener('load', getReadings);
 
-// Function to add date and time of last update.
+// Get current date and time function.
 
 function updateDateTime() {
 
@@ -10,15 +12,16 @@ function updateDateTime() {
         + (currentdate.getMonth() + 1) + "/"
         + currentdate.getFullYear() + " at "
         + currentdate.getHours() + ":"
-        + currentdate.getMinutes() + ":"
-        + currentdate.getSeconds();
+        + (currentdate.getMinutes() < 10 ? "0" : "") + currentdate.getMinutes() + ":"
+        + (currentdate.getSeconds() < 10 ? "0" : "") + currentdate.getSeconds() ;
 
     document.getElementById("update-time").innerHTML = datetime;
     console.log(datetime);
 
 } // Close function.
 
-// Function to get current readings on the webpage when it loads for the first time.
+// Function to get current readings on the webpage when it loads for the first time. (dt.getMinutes() < 10 ? "0" : "") + dt.getMinutes();
+
 function getReadings() {
 
     var xhr = new XMLHttpRequest();
@@ -50,7 +53,8 @@ function getReadings() {
 
 } // Close function.
 
-// Create an Event Source to listen for events
+// Create an Event Source to listen for events.
+
 if (!!window.EventSource) {
     var source = new EventSource('/events');
 
@@ -83,4 +87,5 @@ if (!!window.EventSource) {
         document.getElementById("distanceTravelledArray7").innerHTML = Obj.distanceTravelledArray7;
         updateDateTime();
     }, false);
-}
+
+} // Close function.

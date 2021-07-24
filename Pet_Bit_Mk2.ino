@@ -946,19 +946,19 @@ void setup() {
 
 	// Load values saved in SPIFFS.
 
-	ssid = "BT-7FA3K5";									// Remove these lines before final build.
-	pass = "iKD94Y3K4Qvkck";
-	ip = "192.168.1.200";
-	subnet = "255.255.255.0";
-	gateway = "192.168.1.254";
-	dns = "192.168.1.254";
-	
-	writeFile(SPIFFS, ssidPath, ssid.c_str());
-	writeFile(SPIFFS, passPath, pass.c_str());
-	writeFile(SPIFFS, ipPath, ip.c_str());
-	writeFile(SPIFFS, subnetPath, subnet.c_str());
-	writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	writeFile(SPIFFS, dnsPath, dns.c_str());
+	//ssid = "BT-7FA3K5";									// Remove these lines before final build.
+	//pass = "iKD94Y3K4Qvkck";
+	//ip = "192.168.1.200";
+	//subnet = "255.255.255.0";
+	//gateway = "192.168.1.254";
+	//dns = "192.168.1.254";
+	//
+	//writeFile(SPIFFS, ssidPath, ssid.c_str());
+	//writeFile(SPIFFS, passPath, pass.c_str());
+	//writeFile(SPIFFS, ipPath, ip.c_str());
+	//writeFile(SPIFFS, subnetPath, subnet.c_str());
+	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	//writeFile(SPIFFS, dnsPath, dns.c_str());
 
 	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);

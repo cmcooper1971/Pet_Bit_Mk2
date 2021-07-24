@@ -16,9 +16,10 @@ p {
 }
 body {  
   margin: 0;
+  background-color: #f59f2f;
 }
 .content { 
-  padding: 50px;
+  padding: 25px;
 }
 .card-grid { 
   max-width: 800px; 
@@ -57,4 +58,12 @@ table {
 .update-time {
   font-size: 0.8rem;
   color:#1282A2;
+}
+label{
+  text-align: left;
+
+}
+footer {
+  text-align: centre;
+  font-size: small;
 }
