@@ -140,7 +140,6 @@ unsigned long timerDelay = 30000;
 // Data variables.
 
 byte configurationFlag = 1;					// Configuration menu flag.
-boolean loopCoreID = true;					// Flag to ID core only once.
 
 volatile unsigned int distanceCounter = 0;	// Counting rotations for distance travelled.
 
@@ -735,13 +734,6 @@ void setup() {
 
 	Serial.begin(115200);
 	delay(100);
-
-	// Identify Arduino sketch core being used.
-
-	Serial.println(" ");
-	Serial.print("Setup Running on Core : ");
-	Serial.println(xPortGetCoreID());
-	Serial.println(" ");
 
 	// Set pin modes.
 
@@ -1347,43 +1339,6 @@ void setup() {
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
 	}
 
-	// Delete after finishing.
-
-	//float tempmaxspeed = 0;
-	//int tempdow;
-	//int tempday;
-	//int tempmonth;
-	//int tempyear;
-	//int temphour;
-	//int tempminute;
-	//
-	//eeprom.put(eebestmaxspeed, tempmaxspeed);
-	//eeprom.get(eebestmaxspeed, tempmaxspeed);
-	//
-	//eeprom.get(eebestmaxspeeddow, tempdow);
-	//eeprom.get(eebestmaxspeedday, tempday);
-	//eeprom.get(eebestmaxspeedmonth, tempmonth);
-	//eeprom.get(eebestmaxspeedyear, tempyear);
-	//eeprom.get(eebestmaxspeedhour, temphour);
-	//eeprom.get(eebestmaxspeedminute, tempminute);
-	//eeprom.commit();
-
-	//serial.print("eeprom max speed setting at start up: ");
-	//serial.println(tempmaxspeed);
-	//serial.print("date: ");
-	//serial.print(dayarray[tempdow]);
-	//serial.print(", ");
-	//serial.print(tempday);
-	//serial.print("/");
-	//serial.print(tempmonth);
-	//serial.print("/");
-	//serial.print(tempyear);
-	//serial.print(" at ");
-	//serial.print(temphour);
-	//serial.print(":");
-	//serial.println(tempminute);
-	//serial.println(" ");
-
 } // Close setup.
 
 /*-----------------------------------------------------------------*/
@@ -1398,33 +1353,6 @@ void loop() {
 	}
 
 	else 	digitalWrite(TFT_LED, LOW);			// Output for LCD back light.
-
-	// Hold loop if in AP mode.
-
-	while (apMode == true) {
-
-		// Set wiFi icon to be white for AP mode.
-
-		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiWhite, WIFI_ICON_W, WIFI_ICON_H);
-
-		// Write over time text in black to hide it.
-
-		tft.setTextColor(BLACK);
-		tft.setFreeFont();
-		tft.setTextSize(1);
-		tft.setCursor(13, 220);
-		tft.println("Failed, time set to default.");
-	}
-
-	// Identify Arduino sketch core being used.
-
-	if (loopCoreID == true) {
-
-		Serial.print("Loop Running on Core : ");
-		Serial.println(xPortGetCoreID());
-
-		loopCoreID = false;
-	}
 
 	// Main functions, checking menu, calculations & average speed.
 
@@ -1472,15 +1400,15 @@ void loop() {
 
 	// Update time from Internet time server.
 
-	if (millis() >= LocalTime + localTimeInterval) {
+	if ((disconnectWiFiFlag == false) && (millis() >= LocalTime + localTimeInterval)) {
 
 		printLocalTime();			// Get time and update display.
 		LocalTime = millis();
 	}
 
-	//...Send Events to the client with sensor readins and update colors every 30 seconds
+	// Send Events to the client with sensor readins and update colors every 120 seconds.
 
-	if (millis() - lastTime > timerDelay) {
+	if ((disconnectWiFiFlag == false) && (millis() - lastTime > timerDelay)) {
 
 		String message = getJSONReadings();
 		events.send(message.c_str(), "new_readings", millis());
@@ -2124,18 +2052,6 @@ void loop() {
 		newMaxSpeedF = true;
 	}
 
-	if (sessionDistance > maxSessonDistance) {
-
-		maxSessonDistance = sessionDistance;
-		newBestSessionDistanceF = true;
-	}
-
-	if (sessionTime > maxSessionTime) {
-
-		maxSessionTime = sessionTime;
-		newBestSessionTimeF = true;
-	}
-
 	// Calculate average speed & remove any minus calculations.
 
 	averageKphSpeed = total / numReadings;
@@ -2166,6 +2082,19 @@ void mainData() {
 		recordSessions = 1;
 		eeSessionChange = true;
 		disconnectWiFi = false;
+
+		if (sessionDistance > maxSessonDistance) {
+
+			maxSessonDistance = sessionDistance;
+			newBestSessionDistanceF = true;
+		}
+
+		if (sessionTime > maxSessionTime) {
+
+			maxSessionTime = sessionTime;
+			newBestSessionTimeF = true;
+		}
+
 		newMaxSpeedRecord();
 		updateBestEverRecords();
 
@@ -2320,12 +2249,12 @@ void mainData() {
 	dtostrf(averageKphSpeed, 6, 2, averageKphSpeedArray);
 	dtostrf(maxKphSpeed, 6, 2, maxKphArray);
 
-	float maxMphSpeed = maxKphSpeed * 0.621371;						// Max speed in Mph.
+	// float maxMphSpeed = maxKphSpeed * 0.621371;					// Commented out as no longer used.	// Max speed in Mph.
 	float averageMphSpeed = averageKphSpeed * 0.621371;				// Average speed in Mph. 
 
 	dtostrf(speedMph, 6, 2, mphArray);
-	dtostrf(averageMphSpeed, 6, 2, averageMphSpeedArray);
-	dtostrf(maxMphSpeed, 6, 2, maxMphArray);
+	dtostrf(averageMphSpeed, 6, 2, averageMphSpeedArray);			// Commented out as no longer used.
+	//dtostrf(maxMphSpeed, 6, 2, maxMphArray);						// Commented out as no longer used.
 
 	dtostrf(sessionDistance, 6, 0, sessionDistanceArray);
 	dtostrf(sessionTime, 6, 0, currentSessionTimeArray);
