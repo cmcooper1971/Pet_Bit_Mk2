@@ -215,40 +215,72 @@ int eegraphTMAddress = 104;					// EEPROM address for graph distance scale.
 int eegraphTMIAddress = 112;				// EEPROM address for graph distance increment scale level.
 int eegraphTAPAddress = 120;				// EEPROM address for graph distance array position.
 	
+boolean newMaxSpeedF = 0;					// New max speed flag.
+double maxSessonDistance = 0;				// Max session distance.
+unsigned long maxSessionTime = 0;			// Max session time.
+boolean newBestSessionDistanceF = false;	// New best session distance flag.
+boolean newBestSessionTimeF = false;		// New best session time flag.
+boolean newBestDayF = false;				// New best day flag.
+
 int eeBestMaxSpeed = 124;					// EEPRPOM address for best ever max speed recording.
-int eeBestMaxSpeedDay = 128;
-int eeBestMaxSpeedMonth = 132;
-int eeBestMaxSpeedYear = 136;
+int eeBestMaxSpeedMinute = 128;
+int eeBestMaxSpeedHour = 132;
+int eeBestMaxSpeedDoW = 136;
+int eeBestMaxSpeedDay = 140;
+int eeBestMaxSpeedMonth = 144;
+int eeBestMaxSpeedYear = 148;
 
-int eeBestDistance = 140;					// EEPRPOM address for best ever distance recording.
-int eeBestDistanceDay = 144;
-int eeBestDistanceMonth = 148;
-int eeBestDistanceYear = 152;
+int eeBestDistanceS = 152;					// EEPRPOM address for best ever distance per session recording.
+int eeBestDistanceSMinute = 156;
+int eeBestDistanceSHour = 160;
+int eeBestDistanceSDoW = 164;
+int eeBestDistanceSDay = 168;
+int eeBestDistanceSMonth = 172;
+int eeBestDistanceSYear = 176;
 
-int eeBestTime = 156;						// EEPRPOM address for best ever time recording.
-int eeBestTimeDay = 160;
-int eeBestTimeMonth = 164;
-int eeBestTimeYear = 168;
+int eeBestDistanceD = 180;					// EEPRPOM address for best ever distance per day recording.
+int eeBestDistanceDMinute = 184;
+int eeBestDistanceDHour = 188;
+int eeBestDistanceDDoW = 192;
+int eeBestDistanceDDay = 196;
+int eeBestDistanceDMonth = 200;
+int eeBestDistanceDYear = 204;
 
-int eeBuzzerYNAddress = 200;				// EEPROM address for buzzer enabled / disabled.
+int eeBestTimeS = 208;						// EEPRPOM address for best ever time per session recording.
+int eeBestTimeSMinute = 212;
+int eeBestTimeSHour = 216;
+int eeBestTimeSDoW = 220;
+int eeBestTimeSDay = 224;
+int eeBestTimeSMonth = 228;
+int eeBestTimeSYear = 232;
+
+int eeBestTimeD = 236;						// EEPRPOM address for best ever time per day recording.
+int eeBestTimeDMinute = 240;
+int eeBestTimeDHour = 244;
+int eeBestTimeDDoW = 248;
+int eeBestTimeDDay = 252;
+int eeBestTimeDMonth = 256;
+int eeBestTimeDYear = 260;
+
+int eeBuzzerYNAddress = 300;				// EEPROM address for buzzer enabled / disabled.
 boolean eeBuzzerYNChange;					// Change flag.
 
-int eeCalYNAddress = 204;					// EEPROM address for touch screen calibration enabled disabled.
-int eeCalDataAddress0 = 208;				// EEPROM address for touch screen calibration data.
-int eeCalDataAddress1 = 212;				// EEPROM address for touch screen calibration data.
-int eeCalDataAddress2 = 216;				// EEPROM address for touch screen calibration data.
-int eeCalDataAddress3 = 220;				// EEPROM address for touch screen calibration data.
-int eeCalDataAddress4 = 224;				// EEPROM address for touch screen calibration data.
+int eeCalYNAddress = 304;					// EEPROM address for touch screen calibration enabled disabled.
+int eeCalDataAddress0 = 308;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress1 = 312;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress2 = 316;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress3 = 320;				// EEPROM address for touch screen calibration data.
+int eeCalDataAddress4 = 324;				// EEPROM address for touch screen calibration data.
 
-int eeWiFiYNAddress = 228;					// EEPROM address for WiFi reset.
+int eeWiFiYNAddress = 328;					// EEPROM address for WiFi reset.
 boolean eeWiFiYNChange;						// Change flag.
 
 // Misc array and character spaces are to over write previous screen draw
 
 char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " };	// Default menu options.
 char* resetArray[3] = { "None      ", "Full Reset", "Demo Data " };														// Reset options.
-char* dayArray[9] = { "","Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };						// Days of the week.
-char* dayShortArray[9] = { "","Su","Mo","Tu","We","Th","Fr","Sa" };														// Short days of the week.
+char* dayArray[7] = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };						// Days of the week.
+char* dayShortArray[7] = { "Su","Mo","Tu","We","Th","Fr","Sa" };														// Short days of the week.
 char* ynArray[2] = { "No", "Yes" };																						// Yes / No options.
 
 uint16_t calData[5];						// Touch screen calibration data.
@@ -636,7 +668,7 @@ void printLocalTime() {
 	tft.setFreeFont();
 	tft.setTextSize(1);
 	tft.setCursor(150, 220);
-	tft.println("XXXXXXXX");
+	tft.println("        ");
 
 	// Actual date time to display.
 
@@ -894,6 +926,95 @@ void setup() {
 	distanceTravelledArray5 = distanceTravelledArray[4];
 	distanceTravelledArray6 = distanceTravelledArray[5];
 	distanceTravelledArray7 = distanceTravelledArray[6];
+
+	// Print best ever records data from EEPROM.
+
+	float tempMaxSpeed;
+	int tempDoW;
+	int tempDay;
+	int tempMonth;
+	int tempYear;
+	int tempHour;
+	int tempMinute;
+
+	EEPROM.get(eeBestMaxSpeed, tempMaxSpeed);
+	EEPROM.get(eeBestMaxSpeedDoW, tempDoW);
+	EEPROM.get(eeBestMaxSpeedDay, tempDay);
+	EEPROM.get(eeBestMaxSpeedMonth, tempMonth);
+	EEPROM.get(eeBestMaxSpeedYear, tempYear);
+	EEPROM.get(eeBestMaxSpeedHour, tempHour);
+	EEPROM.get(eeBestMaxSpeedMinute, tempMinute);
+	EEPROM.commit();
+
+	Serial.print("Best Max Speed Record: ");
+	Serial.println(tempMaxSpeed);
+	Serial.print("Date: ");
+	Serial.print(dayArray[tempDoW]);
+	Serial.print(", ");
+	Serial.print(tempDay);
+	Serial.print("/");
+	Serial.print(tempMonth);
+	Serial.print("/");
+	Serial.print(tempYear);
+	Serial.print(" at ");
+	Serial.print(tempHour);
+	Serial.print(":");
+	Serial.println(tempMinute);
+	Serial.println(" ");
+
+	float tempDistance;
+
+	EEPROM.get(eeBestDistanceS, tempDistance);
+	EEPROM.get(eeBestDistanceSDoW, tempDoW);
+	EEPROM.get(eeBestDistanceSDay, tempDay);
+	EEPROM.get(eeBestDistanceSMonth, tempMonth);
+	EEPROM.get(eeBestDistanceSYear, tempYear);
+	EEPROM.get(eeBestDistanceSHour, tempHour);
+	EEPROM.get(eeBestDistanceSMinute, tempMinute);
+	EEPROM.commit();
+
+	Serial.print("Best Distance Record: ");
+	Serial.println(tempDistance);
+	Serial.print("Date: ");
+	Serial.print(dayArray[tempDoW]);
+	Serial.print(", ");
+	Serial.print(tempDay);
+	Serial.print("/");
+	Serial.print(tempMonth);
+	Serial.print("/");
+	Serial.print(tempYear);
+	Serial.print(" at ");
+	Serial.print(tempHour);
+	Serial.print(":");
+	Serial.println(tempMinute);
+	Serial.println(" ");
+
+	long tempTime;
+
+	EEPROM.get(eeBestTimeS, tempTime);
+	EEPROM.get(eeBestTimeSDoW, tempDoW);
+	EEPROM.get(eeBestTimeSDay, tempDay);
+	EEPROM.get(eeBestTimeSMonth, tempMonth);
+	EEPROM.get(eeBestTimeSYear, tempYear);
+	EEPROM.get(eeBestTimeSHour, tempHour);
+	EEPROM.get(eeBestTimeSMinute, tempMinute);
+	EEPROM.commit();
+
+	Serial.print("Best Time Record: ");
+	Serial.println(tempTime);
+	Serial.print("Date: ");
+	Serial.print(dayArray[tempDoW]);
+	Serial.print(", ");
+	Serial.print(tempDay);
+	Serial.print("/");
+	Serial.print(tempMonth);
+	Serial.print("/");
+	Serial.print(tempYear);
+	Serial.print(" at ");
+	Serial.print(tempHour);
+	Serial.print(":");
+	Serial.println(tempMinute);
+	Serial.println(" ");
 
 	// Set menu position and circumference position from EEPROM data.
 
@@ -1225,6 +1346,43 @@ void setup() {
 		WiFi.disconnect();
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
 	}
+
+	// Delete after finishing.
+
+	//float tempmaxspeed = 0;
+	//int tempdow;
+	//int tempday;
+	//int tempmonth;
+	//int tempyear;
+	//int temphour;
+	//int tempminute;
+	//
+	//eeprom.put(eebestmaxspeed, tempmaxspeed);
+	//eeprom.get(eebestmaxspeed, tempmaxspeed);
+	//
+	//eeprom.get(eebestmaxspeeddow, tempdow);
+	//eeprom.get(eebestmaxspeedday, tempday);
+	//eeprom.get(eebestmaxspeedmonth, tempmonth);
+	//eeprom.get(eebestmaxspeedyear, tempyear);
+	//eeprom.get(eebestmaxspeedhour, temphour);
+	//eeprom.get(eebestmaxspeedminute, tempminute);
+	//eeprom.commit();
+
+	//serial.print("eeprom max speed setting at start up: ");
+	//serial.println(tempmaxspeed);
+	//serial.print("date: ");
+	//serial.print(dayarray[tempdow]);
+	//serial.print(", ");
+	//serial.print(tempday);
+	//serial.print("/");
+	//serial.print(tempmonth);
+	//serial.print("/");
+	//serial.print(tempyear);
+	//serial.print(" at ");
+	//serial.print(temphour);
+	//serial.print(":");
+	//serial.println(tempminute);
+	//serial.println(" ");
 
 } // Close setup.
 
@@ -1956,14 +2114,26 @@ void loop() {
 		}
 
 		configurationDisplay();
-
 	}
 
-	// Check for new max speed.
+	// Check for new max speed and save 
 
 	if (speedKph > maxKphSpeed) {
 
 		maxKphSpeed = speedKph;
+		newMaxSpeedF = true;
+	}
+
+	if (sessionDistance > maxSessonDistance) {
+
+		maxSessonDistance = sessionDistance;
+		newBestSessionDistanceF = true;
+	}
+
+	if (sessionTime > maxSessionTime) {
+
+		maxSessionTime = sessionTime;
+		newBestSessionTimeF = true;
 	}
 
 	// Calculate average speed & remove any minus calculations.
@@ -1974,6 +2144,10 @@ void loop() {
 
 		averageKphSpeed = 0.00;
 	}
+
+	// Update bext ever records.
+
+	// Insert some functions.
 
 } // Close loop.
 
@@ -1992,6 +2166,9 @@ void mainData() {
 		recordSessions = 1;
 		eeSessionChange = true;
 		disconnectWiFi = false;
+		newMaxSpeedRecord();
+		updateBestEverRecords();
+
 	}
 
 	else
@@ -2185,6 +2362,206 @@ void averageSpeed() {
 	}
 
 }  // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// New Max Speed record update.
+
+void newMaxSpeedRecord() {
+
+	// Check and update new max speed record.
+
+	if (disconnectWiFi == false && newMaxSpeedF == true) {
+
+		float tempMaxKphSpeed = 0.00;
+
+		EEPROM.get(eeBestMaxSpeed, tempMaxKphSpeed);
+		EEPROM.commit();
+
+		//Serial.print("Max Kph EEPROM Data & Actual: ");
+		//Serial.print(tempMaxKphSpeed);
+		//Serial.print(" vs ");
+		//Serial.println(maxKphSpeed);
+		//Serial.println();
+
+		if (tempMaxKphSpeed < maxKphSpeed) {
+
+			EEPROM.put(eeBestMaxSpeed, maxKphSpeed);
+			EEPROM.put(eeBestMaxSpeedDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestMaxSpeedDay, rtc.getDay());
+			EEPROM.put(eeBestMaxSpeedMonth, rtc.getMonth());
+			EEPROM.put(eeBestMaxSpeedYear, rtc.getYear());
+			EEPROM.put(eeBestMaxSpeedHour, rtc.getHour(true));
+			EEPROM.put(eeBestMaxSpeedMinute, rtc.getMinute());
+			EEPROM.commit();
+
+			float tempMaxSpeed;
+			int tempDoW;
+			int tempDay;
+			int tempMonth;
+			int tempYear;
+			int tempHour;
+			int tempMinute;
+
+			EEPROM.get(eeBestMaxSpeed, tempMaxSpeed);
+			EEPROM.get(eeBestMaxSpeedDoW, tempDoW);
+			EEPROM.get(eeBestMaxSpeedDay, tempDay);
+			EEPROM.get(eeBestMaxSpeedMonth, tempMonth);
+			EEPROM.get(eeBestMaxSpeedYear, tempYear);
+			EEPROM.get(eeBestMaxSpeedHour, tempHour);
+			EEPROM.get(eeBestMaxSpeedMinute, tempMinute);
+			EEPROM.commit();
+
+			Serial.print("New max speed setting: ");
+			Serial.println(tempMaxSpeed);
+			Serial.print("Date: ");
+			Serial.print(dayArray[tempDoW]);
+			Serial.print(", ");
+			Serial.print(tempDay);
+			Serial.print("/");
+			Serial.print(tempMonth);
+			Serial.print("/");
+			Serial.print(tempYear);
+			Serial.print(" at ");
+			Serial.print(tempHour);
+			Serial.print(":");
+			Serial.println(tempMinute);
+			Serial.println(" ");
+		}
+
+		newMaxSpeedF = false;
+	}
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
+// New best ever records update.
+
+void updateBestEverRecords() {
+
+	// Check and update new distance session record.
+
+	if (disconnectWiFi == false && newBestSessionDistanceF == true) {
+
+		float tempDistanceSessionRecord;
+
+		EEPROM.get(eeBestDistanceS, tempDistanceSessionRecord);
+		EEPROM.commit();
+
+		//Serial.print("Distance EEPROM Data & Actual: ");
+		//Serial.print(tempDistanceSessionRecord);
+		//Serial.print(" vs ");
+		//Serial.println(sessionDistance);
+		//Serial.println();
+
+		float tempSession = sessionDistance;								// SessionDistance variable must remain as a double for ESP32, hence conversion here.
+
+		if (tempDistanceSessionRecord < tempSession) {
+
+			EEPROM.put(eeBestDistanceS, tempSession);
+			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.commit();
+
+			float tempDistance;
+			int tempDoW;
+			int tempDay;
+			int tempMonth;
+			int tempYear;
+			int tempHour;
+			int tempMinute;
+
+			EEPROM.get(eeBestDistanceS, tempDistance);
+			EEPROM.get(eeBestDistanceSDoW, tempDoW);
+			EEPROM.get(eeBestDistanceSDay, tempDay);
+			EEPROM.get(eeBestDistanceSMonth, tempMonth);
+			EEPROM.get(eeBestDistanceSYear, tempYear);
+			EEPROM.get(eeBestDistanceSHour, tempHour);
+			EEPROM.get(eeBestDistanceSMinute, tempMinute);
+			EEPROM.commit();
+
+			Serial.print("New max distance per session setting: ");
+			Serial.println(tempDistance);
+			Serial.print("Date: ");
+			Serial.print(dayArray[tempDoW]);
+			Serial.print(", ");
+			Serial.print(tempDay);
+			Serial.print("/");
+			Serial.print(tempMonth);
+			Serial.print("/");
+			Serial.print(tempYear);
+			Serial.print(" at ");
+			Serial.print(tempHour);
+			Serial.print(":");
+			Serial.println(tempMinute);
+			Serial.println(" ");
+		}
+	}
+
+	// Check and update new time session record.
+
+	if (disconnectWiFi == false && newBestSessionTimeF == true) {
+
+		unsigned long tempTimeSessionRecord;
+
+		EEPROM.get(eeBestTimeS, tempTimeSessionRecord);
+		EEPROM.commit();
+
+		if (tempTimeSessionRecord < sessionTime) {
+
+			EEPROM.put(eeBestTimeS, sessionTime);
+			EEPROM.put(eeBestTimeSDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestTimeSDay, rtc.getDay());
+			EEPROM.put(eeBestTimeSMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeSYear, rtc.getYear());
+			EEPROM.put(eeBestTimeSHour, rtc.getHour(true));
+			EEPROM.put(eeBestTimeSMinute, rtc.getMinute());
+			EEPROM.commit();
+
+			long tempTime;
+			int tempDoW;
+			int tempDay;
+			int tempMonth;
+			int tempYear;
+			int tempHour;
+			int tempMinute;
+
+			EEPROM.get(eeBestTimeS, tempTime);
+			EEPROM.get(eeBestTimeSDoW, tempDoW);
+			EEPROM.get(eeBestTimeSDay, tempDay);
+			EEPROM.get(eeBestTimeSMonth, tempMonth);
+			EEPROM.get(eeBestTimeSYear, tempYear);
+			EEPROM.get(eeBestTimeSHour, tempHour);
+			EEPROM.get(eeBestTimeSMinute, tempMinute);
+			EEPROM.commit();
+
+			Serial.print("New max time per session setting: ");
+			Serial.println(tempTime);
+			Serial.print("Date: ");
+			Serial.print(dayArray[tempDoW]);
+			Serial.print(", ");
+			Serial.print(tempDay);
+			Serial.print("/");
+			Serial.print(tempMonth);
+			Serial.print("/");
+			Serial.print(tempYear);
+			Serial.print(" at ");
+			Serial.print(tempHour);
+			Serial.print(":");
+			Serial.println(tempMinute);
+			Serial.println(" ");
+		}
+	}
+
+	newBestSessionDistanceF = false;
+	newBestSessionTimeF = false;
+
+} // Close function.
 
 /*-----------------------------------------------------------------*/
 
@@ -3159,6 +3536,46 @@ void resetSystemData() {
 	EEPROM.put(eeSessionDistanceArray7Address, 0);
 	EEPROM.commit();
 
+	EEPROM.put(eeBestMaxSpeed, 0);												// EEPRPOM address for best ever max speed recording.
+	EEPROM.put(eeBestMaxSpeedMinute, 0);
+	EEPROM.put(eeBestMaxSpeedHour, 0);
+	EEPROM.put(eeBestMaxSpeedDoW, 5);
+	EEPROM.put(eeBestMaxSpeedDay, 1);
+	EEPROM.put(eeBestMaxSpeedMonth, 1);
+	EEPROM.put(eeBestMaxSpeedYear, 2021);
+
+	EEPROM.put(eeBestDistanceS, 0);												// EEPRPOM address for best ever distance per session recording.
+	EEPROM.put(eeBestDistanceSMinute, 0);
+	EEPROM.put(eeBestDistanceSHour, 0);
+	EEPROM.put(eeBestDistanceSDoW, 5);
+	EEPROM.put(eeBestDistanceSDay, 1);
+	EEPROM.put(eeBestDistanceSMonth, 1);
+	EEPROM.put(eeBestDistanceSYear, 2021);
+
+	EEPROM.put(eeBestDistanceD, 0);												// EEPRPOM address for best ever distance per day recording.
+	EEPROM.put(eeBestDistanceDMinute, 0);
+	EEPROM.put(eeBestDistanceDHour, 0);
+	EEPROM.put(eeBestDistanceDDoW, 5);
+	EEPROM.put(eeBestDistanceDDay, 1);
+	EEPROM.put(eeBestDistanceDMonth, 1);
+	EEPROM.put(eeBestDistanceDYear, 2021);
+
+	EEPROM.put(eeBestTimeS, 0);													// EEPRPOM address for best ever time per session recording.
+	EEPROM.put(eeBestTimeSMinute, 0);
+	EEPROM.put(eeBestTimeSHour, 0);
+	EEPROM.put(eeBestTimeSDoW, 5);
+	EEPROM.put(eeBestTimeSDay, 1);
+	EEPROM.put(eeBestTimeSMonth, 1);
+	EEPROM.put(eeBestTimeSYear, 2021);
+
+	EEPROM.put(eeBestTimeS, 0);													// EEPRPOM address for best ever time per day recording.
+	EEPROM.put(eeBestTimeSMinute, 0);
+	EEPROM.put(eeBestTimeSHour, 0);
+	EEPROM.put(eeBestTimeSDoW, 5);
+	EEPROM.put(eeBestTimeSDay, 1);
+	EEPROM.put(eeBestTimeSMonth, 1);
+	EEPROM.put(eeBestTimeSYear, 2021);
+
 	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
 	EEPROM.put(eeResetSettingAddress, 0);
 	EEPROM.commit();
@@ -3299,6 +3716,46 @@ void resetSystemDemoData() {
 	EEPROM.put(eeSessionDistanceArray6Address, 900);
 	EEPROM.put(eeSessionDistanceArray7Address, 1200);
 	EEPROM.commit();
+	
+	EEPROM.put(eeBestMaxSpeed, 20);												// EEPRPOM address for best ever max speed recording.
+	EEPROM.put(eeBestMaxSpeedMinute, 0);
+	EEPROM.put(eeBestMaxSpeedHour, 0);
+	EEPROM.put(eeBestMaxSpeedDoW, 5);
+	EEPROM.put(eeBestMaxSpeedDay, 1);
+	EEPROM.put(eeBestMaxSpeedMonth, 1);
+	EEPROM.put(eeBestMaxSpeedYear, 2021);
+
+	EEPROM.put(eeBestDistanceS, 100);											// EEPRPOM address for best ever distance per session recording.
+	EEPROM.put(eeBestDistanceSMinute, 0);
+	EEPROM.put(eeBestDistanceSHour, 0);
+	EEPROM.put(eeBestDistanceSDoW, 5);
+	EEPROM.put(eeBestDistanceSDay, 1);
+	EEPROM.put(eeBestDistanceSMonth, 1);
+	EEPROM.put(eeBestDistanceSYear, 2021);
+
+	EEPROM.put(eeBestDistanceD, 1500);											// EEPRPOM address for best ever distance per day recording.
+	EEPROM.put(eeBestDistanceDMinute, 0);
+	EEPROM.put(eeBestDistanceDHour, 0);
+	EEPROM.put(eeBestDistanceDDoW, 5);
+	EEPROM.put(eeBestDistanceDDay, 1);
+	EEPROM.put(eeBestDistanceDMonth, 1);
+	EEPROM.put(eeBestDistanceDYear, 2021);
+
+	EEPROM.put(eeBestTimeS, 60000);												// EEPRPOM address for best ever time per session recording.
+	EEPROM.put(eeBestTimeSMinute, 0);
+	EEPROM.put(eeBestTimeSHour, 0);
+	EEPROM.put(eeBestTimeSDoW, 5);
+	EEPROM.put(eeBestTimeSDay, 1);
+	EEPROM.put(eeBestTimeSMonth, 1);
+	EEPROM.put(eeBestTimeSYear, 2021);
+
+	EEPROM.put(eeBestTimeS, 600000);											// EEPRPOM address for best ever time per day recording.
+	EEPROM.put(eeBestTimeSMinute, 0);
+	EEPROM.put(eeBestTimeSHour, 0);
+	EEPROM.put(eeBestTimeSDoW, 5);
+	EEPROM.put(eeBestTimeSDay, 1);
+	EEPROM.put(eeBestTimeSMonth, 1);
+	EEPROM.put(eeBestTimeSYear, 2021);
 
 	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
 	EEPROM.put(eeResetSettingAddress, 0);

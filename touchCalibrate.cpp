@@ -17,12 +17,12 @@ void touch_calibrate(TFT_eSPI& tft) {
     uint16_t calData[5];						// Touch screen calibration data.
     uint8_t calDataOK = 0;
 
-    int eeCalYNAddress = 204;					// EEPROM address for touch screen calibration enabled disabled.
-    int eeCalDataAddress0 = 208;				// EEPROM address for touch screen calibration data.
-    int eeCalDataAddress1 = 212;				// EEPROM address for touch screen calibration data.
-    int eeCalDataAddress2 = 216;				// EEPROM address for touch screen calibration data.
-    int eeCalDataAddress3 = 220;				// EEPROM address for touch screen calibration data.
-    int eeCalDataAddress4 = 224;				// EEPROM address for touch screen calibration data.
+    int eeCalYNAddress = 304;					// EEPROM address for touch screen calibration enabled disabled.
+    int eeCalDataAddress0 = 308;				// EEPROM address for touch screen calibration data.
+    int eeCalDataAddress1 = 312;				// EEPROM address for touch screen calibration data.
+    int eeCalDataAddress2 = 316;				// EEPROM address for touch screen calibration data.
+    int eeCalDataAddress3 = 320;				// EEPROM address for touch screen calibration data.
+    int eeCalDataAddress4 = 324;				// EEPROM address for touch screen calibration data.
 
     // Calibrate.
 
