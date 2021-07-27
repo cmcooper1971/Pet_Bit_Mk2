@@ -677,7 +677,7 @@ void printLocalTime() {
 	tft.setCursor(13, 220);
 	tft.println(&timeinfo, "%A, %B %d %Y %H:%M");
 
-	if (rtc.getHour() == 0 &&  rtc.getMinute() == 0) {
+	if (rtc.getHour() == 0 &&  rtc.getMinute() == 9) {
 
 		blankDailyData();
 	}
@@ -738,17 +738,6 @@ String getJSONReadings() {
 void blankDailyData() {
 
 	sessionArrayPosition = rtc.getDayofWeek();
-
-	if (sessionArrayPosition != 0 ||							// To ensure parametre is within selection.
-		sessionArrayPosition != 1 ||
-		sessionArrayPosition != 2 ||
-		sessionArrayPosition != 3 ||
-		sessionArrayPosition != 4 ||
-		sessionArrayPosition != 5 ||
-		sessionArrayPosition != 6) {
-
-		sessionArrayPosition = 0;
-	}
 
 	Serial.print("Session Array Position = ");
 	Serial.println(sessionArrayPosition);
