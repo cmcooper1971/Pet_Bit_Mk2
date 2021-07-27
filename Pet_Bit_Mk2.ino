@@ -2931,11 +2931,6 @@ void configurationDisplay() {
 	EEPROM.get(eegraphTMIAddress, graphTMI);
 	EEPROM.get(eegraphTAPAddress, graphTAP);
 
-	if (eeResetSetting != 0 || eeResetSetting != 1 || eeResetSetting != 2 || eeResetSetting != 3) {			// Protection to ensure reset menu is always within parametres.
-
-		eeResetSetting = 0;
-	}
-
 	// Display configuration data and selection options.
 
 	tft.setFreeFont(&FreeSans9pt7b);
