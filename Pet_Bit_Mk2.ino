@@ -203,9 +203,6 @@ int eeResetSettingAddress = 72;				// EEPROM address for master reset
 unsigned int eeResetSetting;				// Actual commit for writing, 1 byte.
 boolean eeResetSettingChange = false;		// Change flag.
 
-int eeSessionArrayPositionAddress = 76;		// EEPROM address for array position.
-unsigned int eeSessionArrayPosition;		// Actual commit for writing, 4 bytes.
-
 int eegraphDMAddress = 80;					// EEPROM address for graph distance scale.
 int eegraphDMIAddress = 88;					// EEPROM address for graph distance increment scale level.
 int eegraphDAPAddress = 96;					// EEPROM address for graph distance array position.
@@ -297,6 +294,8 @@ double	averageKphSpeed = 0.00;				// The average speed in Kph.
 // Session time variables.
 
 unsigned long sessionTimeCap;				// Set cap for graph if statements.
+unsigned int distanceGraphCap;				// Set cap for graph if statements.
+
 boolean recordSessions = false;				// Flag to trigger the recording of each session.
 volatile boolean sessionTimeFlag = false;	// Flag to trigger the recording of each session.
 volatile unsigned long sessionStartTime;	// Time each pt session starts.
@@ -307,8 +306,6 @@ volatile unsigned long sessionTime;			// Time each pt session in minutes.
 
 double sessionStartDistance = 0.00;
 double sessionDistance;						// Session distance.
-
-unsigned int distanceGraphCap;				// Set cap for graph if statements.
 
 unsigned int sessionTimeArray0;				// These variables are needed for the Kris Kasprzak charts.
 unsigned int sessionTimeArray1;
@@ -400,7 +397,7 @@ void IRAM_ATTR rotationInterruptISR() {
 
 		sleepT = millis();											// Restart auto sleep timer.
 
-		speedKph = (3600 * circumference) / passedTime;				// km/h.
+		speedKph = (3600 * circumference) / passedTime;				// Km per hour.
 		speedMph = (3600 * circImperial) / passedTime;				// Miles per hour.
 
 		distanceC++;												// Count rotations for distance calculations.
@@ -804,7 +801,6 @@ void setup() {
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
 	EEPROM.get(eeTotalDistanceAddress, distanceC);
-	//EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
 
 	EEPROM.commit();
 
@@ -2115,7 +2111,6 @@ void mainData() {
 
 		newMaxSpeedRecord();
 		updateBestEverRecords();
-
 	}
 
 	else
@@ -2287,14 +2282,6 @@ void mainData() {
 
 		}
 
-		/*if (sessionArrayPosition >= 7) {										// Check array position is within parametres.
-
-			sessionArrayPosition = 0;
-		}
-
-		EEPROM.put(eeSessionArrayPositionAddress, sessionArrayPosition);		// Record the next array position in EEPROM.
-		EEPROM.commit();*/
-
 		sessionTimeFlag = false;
 		recordSessions = false;
 
@@ -2380,12 +2367,6 @@ void newMaxSpeedRecord() {
 		EEPROM.get(eeBestMaxSpeed, tempMaxKphSpeed);
 		EEPROM.commit();
 
-		//Serial.print("Max Kph EEPROM Data & Actual: ");
-		//Serial.print(tempMaxKphSpeed);
-		//Serial.print(" vs ");
-		//Serial.println(maxKphSpeed);
-		//Serial.println();
-
 		if (tempMaxKphSpeed < maxKphSpeed) {
 
 			EEPROM.put(eeBestMaxSpeed, maxKphSpeed);
@@ -2450,12 +2431,6 @@ void updateBestEverRecords() {
 
 		EEPROM.get(eeBestDistanceS, tempDistanceSessionRecord);
 		EEPROM.commit();
-
-		//Serial.print("Distance EEPROM Data & Actual: ");
-		//Serial.print(tempDistanceSessionRecord);
-		//Serial.print(" vs ");
-		//Serial.println(sessionDistance);
-		//Serial.println();
 
 		float tempSession = sessionDistance;								// SessionDistance variable must remain as a double for ESP32, hence conversion here.
 
@@ -3517,9 +3492,6 @@ void resetSystemData() {
 	EEPROM.put(eeTotalDistanceAddress, eeTotalDistance);
 	EEPROM.commit();
 
-	eeSessionArrayPosition = 0;													// Last saved array position.
-	EEPROM.put(eeSessionArrayPositionAddress, eeSessionArrayPosition);
-
 	EEPROM.put(eeSessionTimeArray0Address, 0);									// Populate arrays with zero data.
 	EEPROM.put(eeSessionTimeArray1Address, 0);
 	EEPROM.put(eeSessionTimeArray2Address, 0);
@@ -3697,9 +3669,6 @@ void resetSystemDemoData() {
 	eeTotalDistance = 5000.00;													// Total distance travelled.
 	EEPROM.put(eeTotalDistanceAddress, eeTotalDistance);
 	EEPROM.commit();
-
-	eeSessionArrayPosition = 0;													// Last saved array position.
-	EEPROM.put(eeSessionArrayPositionAddress, eeSessionArrayPosition);
 
 	EEPROM.put(eeSessionTimeArray0Address, 0);									// Populate arrays with demo data.
 	EEPROM.put(eeSessionTimeArray1Address, 100000);
