@@ -51,17 +51,17 @@ unsigned long sleepTime = 60000;	// Reset to 300,000 when finished with design (
 // Pin out Configuration.
 
 const int interruptWheelSensor = 39;	// Reed swtich sensor.
-boolean sensorT = 0;					// To update display when sensor passes.
+boolean sensorT = false;					// To update display when sensor passes.
 
 // Configure ILI9341 display.
 
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
-boolean screenRedraw = 0;			// To limit screen flicker due to unneccesary screen draws.
+boolean screenRedraw = false;			// To limit screen flicker due to unneccesary screen draws.
 
 // Configure sound.
 
 const byte buzzerP = 21;			// Buzzer pin.
-int buzzerYN;						// Buzzer enabled / disabled.
+boolean buzzerYN;					// Buzzer enabled / disabled.
 int buzzerF;						// Set frequency of the buzzer beep.
 int buzzerD;						// Buzzer delay.
 
@@ -82,7 +82,7 @@ AsyncEventSource events("/events");	// Create an Event Source on /events
 
 // WiFi Configuration.
 
-int wiFiYN;							// WiFi reset.
+boolean wiFiYN;						// WiFi reset.
 boolean apMode = false;
 
 // Search for parameter in HTTP POST request.
@@ -283,7 +283,7 @@ char* dayShortArray[7] = { "Su","Mo","Tu","We","Th","Fr","Sa" };														//
 char* ynArray[2] = { "No", "Yes" };																						// Yes / No options.
 
 uint16_t calData[5];						// Touch screen calibration data.
-boolean calTouchScreen = 0;					// Change flag to trigger calibration function.
+boolean calTouchScreen = false;				// Change flag to trigger calibration function.
 
 // Average speed calculation variables.
 
@@ -297,8 +297,8 @@ double	averageKphSpeed = 0.00;				// The average speed in Kph.
 // Session time variables.
 
 unsigned long sessionTimeCap;				// Set cap for graph if statements.
-boolean recordSessions = 0;					// Flag to trigger the recording of each session.
-volatile boolean sessionTimeFlag = 0;		// Flag to trigger the recording of each session.
+boolean recordSessions = false;					// Flag to trigger the recording of each session.
+volatile boolean sessionTimeFlag = false;		// Flag to trigger the recording of each session.
 volatile unsigned long sessionStartTime;	// Time each pt session starts.
 unsigned long sessionTimeArray[7];			// Array for storing 7 sessions.
 byte sessionArrayPosition = 0;				// Array position, this is also used for the distance array position.
@@ -331,7 +331,7 @@ unsigned int distanceTravelledArray7;
 // Menu positions and refresh.
 
 byte screenMenu = 4;				// Screen menu selection.
-boolean menuChange = 1;
+boolean menuChange = true;
 
 // Dial and chart function parametres.
 
@@ -382,14 +382,14 @@ void IRAM_ATTR rotationInterruptISR() {
 
 		detachInterrupt(interruptWheelSensor);						// Detach interrupt.
 
-		if (sensorT == 0) {											// Simple indicator flag for TFT.
+		if (sensorT == false) {											// Simple indicator flag for TFT.
 
-			sensorT = 1;
+			sensorT = true;
 		}
 
-		else if (sensorT == 1) {
+		else if (sensorT == true) {
 
-			sensorT = 0;
+			sensorT = false;
 		}
 
 		disconnectWiFiFlag = true;									// Disable WiFi flag to stop repeat attempts.
@@ -407,12 +407,12 @@ void IRAM_ATTR rotationInterruptISR() {
 		eeTotalDistanceChange = true;								// Rotation flag.
 		distanceTravelled = distanceCounter * circumference;		// Distance calculation.
 
-		if (sessionTimeFlag == 0) {									// Set session timer to start.
+		if (sessionTimeFlag == false) {									// Set session timer to start.
 
-			sessionTimeFlag = 1;
+			sessionTimeFlag = true;
 			sessionStartTime = millis();
 			sessionStartDistance = distanceTravelled;
-			recordSessions = 0;
+			recordSessions = false;
 		}
 
 		lastRotation1 = millis();
@@ -570,6 +570,7 @@ bool initWiFi() {
 void initSPIFFS() {
 
 	if (!SPIFFS.begin(true)) {
+
 		Serial.println("An error has occurred while mounting SPIFFS");
 	}
 
@@ -599,6 +600,7 @@ String readFile(fs::FS& fs, const char* path) {
 	String fileContent;
 
 	while (file.available()) {
+
 		fileContent = file.readStringUntil('\n');
 		break;
 	}
@@ -644,6 +646,7 @@ void printLocalTime() {
 	struct tm timeinfo;
 
 	if (!getLocalTime(&timeinfo)) {
+
 		Serial.println("Failed, time set to default.");
 
 		// Set time manually.
@@ -926,10 +929,6 @@ void setup() {
 	distanceTravelledArray6 = distanceTravelledArray[5];
 	distanceTravelledArray7 = distanceTravelledArray[6];
 
-	// Reset best ever records.
-
-
-
 	// Print best ever records data from EEPROM.
 
 	float tempMaxSpeed;
@@ -1028,7 +1027,7 @@ void setup() {
 
 	// Configure buzzer settings for touch screen.
 
-	if (buzzerYN == 0) {
+	if (buzzerYN == false) {
 
 		buzzerF = 0;	// Set frequency of the buzzer beep.
 		buzzerD = 0;	// Set delay of the buzzer beep.
@@ -1319,7 +1318,7 @@ void setup() {
 
 	}
 
-	// initialize time and get the time.
+	// Initialize time and get the time.
 
 	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 	printLocalTime();
@@ -1810,7 +1809,7 @@ void loop() {
 		if (screenRedraw == 1) {
 
 			drawBlackBox();
-			screenRedraw = 0;
+			screenRedraw = false;
 		}
 
 		currentExerciseScreen();
@@ -1825,7 +1824,7 @@ void loop() {
 
 			drawBlackBox();
 			dial_1 = true;
-			screenRedraw = 0;
+			screenRedraw = false;
 		}
 
 		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Kph", dial_1); // XPH dial screen function.
@@ -1846,7 +1845,7 @@ void loop() {
 			graph_5 = true;
 			graph_6 = true;
 			graph_7 = true;
-			screenRedraw = 0;
+			screenRedraw = false;
 		}
 
 		// Session time bar graphs.
@@ -1951,7 +1950,7 @@ void loop() {
 			graph_12 = true;
 			graph_13 = true;
 			graph_14 = true;
-			screenRedraw = 0;
+			screenRedraw = false;
 		}
 
 		// Distance bar graphs.
@@ -2049,7 +2048,7 @@ void loop() {
 		if (screenRedraw == 1) {
 
 			drawBlackBox();
-			screenRedraw = 0;
+			screenRedraw = false;
 		}
 
 		configurationDisplay();
@@ -2090,7 +2089,7 @@ void mainData() {
 
 		speedKph = 0.00;
 		speedMph = 0.00;
-		recordSessions = 1;
+		recordSessions = true;
 		eeSessionChange = true;
 		disconnectWiFi = false;
 
@@ -2132,7 +2131,7 @@ void mainData() {
 		speedMph = 0.00;
 	}
 
-	if ((sessionTimeFlag == 1) && (recordSessions == 1)) {							// Calculate session duration.
+	if ((sessionTimeFlag == true) && (recordSessions == true)) {							// Calculate session duration.
 
 		sessionTimeArray[sessionArrayPosition] = millis() - sessionStartTime;		// Calculate last session time in millis & store into array.
 		distanceTravelledArray[sessionArrayPosition] = distanceTravelled - sessionStartDistance; // Store distance travelled into array.
@@ -2217,8 +2216,8 @@ void mainData() {
 		EEPROM.put(eeSessionArrayPositionAddress, sessionArrayPosition);		// Record the next array position in EEPROM.
 		EEPROM.commit();
 
-		sessionTimeFlag = 0;
-		recordSessions = 0;
+		sessionTimeFlag = false;
+		recordSessions = false;
 
 		if (eeTotalDistanceChange == true) {
 
@@ -2676,7 +2675,7 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	if (buzzerYN == 0) {	// Used to blank out figure from screen draw.
+	if (buzzerYN == false) {	// Used to blank out figure from screen draw.
 
 		tft.setCursor(161, 110);
 		tft.print(" ");
@@ -2697,7 +2696,7 @@ void configurationDisplay() {
 
 	else tft.setTextColor(WHITE, BLACK);
 
-	if (wiFiYN == 0) {	// Used to blank out figure from screen draw.
+	if (wiFiYN == false) {	// Used to blank out figure from screen draw.
 
 		tft.setCursor(161, 170);
 		tft.print(" ");
@@ -3049,9 +3048,9 @@ void buzzerSettingPlus() {
 
 	// Y/N function change to buzzer setting.
 
-	if (buzzerYN == 0)
+	if (buzzerYN == false)
 	{
-		buzzerYN = 1;
+		buzzerYN = true;
 		eeBuzzerYNChange = true;
 
 	}
@@ -3071,9 +3070,9 @@ void buzzerSettingMinus() {
 
 	// Y/N function change to buzzer setting.
 
-	if (buzzerYN == 1)
+	if (buzzerYN == true)
 	{
-		buzzerYN = 0;
+		buzzerYN = false;
 		eeBuzzerYNChange = true;
 
 	}
