@@ -728,6 +728,65 @@ String getJSONReadings() {
 
 /*-----------------------------------------------------------------*/
 
+// Clear daily totals on date change.
+
+void blankDailyData() {
+
+	if (sessionArrayPosition != rtc.getDayofWeek()) {
+
+		switch (sessionArrayPosition) {
+
+		case 0:
+
+			EEPROM.put(eeSessionTimeArray0Address, 0);				// Record the chart data in EEPROM.
+			EEPROM.put(eeSessionDistanceArray0Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.commit();
+
+		case 1:
+
+			EEPROM.put(eeSessionTimeArray1Address, 0);				// Record the chart data in EEPROM.
+			EEPROM.put(eeSessionDistanceArray1Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.commit();
+
+		case 2:
+
+			EEPROM.put(eeSessionTimeArray2Address, 0);				// Record the chart data in EEPROM.
+			EEPROM.put(eeSessionDistanceArray2Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.commit();
+
+		case 3:
+
+			EEPROM.put(eeSessionTimeArray3Address, 0);				// Record the chart data in EEPROM.
+			EEPROM.put(eeSessionDistanceArray3Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.commit();
+
+		case 4:
+
+			EEPROM.put(eeSessionTimeArray4Address, 0);				// Record the chart data in EEPROM.
+			EEPROM.put(eeSessionDistanceArray4Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.commit();
+
+		case 5:
+
+			EEPROM.put(eeSessionTimeArray5Address, 0);				// Record the chart data in EEPROM.
+			EEPROM.put(eeSessionDistanceArray5Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.commit();
+
+		case 6:
+
+			EEPROM.put(eeSessionTimeArray6Address, 0);				// Record the chart data in EEPROM.
+			EEPROM.put(eeSessionDistanceArray6Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.commit();
+
+		}
+
+		sessionArrayPosition = rtc.getDayofWeek();
+	}
+	
+}
+
+/*-----------------------------------------------------------------*/
+
 void setup() {
 
 	//Begin serial mode.
