@@ -1191,9 +1191,9 @@ void setup() {
 	Serial.println(tempMinute);
 	Serial.println(" ");
 
-	float tempDistance;
+	float tempDistanceS;
 
-	EEPROM.get(eeBestDistanceS, tempDistance);
+	EEPROM.get(eeBestDistanceS, tempDistanceS);
 	EEPROM.get(eeBestDistanceSDoW, tempDoW);
 	EEPROM.get(eeBestDistanceSDay, tempDay);
 	EEPROM.get(eeBestDistanceSMonth, tempMonth);
@@ -1203,7 +1203,7 @@ void setup() {
 	EEPROM.commit();
 
 	Serial.print("Best Session Distance Record: ");
-	Serial.println(tempDistance);
+	Serial.println(tempDistanceS);
 	Serial.print("Date: ");
 	Serial.print(dayArray[tempDoW]);
 	Serial.print(", ");
@@ -1218,9 +1218,9 @@ void setup() {
 	Serial.println(tempMinute);
 	Serial.println(" ");
 
-	long tempTime;
+	long tempTimeS;
 
-	EEPROM.get(eeBestTimeS, tempTime);
+	EEPROM.get(eeBestTimeS, tempTimeS);
 	EEPROM.get(eeBestTimeSDoW, tempDoW);
 	EEPROM.get(eeBestTimeSDay, tempDay);
 	EEPROM.get(eeBestTimeSMonth, tempMonth);
@@ -1230,7 +1230,7 @@ void setup() {
 	EEPROM.commit();
 
 	Serial.print("Best Session Time Record: ");
-	Serial.println(tempTime);
+	Serial.println(tempTimeS);
 	Serial.print("Date: ");
 	Serial.print(dayArray[tempDoW]);
 	Serial.print(", ");
@@ -1257,7 +1257,7 @@ void setup() {
 	EEPROM.commit();
 
 	Serial.print("Best Daily Distance Record: ");
-	Serial.println(tempDistance);
+	Serial.println(tempDistanceD);
 	Serial.print("Date: ");
 	Serial.print(dayArray[tempDoW]);
 	Serial.print(", ");
@@ -1284,7 +1284,7 @@ void setup() {
 	EEPROM.commit();
 
 	Serial.print("Best Daily Time Record: ");
-	Serial.println(tempTime);
+	Serial.println(tempTimeD);
 	Serial.print("Date: ");
 	Serial.print(dayArray[tempDoW]);
 	Serial.print(", ");
@@ -2941,6 +2941,11 @@ void configurationDisplay() {
 	EEPROM.get(eegraphTMAddress, graphTM);										// Graph time scale.
 	EEPROM.get(eegraphTMIAddress, graphTMI);
 	EEPROM.get(eegraphTAPAddress, graphTAP);
+
+	if (eeResetSetting != 0 || eeResetSetting != 1 || eeResetSetting != 2 || eeResetSetting != 3) {			// Protection to ensure reset menu is always within parametres.
+
+		eeResetSetting = 0;
+	}
 
 	// Display configuration data and selection options.
 
