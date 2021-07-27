@@ -30,20 +30,20 @@ function getReadings() {
 
             var myObj = JSON.parse(this.responseText);
             console.log(myObj);
+            document.getElementById("sessionTimeArray0").innerHTML = myObj.sessionTimeArray0;
             document.getElementById("sessionTimeArray1").innerHTML = myObj.sessionTimeArray1;
             document.getElementById("sessionTimeArray2").innerHTML = myObj.sessionTimeArray2;
             document.getElementById("sessionTimeArray3").innerHTML = myObj.sessionTimeArray3;
             document.getElementById("sessionTimeArray4").innerHTML = myObj.sessionTimeArray4;
             document.getElementById("sessionTimeArray5").innerHTML = myObj.sessionTimeArray5;
             document.getElementById("sessionTimeArray6").innerHTML = myObj.sessionTimeArray6;
-            document.getElementById("sessionTimeArray7").innerHTML = myObj.sessionTimeArray7;
+            document.getElementById("distanceTravelledArray0").innerHTML = myObj.distanceTravelledArray0;
             document.getElementById("distanceTravelledArray1").innerHTML = myObj.distanceTravelledArray1;
             document.getElementById("distanceTravelledArray2").innerHTML = myObj.distanceTravelledArray2;
             document.getElementById("distanceTravelledArray3").innerHTML = myObj.distanceTravelledArray3;
             document.getElementById("distanceTravelledArray4").innerHTML = myObj.distanceTravelledArray4;
             document.getElementById("distanceTravelledArray5").innerHTML = myObj.distanceTravelledArray5;
             document.getElementById("distanceTravelledArray6").innerHTML = myObj.distanceTravelledArray6;
-            document.getElementById("distanceTravelledArray7").innerHTML = myObj.distanceTravelledArray7;
             updateDateTime();
         }
     };
@@ -71,20 +71,20 @@ if (!!window.EventSource) {
     source.addEventListener('new_readings', function (e) {
         console.log("new_readings", e.data);
         var obj = JSON.parse(e.data);
+        document.getElementById("sessionTimeArray0").innerHTML = Obj.sessionTimeArray0;
         document.getElementById("sessionTimeArray1").innerHTML = Obj.sessionTimeArray1;
         document.getElementById("sessionTimeArray2").innerHTML = Obj.sessionTimeArray2;
         document.getElementById("sessionTimeArray3").innerHTML = Obj.sessionTimeArray3;
         document.getElementById("sessionTimeArray4").innerHTML = Obj.sessionTimeArray4;
         document.getElementById("sessionTimeArray5").innerHTML = Obj.sessionTimeArray5;
         document.getElementById("sessionTimeArray6").innerHTML = Obj.sessionTimeArray6;
-        document.getElementById("sessionTimeArray7").innerHTML = Obj.sessionTimeArray7;
+        document.getElementById("distanceTravelledArray0").innerHTML = Obj.distanceTravelledArray0;
         document.getElementById("distanceTravelledArray1").innerHTML = Obj.distanceTravelledArray1;
         document.getElementById("distanceTravelledArray2").innerHTML = Obj.distanceTravelledArray2;
         document.getElementById("distanceTravelledArray3").innerHTML = Obj.distanceTravelledArray3;
         document.getElementById("distanceTravelledArray4").innerHTML = Obj.distanceTravelledArray4;
         document.getElementById("distanceTravelledArray5").innerHTML = Obj.distanceTravelledArray5;
         document.getElementById("distanceTravelledArray6").innerHTML = Obj.distanceTravelledArray6;
-        document.getElementById("distanceTravelledArray7").innerHTML = Obj.distanceTravelledArray7;
         updateDateTime();
     }, false);
 

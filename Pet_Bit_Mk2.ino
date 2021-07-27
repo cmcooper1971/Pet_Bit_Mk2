@@ -56,7 +56,7 @@ boolean sensorT = false;			// To update display when sensor passes.
 // Configure ILI9341 display.
 
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
-boolean screenR = false;		// To limit screen flicker due to unneccesary screen draws.
+boolean screenR = false;			// To limit screen flicker due to unneccesary screen draws.
 
 // Configure sound.
 
@@ -181,21 +181,21 @@ int eeTotalDistanceAddress = 8;				// EEPROM address for total distance.
 unsigned long eeTotalDistance;				// Actual commit for writing, 4 bytes.
 boolean eeTotalDistanceChange = false;		// Change flag.
 
-int eeSessionTimeArray1Address = 16;		// EEPROM address for session time 1
-int eeSessionTimeArray2Address = 20;		// EEPROM address for session time 2
-int eeSessionTimeArray3Address = 24;		// EEPROM address for session time 3
-int eeSessionTimeArray4Address = 28;		// EEPROM address for session time 4
-int eeSessionTimeArray5Address = 32;		// EEPROM address for session time 5
-int eeSessionTimeArray6Address = 36;		// EEPROM address for session time 6
-int eeSessionTimeArray7Address = 40;		// EEPROM address for session time 7
+int eeSessionTimeArray0Address = 16;		// EEPROM address for session time 1
+int eeSessionTimeArray1Address = 20;		// EEPROM address for session time 2
+int eeSessionTimeArray2Address = 24;		// EEPROM address for session time 3
+int eeSessionTimeArray3Address = 28;		// EEPROM address for session time 4
+int eeSessionTimeArray4Address = 32;		// EEPROM address for session time 5
+int eeSessionTimeArray5Address = 36;		// EEPROM address for session time 6
+int eeSessionTimeArray6Address = 40;		// EEPROM address for session time 7
 
-int eeSessionDistanceArray1Address = 44;	// EEPROM address for session distance 1
-int eeSessionDistanceArray2Address = 48;	// EEPROM address for session distance 2
-int eeSessionDistanceArray3Address = 52;	// EEPROM address for session distance 3
-int eeSessionDistanceArray4Address = 56;	// EEPROM address for session distance 4
-int eeSessionDistanceArray5Address = 60;	// EEPROM address for session distance 5
-int eeSessionDistanceArray6Address = 64;	// EEPROM address for session distance 6
-int eeSessionDistanceArray7Address = 68;	// EEPROM address for session distance 7
+int eeSessionDistanceArray0Address = 44;	// EEPROM address for session distance 1
+int eeSessionDistanceArray1Address = 48;	// EEPROM address for session distance 2
+int eeSessionDistanceArray2Address = 52;	// EEPROM address for session distance 3
+int eeSessionDistanceArray3Address = 56;	// EEPROM address for session distance 4
+int eeSessionDistanceArray4Address = 60;	// EEPROM address for session distance 5
+int eeSessionDistanceArray5Address = 64;	// EEPROM address for session distance 6
+int eeSessionDistanceArray6Address = 68;	// EEPROM address for session distance 7
 
 boolean eeSessionChange = false;			// Change flag.
 
@@ -213,7 +213,7 @@ int eegraphDAPAddress = 96;					// EEPROM address for graph distance array posit
 int eegraphTMAddress = 104;					// EEPROM address for graph distance scale.
 int eegraphTMIAddress = 112;				// EEPROM address for graph distance increment scale level.
 int eegraphTAPAddress = 120;				// EEPROM address for graph distance array position.
-	
+
 boolean newMaxSpeedF = 0;					// New max speed flag.
 double maxSessonDistance = 0;				// Max session distance.
 unsigned long maxSessionTime = 0;			// Max session time.
@@ -277,7 +277,7 @@ boolean eeWiFiYNChange;						// Change flag.
 // Misc array and character spaces are to over write previous screen draw
 
 char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " };	// Default menu options.
-char* resetArray[4] = { "None         ", "Full Reset   ", "Demo Data    ", "Records Reset"};							// Reset options.
+char* resetArray[4] = { "None         ", "Full Reset   ", "Demo Data    ", "Records Reset" };							// Reset options.
 char* dayArray[7] = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };							// Days of the week.
 char* dayShortArray[7] = { "Su","Mo","Tu","We","Th","Fr","Sa" };														// Short days of the week.
 char* ynArray[2] = { "No", "Yes" };																						// Yes / No options.
@@ -289,7 +289,7 @@ boolean calTouchScreen = false;				// Change flag to trigger calibration functio
 
 const int numReadings = 10;
 
-double	readingsAV[numReadings];				// Latest Kph readings.
+double	readingsAV[numReadings];			// Latest Kph readings.
 int		readIndex = 0;						// The index of the current reading.
 double	total = 0.00;						// The running total of the readings.
 double	averageKphSpeed = 0.00;				// The average speed in Kph.
@@ -297,8 +297,8 @@ double	averageKphSpeed = 0.00;				// The average speed in Kph.
 // Session time variables.
 
 unsigned long sessionTimeCap;				// Set cap for graph if statements.
-boolean recordSessions = false;					// Flag to trigger the recording of each session.
-volatile boolean sessionTimeFlag = false;		// Flag to trigger the recording of each session.
+boolean recordSessions = false;				// Flag to trigger the recording of each session.
+volatile boolean sessionTimeFlag = false;	// Flag to trigger the recording of each session.
 volatile unsigned long sessionStartTime;	// Time each pt session starts.
 unsigned long sessionTimeArray[7];			// Array for storing 7 sessions.
 byte sessionArrayPosition = 0;				// Array position, this is also used for the distance array position.
@@ -310,23 +310,23 @@ double sessionDistance;						// Session distance.
 
 unsigned int distanceGraphCap;				// Set cap for graph if statements.
 
-unsigned int sessionTimeArray1;				// These variables are needed for the Kris Kasprzak charts.
+unsigned int sessionTimeArray0;				// These variables are needed for the Kris Kasprzak charts.
+unsigned int sessionTimeArray1;
 unsigned int sessionTimeArray2;
 unsigned int sessionTimeArray3;
 unsigned int sessionTimeArray4;
 unsigned int sessionTimeArray5;
 unsigned int sessionTimeArray6;
-unsigned int sessionTimeArray7;
 
 unsigned int distanceTravelledArray[7];		// Array for storing 7 sessions.
 
-unsigned int distanceTravelledArray1;		// These variables are needed for the Kris Kasprzak charts.
+unsigned int distanceTravelledArray0;		// These variables are needed for the Kris Kasprzak charts.
+unsigned int distanceTravelledArray1;
 unsigned int distanceTravelledArray2;
 unsigned int distanceTravelledArray3;
 unsigned int distanceTravelledArray4;
 unsigned int distanceTravelledArray5;
 unsigned int distanceTravelledArray6;
-unsigned int distanceTravelledArray7;
 
 // Menu positions and refresh.
 
@@ -380,9 +380,9 @@ void IRAM_ATTR rotationInterruptISR() {
 
 	if (interrupt_time - last_interrupt_time > 50) {
 
-		detachInterrupt(sensorInt);						// Detach interrupt.
+		detachInterrupt(sensorInt);									// Detach interrupt.
 
-		if (sensorT == false) {											// Simple indicator flag for TFT.
+		if (sensorT == false) {										// Simple indicator flag for TFT.
 
 			sensorT = true;
 		}
@@ -392,8 +392,8 @@ void IRAM_ATTR rotationInterruptISR() {
 			sensorT = false;
 		}
 
-		disWiFiF = true;									// Disable WiFi flag to stop repeat attempts.
-		disWiFi = true;										// Disable WiFi on wheel turn.
+		disWiFiF = true;											// Disable WiFi flag to stop repeat attempts.
+		disWiFi = true;												// Disable WiFi on wheel turn.
 
 		passedTime = millis() - startTime;
 		startTime = millis();
@@ -403,11 +403,11 @@ void IRAM_ATTR rotationInterruptISR() {
 		speedKph = (3600 * circumference) / passedTime;				// km/h.
 		speedMph = (3600 * circImperial) / passedTime;				// Miles per hour.
 
-		distanceC++;											// Count rotations for distance calculations.
+		distanceC++;												// Count rotations for distance calculations.
 		eeTotalDistanceChange = true;								// Rotation flag.
-		distanceTravelled = distanceC * circumference;		// Distance calculation.
+		distanceTravelled = distanceC * circumference;				// Distance calculation.
 
-		if (sessionTimeFlag == false) {									// Set session timer to start.
+		if (sessionTimeFlag == false) {								// Set session timer to start.
 
 			sessionTimeFlag = true;
 			sessionStartTime = millis();
@@ -670,7 +670,7 @@ void printLocalTime() {
 	tft.setFreeFont();
 	tft.setTextSize(1);
 	tft.setCursor(150, 220);
-	tft.println("        ");
+	tft.println("                ");
 
 	// Actual date time to display.
 
@@ -706,23 +706,23 @@ String getJSONReadings() {
 
 	// Get daily time activity.
 
+	readings["sessionTimeArray0"] = String(sessionTimeArray0);
 	readings["sessionTimeArray1"] = String(sessionTimeArray1);
 	readings["sessionTimeArray2"] = String(sessionTimeArray2);
 	readings["sessionTimeArray3"] = String(sessionTimeArray3);
 	readings["sessionTimeArray4"] = String(sessionTimeArray4);
 	readings["sessionTimeArray5"] = String(sessionTimeArray5);
 	readings["sessionTimeArray6"] = String(sessionTimeArray6);
-	readings["sessionTimeArray7"] = String(sessionTimeArray7);
-	
+
 	// Get daily distance activity.
-	
+
+	readings["distanceTravelledArray0"] = String(distanceTravelledArray0);
 	readings["distanceTravelledArray1"] = String(distanceTravelledArray1);
 	readings["distanceTravelledArray2"] = String(distanceTravelledArray2);
 	readings["distanceTravelledArray3"] = String(distanceTravelledArray3);
 	readings["distanceTravelledArray4"] = String(distanceTravelledArray4);
 	readings["distanceTravelledArray5"] = String(distanceTravelledArray5);
 	readings["distanceTravelledArray6"] = String(distanceTravelledArray6);
-	readings["distanceTravelledArray7"] = String(distanceTravelledArray7);
 
 	String jsonString = JSON.stringify(readings);
 	return jsonString;
@@ -741,7 +741,7 @@ void setup() {
 	// Set pin modes.
 
 	pinMode(TFT_LED, OUTPUT);				// Output for LCD back light.
-	pinMode(sensorInt, INPUT);	// Wheel sensor (REED switch).
+	pinMode(sensorInt, INPUT);				// Wheel sensor (REED switch).
 
 	// Switch on TFT LED back light.
 
@@ -804,7 +804,7 @@ void setup() {
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
 	EEPROM.get(eeTotalDistanceAddress, distanceC);
-	EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
+	//EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
 
 	EEPROM.commit();
 
@@ -880,13 +880,13 @@ void setup() {
 	}
 	Serial.println(" ");
 
-	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[0]);				// Load previous session times into arrays.
-	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[1]);
-	EEPROM.get(eeSessionTimeArray3Address, sessionTimeArray[2]);
-	EEPROM.get(eeSessionTimeArray4Address, sessionTimeArray[3]);
-	EEPROM.get(eeSessionTimeArray5Address, sessionTimeArray[4]);
-	EEPROM.get(eeSessionTimeArray6Address, sessionTimeArray[5]);
-	EEPROM.get(eeSessionTimeArray7Address, sessionTimeArray[6]);
+	EEPROM.get(eeSessionTimeArray0Address, sessionTimeArray[0]);				// Load previous session times into arrays.
+	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[1]);
+	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[2]);
+	EEPROM.get(eeSessionTimeArray3Address, sessionTimeArray[3]);
+	EEPROM.get(eeSessionTimeArray4Address, sessionTimeArray[4]);
+	EEPROM.get(eeSessionTimeArray5Address, sessionTimeArray[5]);
+	EEPROM.get(eeSessionTimeArray6Address, sessionTimeArray[6]);
 
 	EEPROM.commit();
 
@@ -897,21 +897,21 @@ void setup() {
 	Serial.println(sessionTimeCap);
 	Serial.println(" ");
 
-	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;							// Update chart variables from arrays.
-	sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
-	sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
-	sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
-	sessionTimeArray5 = sessionTimeArray[4] / 1000 / 60;
-	sessionTimeArray6 = sessionTimeArray[5] / 1000 / 60;
-	sessionTimeArray7 = sessionTimeArray[6] / 1000 / 60;
+	sessionTimeArray0 = sessionTimeArray[0] / 1000 / 60;						// Update chart variables from arrays.
+	sessionTimeArray1 = sessionTimeArray[1] / 1000 / 60;
+	sessionTimeArray2 = sessionTimeArray[2] / 1000 / 60;
+	sessionTimeArray3 = sessionTimeArray[3] / 1000 / 60;
+	sessionTimeArray4 = sessionTimeArray[4] / 1000 / 60;
+	sessionTimeArray5 = sessionTimeArray[5] / 1000 / 60;
+	sessionTimeArray6 = sessionTimeArray[6] / 1000 / 60;
 
-	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[0]);		// Load previous session distance's into arrays.
-	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[1]);
-	EEPROM.get(eeSessionDistanceArray3Address, distanceTravelledArray[2]);
-	EEPROM.get(eeSessionDistanceArray4Address, distanceTravelledArray[3]);
-	EEPROM.get(eeSessionDistanceArray5Address, distanceTravelledArray[4]);
-	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[5]);
-	EEPROM.get(eeSessionDistanceArray7Address, distanceTravelledArray[6]);
+	EEPROM.get(eeSessionDistanceArray0Address, distanceTravelledArray[0]);		// Load previous session distance's into arrays.
+	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[1]);
+	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[2]);
+	EEPROM.get(eeSessionDistanceArray3Address, distanceTravelledArray[3]);
+	EEPROM.get(eeSessionDistanceArray4Address, distanceTravelledArray[4]);
+	EEPROM.get(eeSessionDistanceArray5Address, distanceTravelledArray[5]);
+	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[6]);
 
 	distanceGraphCap = graphDM;													// Update graph cap to stop value exceeding chart level.
 
@@ -921,13 +921,13 @@ void setup() {
 
 	EEPROM.commit();
 
-	distanceTravelledArray1 = distanceTravelledArray[0];						// Update chart variables from arrays.
-	distanceTravelledArray2 = distanceTravelledArray[1];
-	distanceTravelledArray3 = distanceTravelledArray[2];
-	distanceTravelledArray4 = distanceTravelledArray[3];
-	distanceTravelledArray5 = distanceTravelledArray[4];
-	distanceTravelledArray6 = distanceTravelledArray[5];
-	distanceTravelledArray7 = distanceTravelledArray[6];
+	distanceTravelledArray0 = distanceTravelledArray[0];						// Update chart variables from arrays.
+	distanceTravelledArray1 = distanceTravelledArray[1];
+	distanceTravelledArray2 = distanceTravelledArray[2];
+	distanceTravelledArray3 = distanceTravelledArray[3];
+	distanceTravelledArray4 = distanceTravelledArray[4];
+	distanceTravelledArray5 = distanceTravelledArray[5];
+	distanceTravelledArray6 = distanceTravelledArray[6];
 
 	// Print best ever records data from EEPROM.
 
@@ -1079,7 +1079,7 @@ void setup() {
 		subnet = "blank";
 		gateway = "blank";
 		dns = "blank";
-				
+
 		writeFile(SPIFFS, ssidPath, ssid.c_str());
 		writeFile(SPIFFS, passPath, pass.c_str());
 		writeFile(SPIFFS, ipPath, ip.c_str());
@@ -1100,7 +1100,7 @@ void setup() {
 	//subnet = "255.255.255.0";
 	//gateway = "192.168.1.254";
 	//dns = "192.168.1.254";
-	//
+
 	//writeFile(SPIFFS, ssidPath, ssid.c_str());
 	//writeFile(SPIFFS, passPath, pass.c_str());
 	//writeFile(SPIFFS, ipPath, ip.c_str());
@@ -1281,7 +1281,7 @@ void setup() {
 		tft.setTextSize(1);
 		tft.setTextColor(WHITE); tft.setCursor(50, 78);
 		tft.print("Access Point Mode");
-		 
+
 		tft.setFreeFont();
 		tft.setTextColor(WHITE);
 		tft.setCursor(50, 90);
@@ -1299,13 +1299,13 @@ void setup() {
 
 		unsigned long previousMillis = millis();
 		unsigned long interval = 120000;
-		
+
 		while (1) {
 
 			// Hold from starting loop while in AP mode.
 
 			unsigned long currentMillis = millis();
-			
+
 			// Restart after 2 minutes in case of failed reconnection with correc WiFi details.
 
 			if (currentMillis - previousMillis >= interval) {
@@ -1323,6 +1323,18 @@ void setup() {
 	configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 	printLocalTime();
 	LocalTime = millis();
+
+	// Set array position to the day of the week.
+
+	sessionArrayPosition = rtc.getDayofWeek();				// Get day of the week from RTC.
+
+	Serial.print("Session Array Position: ");
+	Serial.print(sessionArrayPosition);
+	Serial.print(" Day: ");
+	Serial.println(dayArray[sessionArrayPosition]);
+	Serial.println();
+
+	// Print WiFi configuration.
 
 	Serial.println("");
 	Serial.print("SSID set to: ");
@@ -1850,89 +1862,89 @@ void loop() {
 
 		// Session time bar graphs.
 
-		if (sessionTimeArray1 <= (sessionTimeCap * 0.8)) {
+		if (sessionTimeArray0 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
+			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray0, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
 		}
 
-		else if (sessionTimeArray1 >= sessionTimeCap) {
+		else if (sessionTimeArray0 >= sessionTimeCap) {
 
 			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
 		}
 
-		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
-	
+		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray0, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
+
+		if (sessionTimeArray1 <= (sessionTimeCap * 0.8)) {
+
+			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+		}
+
+		else if (sessionTimeArray1 >= sessionTimeCap) {
+
+			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+		}
+
+		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
+
 		if (sessionTimeArray2 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
 		}
 
 		else if (sessionTimeArray2 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
 		}
-		
-		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
-	
+
+		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
+
 		if (sessionTimeArray3 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
+			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
 		}
 
 		else if (sessionTimeArray3 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
+			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
 		}
-				
-		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
+
+		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
 
 		if (sessionTimeArray4 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
+			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
 		}
 
 		else if (sessionTimeArray4 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
+			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
 		}
-		
-		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
+
+		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
 
 		if (sessionTimeArray5 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
+			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
 		}
 
 		else if (sessionTimeArray5 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
+			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
+		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
 
 		if (sessionTimeArray6 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
+			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
 		}
 
 		else if (sessionTimeArray6 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
-		}
-
-		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
-
-		if (sessionTimeArray7 <= (sessionTimeCap * 0.8)) {
-
-			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
-		}
-
-		else if (sessionTimeArray7 >= sessionTimeCap) {
-
 			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
 		}
 
-		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray7, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
+		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
 
 	}
 
@@ -1955,89 +1967,89 @@ void loop() {
 
 		// Distance bar graphs.
 
-		if (distanceTravelledArray1 <= (distanceGraphCap * 0.8)) {
+		if (distanceTravelledArray0 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
+			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray0, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
 		}
 
-		else if (distanceTravelledArray1 >= distanceGraphCap) {
+		else if (distanceTravelledArray0 >= distanceGraphCap) {
 
 			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
 		}
 
-		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8)));
+		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray0, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8)));
 
-		if (distanceTravelledArray2 <= (distanceGraphCap * 0.8)) {
+		if (distanceTravelledArray1 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
+			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
 		}
 
-		else if (distanceTravelledArray2 >= distanceGraphCap) {
+		else if (distanceTravelledArray1 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9)));
+		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9)));
 
-		if (distanceTravelledArray3 <= (distanceGraphCap * 0.8)) {
+		if (distanceTravelledArray2 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
+			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
 		}
 
-		else if (distanceTravelledArray3 >= distanceGraphCap) {
+		else if (distanceTravelledArray2 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10)));
+		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10)));
 
-		if (distanceTravelledArray4 <= (distanceGraphCap * 0.8)) {
+		if (distanceTravelledArray3 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
+			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
 		}
 
-		else if (distanceTravelledArray4 >= distanceGraphCap) {
+		else if (distanceTravelledArray3 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11)));
+		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11)));
 
-		if (distanceTravelledArray5 <= (distanceGraphCap * 0.8)) {
+		if (distanceTravelledArray4 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
+			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
 		}
 
-		else if (distanceTravelledArray5 >= distanceGraphCap) {
+		else if (distanceTravelledArray4 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12)));
+		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12)));
 
-		if (distanceTravelledArray6 <= (distanceGraphCap * 0.8)) {
+		if (distanceTravelledArray5 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
+			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
 		}
 
-		else if (distanceTravelledArray6 >= distanceGraphCap) {
+		else if (distanceTravelledArray5 >= distanceGraphCap) {
 
 			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13)));
+		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13)));
 
-		if (distanceTravelledArray7 <= (distanceGraphCap * 0.8)) {
+		if (distanceTravelledArray6 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray7, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
+			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
 		}
 
-		else if (distanceTravelledArray7 >= distanceGraphCap) {
+		else if (distanceTravelledArray6 >= distanceGraphCap) {
 
 			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
 		}
 
-		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray7, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14)));
+		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14)));
 
 	}
 
@@ -2070,10 +2082,6 @@ void loop() {
 
 		averageKphSpeed = 0.00;
 	}
-
-	// Update bext ever records.
-
-	// Insert some functions.
 
 } // Close loop.
 
@@ -2131,90 +2139,161 @@ void mainData() {
 		speedMph = 0.00;
 	}
 
-	if ((sessionTimeFlag == true) && (recordSessions == true)) {							// Calculate session duration.
+	// Calculate current session distance travelled.
 
-		sessionTimeArray[sessionArrayPosition] = millis() - sessionStartTime;		// Calculate last session time in millis & store into array.
-		distanceTravelledArray[sessionArrayPosition] = distanceTravelled - sessionStartDistance; // Store distance travelled into array.
+	sessionDistance = distanceTravelled - sessionStartDistance;
+
+	if (maxKphSpeed == 0) {				// Reset start up session distance displayed to zero, otherwise it displays current total distance.
+
+		sessionDistance = 0;
+	}
+
+	if (sessionTime == 0) {				// Reset max speed.
+
+		maxKphSpeed = 0;
+	}
+
+	// Update data arrays.
+
+	if ((sessionTimeFlag == true) && (recordSessions == true)) {									// Calculate session duration.
+
+		// Update array position for the day of the week.
+
+		sessionArrayPosition = rtc.getDayofWeek();													// Get day of the week from RTC.
+
+		Serial.print("Session Array Position: ");
+		Serial.print(sessionArrayPosition);
+		Serial.print(" Day: ");
+		Serial.println(dayArray[sessionArrayPosition]);
+		Serial.println();
+
+		sessionTimeArray[sessionArrayPosition] = millis() - sessionStartTime;						// Calculate last session time in millis & store into array.
+		distanceTravelledArray[sessionArrayPosition] = distanceTravelled - sessionStartDistance;	// Store distance travelled into array.
 
 		if (eeSessionChange == true) {
+
+			unsigned long temporySession0;
+			unsigned long temporySession1;
+			unsigned int temporyDistance0;
+			unsigned int temporyDistance1;
 
 			switch (sessionArrayPosition) {
 
 			case 0:
 
-				sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;					// Divided by 1000 for millis to seconds, then divided by 60 for minutes.
-				distanceTravelledArray1 = distanceTravelledArray[0];					// Update chart data.
-				EEPROM.put(eeSessionTimeArray1Address, sessionTimeArray[0]);			// Record the chart data in EEPROM.
-				EEPROM.put(eeSessionDistanceArray1Address, distanceTravelledArray[0]);	// Record the chart data in EEPROM.
+				EEPROM.get(eeSessionTimeArray0Address, temporySession0);
+				temporySession1 = temporySession0 + sessionTimeArray[0];
+
+				EEPROM.get(eeSessionDistanceArray0Address, temporyDistance0);
+				temporyDistance1 = temporyDistance0 + distanceTravelledArray[0];
+
+				sessionTimeArray0 = temporySession1 / 1000 / 60;						// Divided by 1000 for millis to seconds, then divided by 60 for minutes.
+				distanceTravelledArray0 = temporyDistance1;								// Update chart data.
+				EEPROM.put(eeSessionTimeArray0Address, temporySession1);				// Record the chart data in EEPROM.
+				EEPROM.put(eeSessionDistanceArray0Address, temporyDistance1);			// Record the chart data in EEPROM.
 				EEPROM.commit();
 				eeSessionChange = false;
 
 			case 1:
 
-				sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
-				distanceTravelledArray2 = distanceTravelledArray[1];
-				EEPROM.put(eeSessionTimeArray2Address, sessionTimeArray[1]);
-				EEPROM.put(eeSessionDistanceArray2Address, distanceTravelledArray[1]);
+				EEPROM.get(eeSessionTimeArray1Address, temporySession0);
+				temporySession1 = temporySession0 + sessionTimeArray[1];
+
+				EEPROM.get(eeSessionDistanceArray1Address, temporyDistance0);
+				temporyDistance1 = temporyDistance0 + distanceTravelledArray[1];
+
+				sessionTimeArray1 = temporySession1 / 1000 / 60;
+				distanceTravelledArray1 = temporyDistance1;
+				EEPROM.put(eeSessionTimeArray1Address, temporySession1);
+				EEPROM.put(eeSessionDistanceArray1Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
 
 			case 2:
 
-				sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
-				distanceTravelledArray3 = distanceTravelledArray[2];
-				EEPROM.put(eeSessionTimeArray3Address, sessionTimeArray[2]);
-				EEPROM.put(eeSessionDistanceArray3Address, distanceTravelledArray[2]);
+				EEPROM.get(eeSessionTimeArray2Address, temporySession0);
+				temporySession1 = temporySession0 + sessionTimeArray[2];
+
+				EEPROM.get(eeSessionDistanceArray2Address, temporyDistance0);
+				temporyDistance1 = temporyDistance0 + distanceTravelledArray[2];
+
+				sessionTimeArray2 = temporySession1 / 1000 / 60;
+				distanceTravelledArray2 = temporyDistance1;
+				EEPROM.put(eeSessionTimeArray2Address, temporySession1);
+				EEPROM.put(eeSessionDistanceArray2Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
 
 			case 3:
 
-				sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
-				distanceTravelledArray4 = distanceTravelledArray[3];
-				EEPROM.put(eeSessionTimeArray4Address, sessionTimeArray[3]);
-				EEPROM.put(eeSessionDistanceArray4Address, distanceTravelledArray[3]);
+				EEPROM.get(eeSessionTimeArray3Address, temporySession0);
+				temporySession1 = temporySession0 + sessionTimeArray[3];
+
+				EEPROM.get(eeSessionDistanceArray3Address, temporyDistance0);
+				temporyDistance1 = temporyDistance0 + distanceTravelledArray[3];
+
+				sessionTimeArray3 = temporySession1 / 1000 / 60;
+				distanceTravelledArray3 = temporyDistance1;
+				EEPROM.put(eeSessionTimeArray3Address, temporySession1);
+				EEPROM.put(eeSessionDistanceArray3Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
 
 			case 4:
 
-				sessionTimeArray5 = sessionTimeArray[4] / 1000 / 60;
-				distanceTravelledArray5 = distanceTravelledArray[4];
-				EEPROM.put(eeSessionTimeArray5Address, sessionTimeArray[4]);
-				EEPROM.put(eeSessionDistanceArray5Address, distanceTravelledArray[4]);
+				EEPROM.get(eeSessionTimeArray4Address, temporySession0);
+				temporySession1 = temporySession0 + sessionTimeArray[4];
+
+				EEPROM.get(eeSessionDistanceArray4Address, temporyDistance0);
+				temporyDistance1 = temporyDistance0 + distanceTravelledArray[4];
+
+				sessionTimeArray4 = temporySession1 / 1000 / 60;
+				distanceTravelledArray4 = temporyDistance1;
+				EEPROM.put(eeSessionTimeArray4Address, temporySession1);
+				EEPROM.put(eeSessionDistanceArray4Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
 
 			case 5:
 
-				sessionTimeArray6 = sessionTimeArray[5] / 1000 / 60;
-				distanceTravelledArray6 = distanceTravelledArray[5];
-				EEPROM.put(eeSessionTimeArray6Address, sessionTimeArray[5]);
-				EEPROM.put(eeSessionDistanceArray6Address, distanceTravelledArray[5]);
+				EEPROM.get(eeSessionTimeArray5Address, temporySession0);
+				temporySession1 = temporySession0 + sessionTimeArray[5];
+
+				EEPROM.get(eeSessionDistanceArray5Address, temporyDistance0);
+				temporyDistance1 = temporyDistance0 + distanceTravelledArray[5];
+
+				sessionTimeArray5 = temporySession1 / 1000 / 60;
+				distanceTravelledArray5 = temporyDistance1;
+				EEPROM.put(eeSessionTimeArray5Address, temporySession1);
+				EEPROM.put(eeSessionDistanceArray5Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
 
 			case 6:
 
-				sessionTimeArray7 = sessionTimeArray[6] / 1000 / 60;
-				distanceTravelledArray7 = distanceTravelledArray[6];
-				EEPROM.put(eeSessionTimeArray7Address, sessionTimeArray[6]);
-				EEPROM.put(eeSessionDistanceArray7Address, distanceTravelledArray[6]);
+				EEPROM.get(eeSessionTimeArray6Address, temporySession0);
+				temporySession1 = temporySession0 + sessionTimeArray[6];
+
+				EEPROM.get(eeSessionDistanceArray6Address, temporyDistance0);
+				temporyDistance1 = temporyDistance0 + distanceTravelledArray[6];
+
+				sessionTimeArray6 = temporySession1 / 1000 / 60;
+				distanceTravelledArray6 = temporyDistance1;
+				EEPROM.put(eeSessionTimeArray6Address, temporySession1);
+				EEPROM.put(eeSessionDistanceArray6Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
 			}
 
 		}
 
-		sessionArrayPosition++;													// Increment sessionTimeArrayPosition.
-
-		if (sessionArrayPosition >= 7) {										// Check array position is within parametres.
+		/*if (sessionArrayPosition >= 7) {										// Check array position is within parametres.
 
 			sessionArrayPosition = 0;
 		}
 
 		EEPROM.put(eeSessionArrayPositionAddress, sessionArrayPosition);		// Record the next array position in EEPROM.
-		EEPROM.commit();
+		EEPROM.commit();*/
 
 		sessionTimeFlag = false;
 		recordSessions = false;
@@ -2226,22 +2305,6 @@ void mainData() {
 			eeTotalDistanceChange = false;
 		}
 
-	}
-
-	// Calculate current session distance travelled.
-
-	sessionDistance = distanceTravelled - sessionStartDistance;
-
-	if (maxKphSpeed == 0) {				// Reset start up session distance displayed to zero, otherwise it displays current total distance.
-
-		sessionDistance = 0;
-	}
-
-	if (sessionTime == 0) {
-
-		// Reset max speed.
-
-		maxKphSpeed = 0;
 	}
 
 	/* Configure speed varibales to the same format for screen layout using dtostrf.
@@ -3134,7 +3197,7 @@ void wiFiSettingMinus() {
 
 	// Y/N function change to WiFi setting.
 
-	if (wiFiYN == true) 	{
+	if (wiFiYN == true) {
 
 		wiFiYN = false;
 		eeWiFiYNChange = true;
@@ -3457,22 +3520,22 @@ void resetSystemData() {
 	eeSessionArrayPosition = 0;													// Last saved array position.
 	EEPROM.put(eeSessionArrayPositionAddress, eeSessionArrayPosition);
 
-	EEPROM.put(eeSessionTimeArray1Address, 0);									// Populate arrays with zero data.
+	EEPROM.put(eeSessionTimeArray0Address, 0);									// Populate arrays with zero data.
+	EEPROM.put(eeSessionTimeArray1Address, 0);
 	EEPROM.put(eeSessionTimeArray2Address, 0);
 	EEPROM.put(eeSessionTimeArray3Address, 0);
 	EEPROM.put(eeSessionTimeArray4Address, 0);
 	EEPROM.put(eeSessionTimeArray5Address, 0);
 	EEPROM.put(eeSessionTimeArray6Address, 0);
-	EEPROM.put(eeSessionTimeArray7Address, 0);
 	EEPROM.commit();
 
+	EEPROM.put(eeSessionDistanceArray0Address, 0);
 	EEPROM.put(eeSessionDistanceArray1Address, 0);
 	EEPROM.put(eeSessionDistanceArray2Address, 0);
 	EEPROM.put(eeSessionDistanceArray3Address, 0);
 	EEPROM.put(eeSessionDistanceArray4Address, 0);
 	EEPROM.put(eeSessionDistanceArray5Address, 0);
 	EEPROM.put(eeSessionDistanceArray6Address, 0);
-	EEPROM.put(eeSessionDistanceArray7Address, 0);
 	EEPROM.commit();
 
 	EEPROM.put(eeBestMaxSpeed, 0);												// EEPRPOM address for best ever max speed recording.
@@ -3535,41 +3598,41 @@ void resetSystemData() {
 
 	EEPROM.commit();
 
-	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[0]);
-	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[1]);
-	EEPROM.get(eeSessionTimeArray3Address, sessionTimeArray[2]);
-	EEPROM.get(eeSessionTimeArray4Address, sessionTimeArray[3]);
-	EEPROM.get(eeSessionTimeArray5Address, sessionTimeArray[4]);
-	EEPROM.get(eeSessionTimeArray6Address, sessionTimeArray[5]);
-	EEPROM.get(eeSessionTimeArray7Address, sessionTimeArray[6]);
+	EEPROM.get(eeSessionTimeArray0Address, sessionTimeArray[0]);
+	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[1]);
+	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[2]);
+	EEPROM.get(eeSessionTimeArray3Address, sessionTimeArray[3]);
+	EEPROM.get(eeSessionTimeArray4Address, sessionTimeArray[4]);
+	EEPROM.get(eeSessionTimeArray5Address, sessionTimeArray[5]);
+	EEPROM.get(eeSessionTimeArray6Address, sessionTimeArray[6]);
 
 	EEPROM.commit();
 
-	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;						// Times to be updated, needs to be divided by 1000.
-	sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
-	sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
-	sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
-	sessionTimeArray5 = sessionTimeArray[4] / 1000 / 60;
-	sessionTimeArray6 = sessionTimeArray[5] / 1000 / 60;
-	sessionTimeArray7 = sessionTimeArray[6] / 1000 / 60;
+	sessionTimeArray0 = sessionTimeArray[0] / 1000 / 60;						// Times to be updated, needs to be divided by 1000.
+	sessionTimeArray1 = sessionTimeArray[1] / 1000 / 60;
+	sessionTimeArray2 = sessionTimeArray[2] / 1000 / 60;
+	sessionTimeArray3 = sessionTimeArray[3] / 1000 / 60;
+	sessionTimeArray4 = sessionTimeArray[4] / 1000 / 60;
+	sessionTimeArray5 = sessionTimeArray[5] / 1000 / 60;
+	sessionTimeArray6 = sessionTimeArray[6] / 1000 / 60;
 
-	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[0]);
-	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[1]);
-	EEPROM.get(eeSessionDistanceArray3Address, distanceTravelledArray[2]);
-	EEPROM.get(eeSessionDistanceArray4Address, distanceTravelledArray[3]);
-	EEPROM.get(eeSessionDistanceArray5Address, distanceTravelledArray[4]);
-	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[5]);
-	EEPROM.get(eeSessionDistanceArray7Address, distanceTravelledArray[6]);
+	EEPROM.get(eeSessionDistanceArray0Address, distanceTravelledArray[0]);
+	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[1]);
+	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[2]);
+	EEPROM.get(eeSessionDistanceArray3Address, distanceTravelledArray[3]);
+	EEPROM.get(eeSessionDistanceArray4Address, distanceTravelledArray[4]);
+	EEPROM.get(eeSessionDistanceArray5Address, distanceTravelledArray[5]);
+	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[6]);
 
 	EEPROM.commit();
 
-	distanceTravelledArray1 = distanceTravelledArray[0];
-	distanceTravelledArray2 = distanceTravelledArray[1];
-	distanceTravelledArray3 = distanceTravelledArray[2];
-	distanceTravelledArray4 = distanceTravelledArray[3];
-	distanceTravelledArray5 = distanceTravelledArray[4];
-	distanceTravelledArray6 = distanceTravelledArray[5];
-	distanceTravelledArray7 = distanceTravelledArray[6];
+	distanceTravelledArray0 = distanceTravelledArray[0];
+	distanceTravelledArray1 = distanceTravelledArray[1];
+	distanceTravelledArray2 = distanceTravelledArray[2];
+	distanceTravelledArray3 = distanceTravelledArray[3];
+	distanceTravelledArray4 = distanceTravelledArray[4];
+	distanceTravelledArray5 = distanceTravelledArray[5];
+	distanceTravelledArray6 = distanceTravelledArray[6];
 
 	Serial.println("Output from reset system data after EEPROM get");
 	Serial.print("Distance Scale: ");
@@ -3638,24 +3701,24 @@ void resetSystemDemoData() {
 	eeSessionArrayPosition = 0;													// Last saved array position.
 	EEPROM.put(eeSessionArrayPositionAddress, eeSessionArrayPosition);
 
-	EEPROM.put(eeSessionTimeArray1Address, 0);									// Populate arrays with demo data.
-	EEPROM.put(eeSessionTimeArray2Address, 100000);
-	EEPROM.put(eeSessionTimeArray3Address, 200000);
-	EEPROM.put(eeSessionTimeArray4Address, 300000);
-	EEPROM.put(eeSessionTimeArray5Address, 400000);
-	EEPROM.put(eeSessionTimeArray6Address, 500000);
-	EEPROM.put(eeSessionTimeArray7Address, 600000);
+	EEPROM.put(eeSessionTimeArray0Address, 0);									// Populate arrays with demo data.
+	EEPROM.put(eeSessionTimeArray1Address, 100000);
+	EEPROM.put(eeSessionTimeArray2Address, 200000);
+	EEPROM.put(eeSessionTimeArray3Address, 300000);
+	EEPROM.put(eeSessionTimeArray4Address, 400000);
+	EEPROM.put(eeSessionTimeArray5Address, 500000);
+	EEPROM.put(eeSessionTimeArray6Address, 600000);
 	EEPROM.commit();
 
-	EEPROM.put(eeSessionDistanceArray1Address, 0);
-	EEPROM.put(eeSessionDistanceArray2Address, 200);
-	EEPROM.put(eeSessionDistanceArray3Address, 400);
-	EEPROM.put(eeSessionDistanceArray4Address, 600);
-	EEPROM.put(eeSessionDistanceArray5Address, 800);
-	EEPROM.put(eeSessionDistanceArray6Address, 900);
-	EEPROM.put(eeSessionDistanceArray7Address, 1200);
+	EEPROM.put(eeSessionDistanceArray0Address, 0);
+	EEPROM.put(eeSessionDistanceArray1Address, 200);
+	EEPROM.put(eeSessionDistanceArray2Address, 400);
+	EEPROM.put(eeSessionDistanceArray3Address, 600);
+	EEPROM.put(eeSessionDistanceArray4Address, 800);
+	EEPROM.put(eeSessionDistanceArray5Address, 900);
+	EEPROM.put(eeSessionDistanceArray6Address, 1200);
 	EEPROM.commit();
-	
+
 	EEPROM.put(eeBestMaxSpeed, 20);												// EEPRPOM address for best ever max speed recording.
 	EEPROM.put(eeBestMaxSpeedMinute, 0);
 	EEPROM.put(eeBestMaxSpeedHour, 0);
@@ -3716,41 +3779,41 @@ void resetSystemDemoData() {
 
 	EEPROM.commit();
 
-	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[0]);
-	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[1]);
-	EEPROM.get(eeSessionTimeArray3Address, sessionTimeArray[2]);
-	EEPROM.get(eeSessionTimeArray4Address, sessionTimeArray[3]);
-	EEPROM.get(eeSessionTimeArray5Address, sessionTimeArray[4]);
-	EEPROM.get(eeSessionTimeArray6Address, sessionTimeArray[5]);
-	EEPROM.get(eeSessionTimeArray7Address, sessionTimeArray[6]);
+	EEPROM.get(eeSessionTimeArray0Address, sessionTimeArray[0]);
+	EEPROM.get(eeSessionTimeArray1Address, sessionTimeArray[1]);
+	EEPROM.get(eeSessionTimeArray2Address, sessionTimeArray[2]);
+	EEPROM.get(eeSessionTimeArray3Address, sessionTimeArray[3]);
+	EEPROM.get(eeSessionTimeArray4Address, sessionTimeArray[4]);
+	EEPROM.get(eeSessionTimeArray5Address, sessionTimeArray[5]);
+	EEPROM.get(eeSessionTimeArray6Address, sessionTimeArray[6]);
 
 	EEPROM.commit();
 
-	sessionTimeArray1 = sessionTimeArray[0] / 1000 / 60;						// Times to be updated, needs to be divided by 1000.
-	sessionTimeArray2 = sessionTimeArray[1] / 1000 / 60;
-	sessionTimeArray3 = sessionTimeArray[2] / 1000 / 60;
-	sessionTimeArray4 = sessionTimeArray[3] / 1000 / 60;
-	sessionTimeArray5 = sessionTimeArray[4] / 1000 / 60;
-	sessionTimeArray6 = sessionTimeArray[5] / 1000 / 60;
-	sessionTimeArray7 = sessionTimeArray[6] / 1000 / 60;
+	sessionTimeArray0 = sessionTimeArray[0] / 1000 / 60;						// Times to be updated, needs to be divided by 1000.
+	sessionTimeArray1 = sessionTimeArray[1] / 1000 / 60;
+	sessionTimeArray2 = sessionTimeArray[2] / 1000 / 60;
+	sessionTimeArray3 = sessionTimeArray[3] / 1000 / 60;
+	sessionTimeArray4 = sessionTimeArray[4] / 1000 / 60;
+	sessionTimeArray5 = sessionTimeArray[5] / 1000 / 60;
+	sessionTimeArray6 = sessionTimeArray[6] / 1000 / 60;
 
-	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[0]);
-	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[1]);
-	EEPROM.get(eeSessionDistanceArray3Address, distanceTravelledArray[2]);
-	EEPROM.get(eeSessionDistanceArray4Address, distanceTravelledArray[3]);
-	EEPROM.get(eeSessionDistanceArray5Address, distanceTravelledArray[4]);
-	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[5]);
-	EEPROM.get(eeSessionDistanceArray7Address, distanceTravelledArray[6]);
+	EEPROM.get(eeSessionDistanceArray0Address, distanceTravelledArray[0]);
+	EEPROM.get(eeSessionDistanceArray1Address, distanceTravelledArray[1]);
+	EEPROM.get(eeSessionDistanceArray2Address, distanceTravelledArray[2]);
+	EEPROM.get(eeSessionDistanceArray3Address, distanceTravelledArray[3]);
+	EEPROM.get(eeSessionDistanceArray4Address, distanceTravelledArray[4]);
+	EEPROM.get(eeSessionDistanceArray5Address, distanceTravelledArray[5]);
+	EEPROM.get(eeSessionDistanceArray6Address, distanceTravelledArray[6]);
 
 	EEPROM.commit();
 
-	distanceTravelledArray1 = distanceTravelledArray[0];
-	distanceTravelledArray2 = distanceTravelledArray[1];
-	distanceTravelledArray3 = distanceTravelledArray[2];
-	distanceTravelledArray4 = distanceTravelledArray[3];
-	distanceTravelledArray5 = distanceTravelledArray[4];
-	distanceTravelledArray6 = distanceTravelledArray[5];
-	distanceTravelledArray7 = distanceTravelledArray[6];
+	distanceTravelledArray0 = distanceTravelledArray[0];
+	distanceTravelledArray1 = distanceTravelledArray[1];
+	distanceTravelledArray2 = distanceTravelledArray[2];
+	distanceTravelledArray3 = distanceTravelledArray[3];
+	distanceTravelledArray4 = distanceTravelledArray[4];
+	distanceTravelledArray5 = distanceTravelledArray[5];
+	distanceTravelledArray6 = distanceTravelledArray[6];
 
 	Serial.println("Output from reset system data after EEPROM get");
 	Serial.print("Distance Scale: ");
@@ -3778,11 +3841,29 @@ void resetSystemDemoData() {
 
 void resetRecordsData() {
 
-	eeMenuSetting = 3;															// Default menu setting.
+	eeMenuSetting = 3;														// Default menu setting.
 	EEPROM.put(eeMenuAddress, eeMenuSetting);
 	EEPROM.commit();
 
-	EEPROM.put(eeBestMaxSpeed, 0);												// EEPRPOM address for best ever max speed recording.
+	EEPROM.put(eeSessionTimeArray0Address, 0);								// Blank arrays.
+	EEPROM.put(eeSessionTimeArray1Address, 0);
+	EEPROM.put(eeSessionTimeArray2Address, 0);
+	EEPROM.put(eeSessionTimeArray3Address, 0);
+	EEPROM.put(eeSessionTimeArray4Address, 0);
+	EEPROM.put(eeSessionTimeArray5Address, 0);
+	EEPROM.put(eeSessionTimeArray6Address, 0);
+	EEPROM.commit();
+
+	EEPROM.put(eeSessionDistanceArray0Address, 0);
+	EEPROM.put(eeSessionDistanceArray1Address, 0);
+	EEPROM.put(eeSessionDistanceArray2Address, 0);
+	EEPROM.put(eeSessionDistanceArray3Address, 0);
+	EEPROM.put(eeSessionDistanceArray4Address, 0);
+	EEPROM.put(eeSessionDistanceArray5Address, 0);
+	EEPROM.put(eeSessionDistanceArray6Address, 0);
+	EEPROM.commit();
+
+	EEPROM.put(eeBestMaxSpeed, 0);											// EEPRPOM address for best ever max speed recording.
 	EEPROM.put(eeBestMaxSpeedMinute, 0);
 	EEPROM.put(eeBestMaxSpeedHour, 0);
 	EEPROM.put(eeBestMaxSpeedDoW, 5);
@@ -3822,7 +3903,7 @@ void resetRecordsData() {
 	EEPROM.put(eeBestTimeDMonth, 1);
 	EEPROM.put(eeBestTimeDYear, 2021);
 
-	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
+	eeResetSetting = 0;														// Reset EEPROM reset back to zero.
 	EEPROM.put(eeResetSettingAddress, 0);
 	EEPROM.commit();
 
