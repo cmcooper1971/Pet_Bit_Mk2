@@ -50,13 +50,13 @@ unsigned long sleepTime = 60000;	// Reset to 300,000 when finished with design (
 
 // Pin out Configuration.
 
-const int interruptWheelSensor = 39;	// Reed swtich sensor.
-boolean sensorT = false;					// To update display when sensor passes.
+const int sensorInt = 39;			// Reed switch sensor.
+boolean sensorT = false;			// To update display when sensor passes.
 
 // Configure ILI9341 display.
 
 TFT_eSPI tft = TFT_eSPI();			// Invoke custom library.
-boolean screenRedraw = false;			// To limit screen flicker due to unneccesary screen draws.
+boolean screenR = false;		// To limit screen flicker due to unneccesary screen draws.
 
 // Configure sound.
 
@@ -127,8 +127,8 @@ JSONVar readings;
 
 unsigned long wiFiR = 0;					// WiFi retry (wiFiR) to attempt connecting to the last known WiFi if connection lost.
 unsigned long wiFiRI = 60000;				// WiFi retry Interval (wiFiRI) used to retry connecting to the last known WiFi if connection lost.
-volatile bool disconnectWiFi = false;		// Used in the sensor interrupt function to disable WiFi.
-volatile bool disconnectWiFiFlag = false;	// Used in the sensor interrupt function to disable WiFi.
+volatile bool disWiFi = false;				// Used in the sensor interrupt function to disable WiFi.
+volatile bool disWiFiF = false;				// Used in the sensor interrupt function to disable WiFi.
 unsigned long previousMillis = 0;			// Used in the WiFI Init function.
 const long interval = 10000;				// Interval to wait for Wi-Fi connection (milliseconds).
 
@@ -141,7 +141,7 @@ unsigned long timerDelay = 30000;
 
 byte configurationFlag = 1;					// Configuration menu flag.
 
-volatile unsigned int distanceCounter = 0;	// Counting rotations for distance travelled.
+volatile unsigned int distanceC = 0;		// Counting rotations for distance travelled.
 
 volatile unsigned long passedTime;			// Setting time to calculate speed.
 volatile unsigned long startTime;			// Setting time to calculate speed.
@@ -380,7 +380,7 @@ void IRAM_ATTR rotationInterruptISR() {
 
 	if (interrupt_time - last_interrupt_time > 50) {
 
-		detachInterrupt(interruptWheelSensor);						// Detach interrupt.
+		detachInterrupt(sensorInt);						// Detach interrupt.
 
 		if (sensorT == false) {											// Simple indicator flag for TFT.
 
@@ -392,8 +392,8 @@ void IRAM_ATTR rotationInterruptISR() {
 			sensorT = false;
 		}
 
-		disconnectWiFiFlag = true;									// Disable WiFi flag to stop repeat attempts.
-		disconnectWiFi = true;										// Disable WiFi on wheel turn.
+		disWiFiF = true;									// Disable WiFi flag to stop repeat attempts.
+		disWiFi = true;										// Disable WiFi on wheel turn.
 
 		passedTime = millis() - startTime;
 		startTime = millis();
@@ -403,9 +403,9 @@ void IRAM_ATTR rotationInterruptISR() {
 		speedKph = (3600 * circumference) / passedTime;				// km/h.
 		speedMph = (3600 * circImperial) / passedTime;				// Miles per hour.
 
-		distanceCounter++;											// Count rotations for distance calculations.
+		distanceC++;											// Count rotations for distance calculations.
 		eeTotalDistanceChange = true;								// Rotation flag.
-		distanceTravelled = distanceCounter * circumference;		// Distance calculation.
+		distanceTravelled = distanceC * circumference;		// Distance calculation.
 
 		if (sessionTimeFlag == false) {									// Set session timer to start.
 
@@ -418,7 +418,7 @@ void IRAM_ATTR rotationInterruptISR() {
 		lastRotation1 = millis();
 		lastRotation2 = lastRotation1 + 4000;
 
-		attachInterrupt(digitalPinToInterrupt(interruptWheelSensor), rotationInterruptISR, FALLING);	// Attach interrupt.
+		attachInterrupt(digitalPinToInterrupt(sensorInt), rotationInterruptISR, FALLING);	// Attach interrupt.
 
 	}
 
@@ -555,7 +555,7 @@ bool initWiFi() {
 	tft.print("Unit is starting...");
 	tft.setFreeFont();
 
-	screenRedraw = 1;
+	screenR = 1;
 
 	delay(3000);	// Wait a moment.
 
@@ -741,7 +741,7 @@ void setup() {
 	// Set pin modes.
 
 	pinMode(TFT_LED, OUTPUT);				// Output for LCD back light.
-	pinMode(interruptWheelSensor, INPUT);	// Wheel sensor (REED switch).
+	pinMode(sensorInt, INPUT);	// Wheel sensor (REED switch).
 
 	// Switch on TFT LED back light.
 
@@ -754,7 +754,7 @@ void setup() {
 
 	// Configure interupt.
 
-	attachInterrupt(digitalPinToInterrupt(interruptWheelSensor), rotationInterruptISR, FALLING);
+	attachInterrupt(digitalPinToInterrupt(sensorInt), rotationInterruptISR, FALLING);
 
 	// Configure EEPROM.
 
@@ -803,7 +803,7 @@ void setup() {
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
-	EEPROM.get(eeTotalDistanceAddress, distanceCounter);
+	EEPROM.get(eeTotalDistanceAddress, distanceC);
 	EEPROM.get(eeSessionArrayPositionAddress, sessionArrayPosition);
 
 	EEPROM.commit();
@@ -1341,7 +1341,7 @@ void setup() {
 
 	// Check if WiFi is disabled, technically it wont be unless the interupt sensor has triggered during start up.
 
-	if (disconnectWiFi == true) {
+	if (disWiFi == true) {
 
 		//disconnect WiFi as it's no longer needed.
 
@@ -1373,14 +1373,14 @@ void loop() {
 
 	// Enable / Disable WiFi when interrupt is in operation.
 
-	if (disconnectWiFi == true && disconnectWiFiFlag == true) {
+	if (disWiFi == true && disWiFiF == true) {
 
 		if (WiFi.status() == WL_CONNECTED);
 		WiFi.disconnect();
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiAmber, WIFI_ICON_W, WIFI_ICON_H);
 	}
 
-	else if (disconnectWiFi == false && disconnectWiFiFlag == true) {
+	else if (disWiFi == false && disWiFiF == true) {
 
 		if (WiFi.status() != WL_CONNECTED);
 		WiFi.begin(ssid.c_str(), pass.c_str());
@@ -1392,14 +1392,14 @@ void loop() {
 		Serial.println(WiFi.RSSI());
 		drawBitmap(tft, WIFI_ICON_Y, WIFI_ICON_X, wiFiGreen, WIFI_ICON_W, WIFI_ICON_H);
 
-		disconnectWiFiFlag = false;
+		disWiFiF = false;
 	}
 
 	// Retry connecting to WiFi if connection is lost at all other times.
 
 	unsigned long wiFiRC = millis();
 
-	if ((WiFi.status() != WL_CONNECTED) && (disconnectWiFi == false) && (wiFiRC - wiFiR >= wiFiRI)) {
+	if ((WiFi.status() != WL_CONNECTED) && (disWiFi == false) && (wiFiRC - wiFiR >= wiFiRI)) {
 
 		Serial.print(millis());
 		Serial.println("Reconnecting to WiFi...");
@@ -1410,7 +1410,7 @@ void loop() {
 
 	// Update time from Internet time server.
 
-	if ((disconnectWiFiFlag == false) && (millis() >= LocalTime + localTimeInterval)) {
+	if ((disWiFiF == false) && (millis() >= LocalTime + localTimeInterval)) {
 
 		printLocalTime();			// Get time and update display.
 		LocalTime = millis();
@@ -1418,7 +1418,7 @@ void loop() {
 
 	// Send Events to the client with sensor readins and update colors every 120 seconds.
 
-	if ((disconnectWiFiFlag == false) && (millis() - lastTime > timerDelay)) {
+	if ((disWiFiF == false) && (millis() - lastTime > timerDelay)) {
 
 		String message = getJSONReadings();
 		events.send(message.c_str(), "new_readings", millis());
@@ -1608,7 +1608,7 @@ void loop() {
 					tone(buzzerP, buzzerF);
 					screenMenu = 1;
 					menuChange = 1;
-					screenRedraw = 1;
+					screenR = 1;
 					Serial.print("Button 1 hit ");
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
@@ -1629,7 +1629,7 @@ void loop() {
 					tone(buzzerP, buzzerF);
 					screenMenu = 2;
 					menuChange = 1;
-					screenRedraw = 1;
+					screenR = 1;
 					Serial.print("Button 2 hit ");
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
@@ -1692,7 +1692,7 @@ void loop() {
 					tone(buzzerP, buzzerF);
 					screenMenu = 3;
 					menuChange = 1;
-					screenRedraw = 1;
+					screenR = 1;
 					Serial.print("Button 3 hit ");
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
@@ -1755,7 +1755,7 @@ void loop() {
 					tone(buzzerP, buzzerF);
 					screenMenu = 4;
 					menuChange = 1;
-					screenRedraw = 1;
+					screenR = 1;
 					Serial.print("Button 4 hit ");
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
@@ -1789,7 +1789,7 @@ void loop() {
 					tone(buzzerP, buzzerF);
 					screenMenu = 5;
 					menuChange = 1;
-					screenRedraw = 1;
+					screenR = 1;
 					Serial.print("Button 5 hit ");
 					Serial.print(" : Screen Menu: ");
 					Serial.print(screenMenu);
@@ -1806,10 +1806,10 @@ void loop() {
 
 	if (screenMenu == 1) {
 
-		if (screenRedraw == 1) {
+		if (screenR == 1) {
 
 			drawBlackBox();
-			screenRedraw = false;
+			screenR = false;
 		}
 
 		currentExerciseScreen();
@@ -1819,12 +1819,12 @@ void loop() {
 
 	if (screenMenu == 2) {
 
-		if (screenRedraw == 1) {
+		if (screenR == 1) {
 
 
 			drawBlackBox();
 			dial_1 = true;
-			screenRedraw = false;
+			screenR = false;
 		}
 
 		XphDialScreen(tft, dialX, dialY, 80, 0, 20, 2, 170, speedKph, 2, 0, RED, WHITE, BLACK, "Kph", dial_1); // XPH dial screen function.
@@ -1835,7 +1835,7 @@ void loop() {
 
 	if (screenMenu == 3) {
 
-		if (screenRedraw == 1) {
+		if (screenR == 1) {
 
 			drawBlackBox();
 			graph_1 = true;
@@ -1845,7 +1845,7 @@ void loop() {
 			graph_5 = true;
 			graph_6 = true;
 			graph_7 = true;
-			screenRedraw = false;
+			screenR = false;
 		}
 
 		// Session time bar graphs.
@@ -1940,7 +1940,7 @@ void loop() {
 
 	if (screenMenu == 4) {
 
-		if (screenRedraw == 1) {
+		if (screenR == 1) {
 
 			drawBlackBox();
 			graph_8 = true;
@@ -1950,7 +1950,7 @@ void loop() {
 			graph_12 = true;
 			graph_13 = true;
 			graph_14 = true;
-			screenRedraw = false;
+			screenR = false;
 		}
 
 		// Distance bar graphs.
@@ -2045,10 +2045,10 @@ void loop() {
 
 	if (screenMenu == 5) {
 
-		if (screenRedraw == 1) {
+		if (screenR == 1) {
 
 			drawBlackBox();
-			screenRedraw = false;
+			screenR = false;
 		}
 
 		configurationDisplay();
@@ -2091,7 +2091,7 @@ void mainData() {
 		speedMph = 0.00;
 		recordSessions = true;
 		eeSessionChange = true;
-		disconnectWiFi = false;
+		disWiFi = false;
 
 		if (sessionDistance > maxSessonDistance) {
 
@@ -2221,7 +2221,7 @@ void mainData() {
 
 		if (eeTotalDistanceChange == true) {
 
-			EEPROM.put(eeTotalDistanceAddress, distanceCounter);
+			EEPROM.put(eeTotalDistanceAddress, distanceC);
 			EEPROM.commit();
 			eeTotalDistanceChange = false;
 		}
@@ -2310,7 +2310,7 @@ void newMaxSpeedRecord() {
 
 	// Check and update new max speed record.
 
-	if (disconnectWiFi == false && newMaxSpeedF == true) {
+	if (disWiFi == false && newMaxSpeedF == true) {
 
 		float tempMaxKphSpeed = 0.00;
 
@@ -2381,7 +2381,7 @@ void updateBestEverRecords() {
 
 	// Check and update new distance session record.
 
-	if (disconnectWiFi == false && newBestSessionDistanceF == true) {
+	if (disWiFi == false && newBestSessionDistanceF == true) {
 
 		float tempDistanceSessionRecord;
 
@@ -2444,7 +2444,7 @@ void updateBestEverRecords() {
 
 	// Check and update new time session record.
 
-	if (disconnectWiFi == false && newBestSessionTimeF == true) {
+	if (disWiFi == false && newBestSessionTimeF == true) {
 
 		unsigned long tempTimeSessionRecord;
 
@@ -2760,7 +2760,7 @@ void configurationDisplay() {
 					tone(buzzerP, buzzerF);
 					screenMenu = 5;
 					menuChange = 1;
-					screenRedraw = 1;
+					screenR = 1;
 					configurationFlag = 1;
 					Serial.print("Button 5 hit ");
 					Serial.print(" : Screen Menu: ");
@@ -2783,7 +2783,7 @@ void configurationDisplay() {
 	tft.setCursor(23, 200);
 	tft.print("Total Distance   : ");
 	tft.setCursor(150, 200);
-	tft.println(distanceTravelled = distanceCounter * circumference);
+	tft.println(distanceTravelled = distanceC * circumference);
 
 } // Close function.
 
@@ -3523,7 +3523,7 @@ void resetSystemData() {
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
-	EEPROM.get(eeTotalDistanceAddress, distanceCounter);
+	EEPROM.get(eeTotalDistanceAddress, distanceC);
 
 	EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
 	EEPROM.get(eegraphDMIAddress, graphDMI);
@@ -3704,7 +3704,7 @@ void resetSystemDemoData() {
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
 	EEPROM.get(eeCircAddress, circumference);
-	EEPROM.get(eeTotalDistanceAddress, distanceCounter);
+	EEPROM.get(eeTotalDistanceAddress, distanceC);
 
 	EEPROM.get(eegraphDMAddress, graphDM);										// Graph disrance scale.
 	EEPROM.get(eegraphDMIAddress, graphDMI);
