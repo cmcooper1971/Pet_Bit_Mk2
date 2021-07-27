@@ -300,7 +300,7 @@ boolean recordSessions = false;				// Flag to trigger the recording of each sess
 volatile boolean sessionTimeFlag = false;	// Flag to trigger the recording of each session.
 volatile unsigned long sessionStartTime;	// Time each pt session starts.
 unsigned long sessionTimeArray[7];			// Array for storing 7 sessions.
-byte sessionArrayPosition = 0;				// Array position, this is also used for the distance array position.
+byte sessionArrayPosition = 5;				// Array position, this is also used for the distance array position.
 volatile unsigned long sessionTimeMillis;	// Time each pt session in millis.
 volatile unsigned long sessionTime;			// Time each pt session in minutes.
 
@@ -677,6 +677,11 @@ void printLocalTime() {
 	tft.setCursor(13, 220);
 	tft.println(&timeinfo, "%A, %B %d %Y %H:%M");
 
+	if (rtc.getHour() == 0 &&  rtc.getMinute() == 0) {
+
+		blankDailyData();
+	}
+
 } // Close function.
 
 /*-----------------------------------------------------------------*/
@@ -732,58 +737,225 @@ String getJSONReadings() {
 
 void blankDailyData() {
 
-	if (sessionArrayPosition != rtc.getDayofWeek()) {
+	sessionArrayPosition = rtc.getDayofWeek();
 
-		switch (sessionArrayPosition) {
+	if (sessionArrayPosition != 0 ||							// To ensure parametre is within selection.
+		sessionArrayPosition != 1 ||
+		sessionArrayPosition != 2 ||
+		sessionArrayPosition != 3 ||
+		sessionArrayPosition != 4 ||
+		sessionArrayPosition != 5 ||
+		sessionArrayPosition != 6) {
 
-		case 0:
+		sessionArrayPosition = 0;
+	}
 
-			EEPROM.put(eeSessionTimeArray0Address, 0);				// Record the chart data in EEPROM.
-			EEPROM.put(eeSessionDistanceArray0Address, 0);			// Record the chart data in EEPROM.
+	Serial.print("Session Array Position = ");
+	Serial.println(sessionArrayPosition);
+	Serial.println();
+
+	if (sessionArrayPosition == 0) {
+
+		sessionTimeArray0 = 0;
+		distanceTravelledArray0 = 0;
+
+		EEPROM.put(eeSessionTimeArray0Address, 0);				// Record the chart data in EEPROM.
+		EEPROM.put(eeSessionDistanceArray0Address, 0);			// Record the chart data in EEPROM.
+		EEPROM.commit();
+
+		Serial.print("Daily Data Successfully Deleted: ");
+		Serial.print(dayArray[0]);
+		Serial.println();
+	}
+
+	else if (sessionArrayPosition == 1) {
+
+		sessionTimeArray1 = 0;
+		distanceTravelledArray1 = 0;
+
+		EEPROM.put(eeSessionTimeArray1Address, 0);				// Record the chart data in EEPROM.
+		EEPROM.put(eeSessionDistanceArray1Address, 0);			// Record the chart data in EEPROM.
+		EEPROM.commit();
+
+		Serial.print("Daily Data Successfully Deleted: ");
+		Serial.print(dayArray[1]);
+		Serial.println();
+	}
+
+	else if (sessionArrayPosition == 2) {
+
+		sessionTimeArray2 = 0;
+		distanceTravelledArray2 = 0;
+
+		EEPROM.put(eeSessionTimeArray2Address, 0);				// Record the chart data in EEPROM.
+		EEPROM.put(eeSessionDistanceArray2Address, 0);			// Record the chart data in EEPROM.
+		EEPROM.commit();
+
+		Serial.print("Daily Data Successfully Deleted: ");
+		Serial.print(dayArray[2]);
+		Serial.println();
+	}
+
+	else if (sessionArrayPosition == 3) {
+
+		float tempDistance1;
+		float tempDistance2;
+
+		EEPROM.get(eeBestDistanceD, tempDistance1);
+		EEPROM.get(distanceTravelledArray3, tempDistance2);
+		EEPROM.commit();
+
+		if (tempDistance1 < tempDistance2) {
+
+			EEPROM.put(eeBestDistanceD, tempDistance2);
+			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
 			EEPROM.commit();
 
-		case 1:
+			float tempDistance;
+			int tempDoW;
+			int tempDay;
+			int tempMonth;
+			int tempYear;
+			int tempHour;
+			int tempMinute;
 
-			EEPROM.put(eeSessionTimeArray1Address, 0);				// Record the chart data in EEPROM.
-			EEPROM.put(eeSessionDistanceArray1Address, 0);			// Record the chart data in EEPROM.
+			EEPROM.get(eeBestDistanceD, tempDistance);
+			EEPROM.get(eeBestDistanceDDoW, tempDoW);
+			EEPROM.get(eeBestDistanceDDay, tempDay);
+			EEPROM.get(eeBestDistanceDMonth, tempMonth);
+			EEPROM.get(eeBestDistanceDYear, tempYear);
+			EEPROM.get(eeBestDistanceDHour, tempHour);
+			EEPROM.get(eeBestDistanceDMinute, tempMinute);
 			EEPROM.commit();
 
-		case 2:
-
-			EEPROM.put(eeSessionTimeArray2Address, 0);				// Record the chart data in EEPROM.
-			EEPROM.put(eeSessionDistanceArray2Address, 0);			// Record the chart data in EEPROM.
-			EEPROM.commit();
-
-		case 3:
-
-			EEPROM.put(eeSessionTimeArray3Address, 0);				// Record the chart data in EEPROM.
-			EEPROM.put(eeSessionDistanceArray3Address, 0);			// Record the chart data in EEPROM.
-			EEPROM.commit();
-
-		case 4:
-
-			EEPROM.put(eeSessionTimeArray4Address, 0);				// Record the chart data in EEPROM.
-			EEPROM.put(eeSessionDistanceArray4Address, 0);			// Record the chart data in EEPROM.
-			EEPROM.commit();
-
-		case 5:
-
-			EEPROM.put(eeSessionTimeArray5Address, 0);				// Record the chart data in EEPROM.
-			EEPROM.put(eeSessionDistanceArray5Address, 0);			// Record the chart data in EEPROM.
-			EEPROM.commit();
-
-		case 6:
-
-			EEPROM.put(eeSessionTimeArray6Address, 0);				// Record the chart data in EEPROM.
-			EEPROM.put(eeSessionDistanceArray6Address, 0);			// Record the chart data in EEPROM.
-			EEPROM.commit();
-
+			Serial.print("New best daily distance: ");
+			Serial.println(tempDistance);
+			Serial.print("Date: ");
+			Serial.print(dayArray[tempDoW]);
+			Serial.print(", ");
+			Serial.print(tempDay);
+			Serial.print("/");
+			Serial.print(tempMonth);
+			Serial.print("/");
+			Serial.print(tempYear);
+			Serial.print(" at ");
+			Serial.print(tempHour);
+			Serial.print(":");
+			Serial.println(tempMinute);
+			Serial.println(" ");
 		}
 
-		sessionArrayPosition = rtc.getDayofWeek();
+		unsigned long tempTime1;
+		unsigned long tempTime2;
+
+		EEPROM.get(eeBestTimeD, tempTime1);
+		EEPROM.get(eeSessionTimeArray3Address, tempTime2);
+		EEPROM.commit();
+
+		if (tempTime1 < tempTime2) {
+
+			EEPROM.put(eeBestTimeD, tempTime2);
+			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestTimeDDay, rtc.getDay());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDYear, rtc.getYear());
+			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
+			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
+
+			long tempTime;
+			int tempDoW;
+			int tempDay;
+			int tempMonth;
+			int tempYear;
+			int tempHour;
+			int tempMinute;
+
+			EEPROM.get(eeBestTimeD, tempTime);
+			EEPROM.get(eeBestTimeDDoW, tempDoW);
+			EEPROM.get(eeBestTimeDDay, tempDay);
+			EEPROM.get(eeBestTimeDMonth, tempMonth);
+			EEPROM.get(eeBestTimeDYear, tempYear);
+			EEPROM.get(eeBestTimeDHour, tempHour);
+			EEPROM.get(eeBestTimeDMinute, tempMinute);
+			EEPROM.commit();
+
+			Serial.print("New best daily time: ");
+			Serial.println(tempTime);
+			Serial.print("Date: ");
+			Serial.print(dayArray[tempDoW]);
+			Serial.print(", ");
+			Serial.print(tempDay);
+			Serial.print("/");
+			Serial.print(tempMonth);
+			Serial.print("/");
+			Serial.print(tempYear);
+			Serial.print(" at ");
+			Serial.print(tempHour);
+			Serial.print(":");
+			Serial.println(tempMinute);
+			Serial.println(" ");
+		}
+
+		sessionTimeArray3 = 0;
+		distanceTravelledArray3 = 0;
+
+		EEPROM.put(eeSessionTimeArray3Address, 0);				// Record the chart data in EEPROM.
+		EEPROM.put(eeSessionDistanceArray3Address, 0);			// Record the chart data in EEPROM.
+		EEPROM.commit();
+
+		Serial.print("Daily Data Successfully Deleted: ");
+		Serial.print(dayArray[3]);
+		Serial.println();
 	}
-	
-}
+
+	else if (sessionArrayPosition == 4) {
+
+		sessionTimeArray4 = 0;
+		distanceTravelledArray4 = 0;
+
+		EEPROM.put(eeSessionTimeArray4Address, 0);				// Record the chart data in EEPROM.
+		EEPROM.put(eeSessionDistanceArray4Address, 0);			// Record the chart data in EEPROM.
+		EEPROM.commit();
+
+		Serial.print("Daily Data Successfully Deleted: ");
+		Serial.print(dayArray[4]);
+		Serial.println();
+	}
+
+	else if (sessionArrayPosition == 5) {
+
+		sessionTimeArray5 = 0;
+		distanceTravelledArray5 = 0;
+
+		EEPROM.put(eeSessionTimeArray5Address, 0);				// Record the chart data in EEPROM.
+		EEPROM.put(eeSessionDistanceArray5Address, 0);			// Record the chart data in EEPROM.
+		EEPROM.commit();
+
+		Serial.print("Daily Data Successfully Deleted: ");
+		Serial.print(dayArray[5]);
+		Serial.println();
+	}
+
+	else if (sessionArrayPosition == 6) {
+
+		sessionTimeArray6 = 0;
+		distanceTravelledArray6 = 0;
+
+		EEPROM.put(eeSessionTimeArray6Address, 0);				// Record the chart data in EEPROM.
+		EEPROM.put(eeSessionDistanceArray6Address, 0);			// Record the chart data in EEPROM.
+		EEPROM.commit();
+
+		Serial.print("Daily Data Successfully Deleted: ");
+		Serial.print(dayArray[6]);
+		Serial.println();
+	}
+		
+} // Close function.
 
 /*-----------------------------------------------------------------*/
 
@@ -1030,7 +1202,7 @@ void setup() {
 	EEPROM.get(eeBestDistanceSMinute, tempMinute);
 	EEPROM.commit();
 
-	Serial.print("Best Distance Record: ");
+	Serial.print("Best Session Distance Record: ");
 	Serial.println(tempDistance);
 	Serial.print("Date: ");
 	Serial.print(dayArray[tempDoW]);
@@ -1057,7 +1229,61 @@ void setup() {
 	EEPROM.get(eeBestTimeSMinute, tempMinute);
 	EEPROM.commit();
 
-	Serial.print("Best Time Record: ");
+	Serial.print("Best Session Time Record: ");
+	Serial.println(tempTime);
+	Serial.print("Date: ");
+	Serial.print(dayArray[tempDoW]);
+	Serial.print(", ");
+	Serial.print(tempDay);
+	Serial.print("/");
+	Serial.print(tempMonth);
+	Serial.print("/");
+	Serial.print(tempYear);
+	Serial.print(" at ");
+	Serial.print(tempHour);
+	Serial.print(":");
+	Serial.println(tempMinute);
+	Serial.println(" ");
+
+	float tempDistanceD;
+
+	EEPROM.get(eeBestDistanceD, tempDistanceD);
+	EEPROM.get(eeBestDistanceDDoW, tempDoW);
+	EEPROM.get(eeBestDistanceDDay, tempDay);
+	EEPROM.get(eeBestDistanceDMonth, tempMonth);
+	EEPROM.get(eeBestDistanceDYear, tempYear);
+	EEPROM.get(eeBestDistanceDHour, tempHour);
+	EEPROM.get(eeBestDistanceDMinute, tempMinute);
+	EEPROM.commit();
+
+	Serial.print("Best Daily Distance Record: ");
+	Serial.println(tempDistance);
+	Serial.print("Date: ");
+	Serial.print(dayArray[tempDoW]);
+	Serial.print(", ");
+	Serial.print(tempDay);
+	Serial.print("/");
+	Serial.print(tempMonth);
+	Serial.print("/");
+	Serial.print(tempYear);
+	Serial.print(" at ");
+	Serial.print(tempHour);
+	Serial.print(":");
+	Serial.println(tempMinute);
+	Serial.println(" ");
+
+	long tempTimeD;
+
+	EEPROM.get(eeBestTimeD, tempTimeD);
+	EEPROM.get(eeBestTimeDDoW, tempDoW);
+	EEPROM.get(eeBestTimeDDay, tempDay);
+	EEPROM.get(eeBestTimeDMonth, tempMonth);
+	EEPROM.get(eeBestTimeDYear, tempYear);
+	EEPROM.get(eeBestTimeDHour, tempHour);
+	EEPROM.get(eeBestTimeDMinute, tempMinute);
+	EEPROM.commit();
+
+	Serial.print("Best Daily Time Record: ");
 	Serial.println(tempTime);
 	Serial.print("Date: ");
 	Serial.print(dayArray[tempDoW]);
@@ -1917,89 +2143,89 @@ void loop() {
 
 		// Session time bar graphs.
 
-		if (sessionTimeArray0 <= (sessionTimeCap * 0.8)) {
-
-			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray0, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
-		}
-
-		else if (sessionTimeArray0 >= sessionTimeCap) {
-
-			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1);
-		}
-
-		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray0, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_1)));
-
 		if (sessionTimeArray1 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Mo", graph_1);
 		}
 
 		else if (sessionTimeArray1 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2);
+			ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Mo", graph_1);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_2)));
+		else ((ptSessionTimeV1(tft, graphX1, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Mo", graph_1)));
 
 		if (sessionTimeArray2 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
+			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Tu", graph_2);
 		}
 
 		else if (sessionTimeArray2 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3);
+			ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Tu", graph_2);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_3)));
+		else ((ptSessionTimeV2(tft, graphX2, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Tu", graph_2)));
 
 		if (sessionTimeArray3 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
+			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "We", graph_3);
 		}
 
 		else if (sessionTimeArray3 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4);
+			ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "We", graph_3);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_4)));
+		else ((ptSessionTimeV2(tft, graphX3, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "We", graph_3)));
 
 		if (sessionTimeArray4 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
+			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Th", graph_4);
 		}
 
 		else if (sessionTimeArray4 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5);
+			ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Th", graph_4);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_5)));
+		else ((ptSessionTimeV2(tft, graphX4, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Th", graph_4)));
 
 		if (sessionTimeArray5 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
+			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Fr", graph_5);
 		}
 
 		else if (sessionTimeArray5 >= sessionTimeCap) {
 
-			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6);
+			ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Fr", graph_5);
 		}
 
-		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_6)));
+		else ((ptSessionTimeV2(tft, graphX5, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Fr", graph_5)));
 
 		if (sessionTimeArray6 <= (sessionTimeCap * 0.8)) {
 
-			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
+			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Sa", graph_6);
 		}
 
 		else if (sessionTimeArray6 >= sessionTimeCap) {
 
-			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7);
+			ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Sa", graph_6);
 		}
 
-		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_7)));
+		else ((ptSessionTimeV2(tft, graphX6, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Sa", graph_6)));
+
+		if (sessionTimeArray0 <= (sessionTimeCap * 0.8)) {
+
+			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray0, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Su", graph_7);
+		}
+
+		else if (sessionTimeArray0 >= sessionTimeCap) {
+
+			ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Su", graph_7);
+		}
+
+		else ((ptSessionTimeV3(tft, graphX7, graphY, graphW, graphH, 0, graphTM, graphTMI, sessionTimeArray0, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Su", graph_7)));
 
 	}
 
@@ -2022,89 +2248,89 @@ void loop() {
 
 		// Distance bar graphs.
 
-		if (distanceTravelledArray0 <= (distanceGraphCap * 0.8)) {
-
-			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray0, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
-		}
-
-		else if (distanceTravelledArray0 >= distanceGraphCap) {
-
-			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8);
-		}
-
-		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray0, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "1", graph_8)));
-
 		if (distanceTravelledArray1 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
+			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Mo", graph_8);
 		}
 
 		else if (distanceTravelledArray1 >= distanceGraphCap) {
 
-			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9);
+			ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Mo", graph_8);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "2", graph_9)));
+		else ((ptSessionDistanceV1(tft, graphX1, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray1, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Mo", graph_8)));
 
 		if (distanceTravelledArray2 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
+			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Tu", graph_9);
 		}
 
 		else if (distanceTravelledArray2 >= distanceGraphCap) {
 
-			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10);
+			ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Tu", graph_9);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "3", graph_10)));
+		else ((ptSessionDistanceV2(tft, graphX2, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray2, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Tu", graph_9)));
 
 		if (distanceTravelledArray3 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
+			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "We", graph_10);
 		}
 
 		else if (distanceTravelledArray3 >= distanceGraphCap) {
 
-			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11);
+			ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "We", graph_10);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "4", graph_11)));
+		else ((ptSessionDistanceV2(tft, graphX3, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray3, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "We", graph_10)));
 
 		if (distanceTravelledArray4 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
+			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Th", graph_11);
 		}
 
 		else if (distanceTravelledArray4 >= distanceGraphCap) {
 
-			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12);
+			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Th", graph_11);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "5", graph_12)));
+		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Th", graph_11)));
 
 		if (distanceTravelledArray5 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
+			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Fr", graph_12);
 		}
 
 		else if (distanceTravelledArray5 >= distanceGraphCap) {
 
-			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13);
+			ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Fr", graph_12);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "6", graph_13)));
+		else ((ptSessionDistanceV2(tft, graphX5, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray5, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Fr", graph_12)));
 
 		if (distanceTravelledArray6 <= (distanceGraphCap * 0.8)) {
 
-			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
+			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Sa", graph_13);
 		}
 
 		else if (distanceTravelledArray6 >= distanceGraphCap) {
 
-			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14);
+			ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Sa", graph_13);
 		}
 
-		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "7", graph_14)));
+		else ((ptSessionDistanceV2(tft, graphX6, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray6, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Sa", graph_13)));
+
+		if (distanceTravelledArray0 <= (distanceGraphCap * 0.8)) {
+
+			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray0, 3, 0, CYAN, DKGREY, WHITE, WHITE, BLACK, "Su", graph_14);
+		}
+
+		else if (distanceTravelledArray0 >= distanceGraphCap) {
+
+			ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Su", graph_14);
+		}
+
+		else ((ptSessionDistanceV3(tft, graphX7, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray0, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Su", graph_14)));
 
 	}
 
@@ -2213,7 +2439,7 @@ void mainData() {
 
 		// Update array position for the day of the week.
 
-		sessionArrayPosition = rtc.getDayofWeek();													// Get day of the week from RTC.
+		//sessionArrayPosition = rtc.getDayofWeek();													// Get day of the week from RTC.
 
 		Serial.print("Session Array Position: ");
 		Serial.print(sessionArrayPosition);
@@ -2248,6 +2474,11 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
+				Serial.println("Case 0 Triggered: ");
+				Serial.println("");
+
+				break;
+
 			case 1:
 
 				EEPROM.get(eeSessionTimeArray1Address, temporySession0);
@@ -2262,6 +2493,11 @@ void mainData() {
 				EEPROM.put(eeSessionDistanceArray1Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
+
+				Serial.println("Case 1 Triggered: ");
+				Serial.println("");
+
+				break;
 
 			case 2:
 
@@ -2278,6 +2514,11 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
+				Serial.println("Case 2 Triggered: ");
+				Serial.println("");
+
+				break;
+
 			case 3:
 
 				EEPROM.get(eeSessionTimeArray3Address, temporySession0);
@@ -2292,6 +2533,11 @@ void mainData() {
 				EEPROM.put(eeSessionDistanceArray3Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
+
+				Serial.println("Case 3 Triggered: ");
+				Serial.println("");
+
+				break;
 
 			case 4:
 
@@ -2308,6 +2554,11 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
+				Serial.println("Case 4 Triggered: ");
+				Serial.println("");
+
+				break;
+
 			case 5:
 
 				EEPROM.get(eeSessionTimeArray5Address, temporySession0);
@@ -2323,6 +2574,11 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
+				Serial.println("Case 5 Triggered: ");
+				Serial.println("");
+
+				break;
+
 			case 6:
 
 				EEPROM.get(eeSessionTimeArray6Address, temporySession0);
@@ -2337,6 +2593,11 @@ void mainData() {
 				EEPROM.put(eeSessionDistanceArray6Address, temporyDistance1);
 				EEPROM.commit();
 				eeSessionChange = false;
+
+				Serial.println("Case 6 Triggered: ");
+				Serial.println("");
+
+				break;
 			}
 
 		}
@@ -2627,7 +2888,7 @@ void currentExerciseScreen() {
 	tft.setCursor(23, 160);
 	tft.print("Max Kph: ");
 	tft.setCursor(23, 180);
-	tft.print("Dis: ");
+	tft.print("Dis  (m):");
 	tft.setCursor(23, 200);
 	tft.print("Time (s): ");
 
@@ -3609,10 +3870,6 @@ void resetSystemData() {
 	EEPROM.put(eeBestTimeDMonth, 1);
 	EEPROM.put(eeBestTimeDYear, 2021);
 
-	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
-	EEPROM.put(eeResetSettingAddress, 0);
-	EEPROM.commit();
-
 	EEPROM.get(eeMenuAddress, eeMenuSetting);									// Load data from EEPROM.
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
@@ -3684,6 +3941,10 @@ void resetSystemData() {
 	Serial.print("Position: ");
 	Serial.println(graphTAP);
 	Serial.println(" ");
+
+	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
+	EEPROM.put(eeResetSettingAddress, 0);
+	EEPROM.commit();
 
 } // Close function.
 
@@ -3787,10 +4048,6 @@ void resetSystemDemoData() {
 	EEPROM.put(eeBestTimeDMonth, 1);
 	EEPROM.put(eeBestTimeDYear, 2021);
 
-	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
-	EEPROM.put(eeResetSettingAddress, 0);
-	EEPROM.commit();
-
 	EEPROM.get(eeMenuAddress, eeMenuSetting);									// Load data from EEPROM.
 	EEPROM.get(eeCircAddress, eeCircSetting);
 	EEPROM.get(eeMenuAddress, screenMenu);
@@ -3862,6 +4119,10 @@ void resetSystemDemoData() {
 	Serial.print("Position: ");
 	Serial.println(graphTAP);
 	Serial.println(" ");
+
+	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
+	EEPROM.put(eeResetSettingAddress, 0);
+	EEPROM.commit();
 
 } // Close function.
 
