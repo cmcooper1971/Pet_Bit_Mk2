@@ -733,7 +733,7 @@ String getJSONReadings() {
 
 /*-----------------------------------------------------------------*/
 
-// Clear daily totals on date change.
+// Clear daily totals on date change and update any new daily activity records.
 
 void blankDailyData() {
 
@@ -4130,7 +4130,7 @@ void resetSystemDemoData() {
 
 void resetRecordsData() {
 
-	eeMenuSetting = 3;														// Default menu setting.
+	eeMenuSetting = 2;														// Default menu setting.
 	EEPROM.put(eeMenuAddress, eeMenuSetting);
 	EEPROM.commit();
 
