@@ -277,8 +277,8 @@ boolean eeWiFiYNChange;						// Change flag.
 // Misc array and character spaces are to over write previous screen draw
 
 char* menuArray[7] = { "","Current Session","Odemeter       ","Daily Times    ","Daily Distance ","Configuration  " };	// Default menu options.
-char* resetArray[3] = { "None      ", "Full Reset", "Demo Data " };														// Reset options.
-char* dayArray[7] = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };						// Days of the week.
+char* resetArray[4] = { "None         ", "Full Reset   ", "Demo Data    ", "Records Reset"};							// Reset options.
+char* dayArray[7] = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };							// Days of the week.
 char* dayShortArray[7] = { "Su","Mo","Tu","We","Th","Fr","Sa" };														// Short days of the week.
 char* ynArray[2] = { "No", "Yes" };																						// Yes / No options.
 
@@ -782,6 +782,13 @@ void setup() {
 		Serial.println();
 	}
 
+	else if (eeResetSetting == 3) {
+
+		resetRecordsData();
+		Serial.println("Data loaded to reset records");
+		Serial.println();
+	}
+
 	else {
 		Serial.println("No data loaded from reset function");
 		Serial.println();
@@ -918,6 +925,10 @@ void setup() {
 	distanceTravelledArray5 = distanceTravelledArray[4];
 	distanceTravelledArray6 = distanceTravelledArray[5];
 	distanceTravelledArray7 = distanceTravelledArray[6];
+
+	// Reset best ever records.
+
+
 
 	// Print best ever records data from EEPROM.
 
@@ -3166,7 +3177,7 @@ void resetMenuSettingPlus() {
 
 	// Incremental function to reset setting.
 
-	if (eeResetSetting == 2) {
+	if (eeResetSetting == 3) {
 
 		eeResetSetting = 0;
 		eeResetSettingChange = true;
@@ -3195,7 +3206,7 @@ void resetMenuSettingMinus() {
 
 	if (eeResetSetting == 0) {
 
-		eeResetSetting = 2;
+		eeResetSetting = 3;
 		eeResetSettingChange = true;
 	}
 
@@ -3497,13 +3508,13 @@ void resetSystemData() {
 	EEPROM.put(eeBestTimeSMonth, 1);
 	EEPROM.put(eeBestTimeSYear, 2021);
 
-	EEPROM.put(eeBestTimeS, 0);													// EEPRPOM address for best ever time per day recording.
-	EEPROM.put(eeBestTimeSMinute, 0);
-	EEPROM.put(eeBestTimeSHour, 0);
-	EEPROM.put(eeBestTimeSDoW, 5);
-	EEPROM.put(eeBestTimeSDay, 1);
-	EEPROM.put(eeBestTimeSMonth, 1);
-	EEPROM.put(eeBestTimeSYear, 2021);
+	EEPROM.put(eeBestTimeD, 0);													// EEPRPOM address for best ever time per day recording.
+	EEPROM.put(eeBestTimeDMinute, 0);
+	EEPROM.put(eeBestTimeDHour, 0);
+	EEPROM.put(eeBestTimeDDoW, 5);
+	EEPROM.put(eeBestTimeDDay, 1);
+	EEPROM.put(eeBestTimeDMonth, 1);
+	EEPROM.put(eeBestTimeDYear, 2021);
 
 	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
 	EEPROM.put(eeResetSettingAddress, 0);
@@ -3678,13 +3689,13 @@ void resetSystemDemoData() {
 	EEPROM.put(eeBestTimeSMonth, 1);
 	EEPROM.put(eeBestTimeSYear, 2021);
 
-	EEPROM.put(eeBestTimeS, 600000);											// EEPRPOM address for best ever time per day recording.
-	EEPROM.put(eeBestTimeSMinute, 0);
-	EEPROM.put(eeBestTimeSHour, 0);
-	EEPROM.put(eeBestTimeSDoW, 5);
-	EEPROM.put(eeBestTimeSDay, 1);
-	EEPROM.put(eeBestTimeSMonth, 1);
-	EEPROM.put(eeBestTimeSYear, 2021);
+	EEPROM.put(eeBestTimeD, 600000);											// EEPRPOM address for best ever time per day recording.
+	EEPROM.put(eeBestTimeDMinute, 0);
+	EEPROM.put(eeBestTimeDHour, 0);
+	EEPROM.put(eeBestTimeDDoW, 5);
+	EEPROM.put(eeBestTimeDDay, 1);
+	EEPROM.put(eeBestTimeDMonth, 1);
+	EEPROM.put(eeBestTimeDYear, 2021);
 
 	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
 	EEPROM.put(eeResetSettingAddress, 0);
@@ -3765,3 +3776,58 @@ void resetSystemDemoData() {
 } // Close function.
 
 /*-----------------------------------------------------------------*/
+
+void resetRecordsData() {
+
+	eeMenuSetting = 3;															// Default menu setting.
+	EEPROM.put(eeMenuAddress, eeMenuSetting);
+	EEPROM.commit();
+
+	EEPROM.put(eeBestMaxSpeed, 0);												// EEPRPOM address for best ever max speed recording.
+	EEPROM.put(eeBestMaxSpeedMinute, 0);
+	EEPROM.put(eeBestMaxSpeedHour, 0);
+	EEPROM.put(eeBestMaxSpeedDoW, 5);
+	EEPROM.put(eeBestMaxSpeedDay, 1);
+	EEPROM.put(eeBestMaxSpeedMonth, 1);
+	EEPROM.put(eeBestMaxSpeedYear, 2021);
+
+	EEPROM.put(eeBestDistanceS, 0);											// EEPRPOM address for best ever distance per session recording.
+	EEPROM.put(eeBestDistanceSMinute, 0);
+	EEPROM.put(eeBestDistanceSHour, 0);
+	EEPROM.put(eeBestDistanceSDoW, 5);
+	EEPROM.put(eeBestDistanceSDay, 1);
+	EEPROM.put(eeBestDistanceSMonth, 1);
+	EEPROM.put(eeBestDistanceSYear, 2021);
+
+	EEPROM.put(eeBestDistanceD, 0);											// EEPRPOM address for best ever distance per day recording.
+	EEPROM.put(eeBestDistanceDMinute, 0);
+	EEPROM.put(eeBestDistanceDHour, 0);
+	EEPROM.put(eeBestDistanceDDoW, 5);
+	EEPROM.put(eeBestDistanceDDay, 1);
+	EEPROM.put(eeBestDistanceDMonth, 1);
+	EEPROM.put(eeBestDistanceDYear, 2021);
+
+	EEPROM.put(eeBestTimeS, 0);												// EEPRPOM address for best ever time per session recording.
+	EEPROM.put(eeBestTimeSMinute, 0);
+	EEPROM.put(eeBestTimeSHour, 0);
+	EEPROM.put(eeBestTimeSDoW, 5);
+	EEPROM.put(eeBestTimeSDay, 1);
+	EEPROM.put(eeBestTimeSMonth, 1);
+	EEPROM.put(eeBestTimeSYear, 2021);
+
+	EEPROM.put(eeBestTimeD, 0);												// EEPRPOM address for best ever time per day recording.
+	EEPROM.put(eeBestTimeDMinute, 0);
+	EEPROM.put(eeBestTimeDHour, 0);
+	EEPROM.put(eeBestTimeDDoW, 5);
+	EEPROM.put(eeBestTimeDDay, 1);
+	EEPROM.put(eeBestTimeDMonth, 1);
+	EEPROM.put(eeBestTimeDYear, 2021);
+
+	eeResetSetting = 0;															// Reset EEPROM reset back to zero.
+	EEPROM.put(eeResetSettingAddress, 0);
+	EEPROM.commit();
+
+} // Close function.
+
+/*-----------------------------------------------------------------*/
+
