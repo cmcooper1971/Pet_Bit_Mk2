@@ -681,7 +681,7 @@ void printLocalTime() {
 
 	if (rtc.getHour(true) == 23 && rtc.getMinute() == 59) {
 
-		detachInterrupt(sensorInt);									// Detach interrupt.
+		detachInterrupt(sensorInt);									// detach interrupt.
 	}
 
 	if (rtc.getHour(true) == 0 && rtc.getMinute() == 0) {
@@ -766,7 +766,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Distance Record = ");
 		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.print("Data from Session Array 6 (Saturday) = ");
 		Serial.println(tempDistance2);
 		Serial.println("");
 
@@ -824,7 +824,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Time Record = ");
 		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.print("Data from Time Array 6 (Saturday) = ");
 		Serial.println(tempTime2);
 		Serial.println("");
 
@@ -895,7 +895,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Distance Record = ");
 		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.print("Data from Session Array 0 (Sunday) = ");
 		Serial.println(tempDistance2);
 		Serial.println("");
 
@@ -953,7 +953,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Time Record = ");
 		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.print("Data from Time Array 0 (Sunday) = ");
 		Serial.println(tempTime2);
 		Serial.println("");
 
@@ -1024,7 +1024,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Distance Record = ");
 		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.print("Data from Session Array 1 (Monday) = ");
 		Serial.println(tempDistance2);
 		Serial.println("");
 
@@ -1082,7 +1082,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Time Record = ");
 		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.print("Data from Time Array 1 (Monday) = ");
 		Serial.println(tempTime2);
 		Serial.println("");
 
@@ -1282,7 +1282,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Distance Record = ");
 		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.print("Data from Session Array 3 (Wednesday) = ");
 		Serial.println(tempDistance2);
 		Serial.println("");
 
@@ -1340,7 +1340,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Time Record = ");
 		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.print("Data from Time Array 3 (Wednesday) = ");
 		Serial.println(tempTime2);
 		Serial.println("");
 
@@ -1411,8 +1411,9 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Distance Record = ");
 		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.print("Data from Session Array 4 (Thursday) = ");
 		Serial.println(tempDistance2);
+		Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -1468,7 +1469,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Time Record = ");
 		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.print("Data from Time Array 4 (Thursday) = ");
 		Serial.println(tempTime2);
 		Serial.println("");
 
@@ -1539,7 +1540,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Distance Record = ");
 		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.print("Data from Session Array 5 (Friday) = ");
 		Serial.println(tempDistance2);
 		Serial.println("");
 
@@ -1597,7 +1598,7 @@ void blankDailyData() {
 
 		Serial.print("Data from Best Time Record = ");
 		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.print("Data from Time Array 5 (Friday) = ");
 		Serial.println(tempTime2);
 		Serial.println("");
 
