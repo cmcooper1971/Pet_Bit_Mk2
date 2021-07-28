@@ -775,7 +775,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceD, tempDistance2);
 			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
@@ -833,7 +833,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeD, tempTime2);
 			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeDDay, rtc.getDay());
-			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeDYear, rtc.getYear());
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
@@ -904,7 +904,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceD, tempDistance2);
 			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
@@ -962,7 +962,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeD, tempTime2);
 			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeDDay, rtc.getDay());
-			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeDYear, rtc.getYear());
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
@@ -1033,7 +1033,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceD, tempDistance2);
 			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
@@ -1091,7 +1091,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeD, tempTime2);
 			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeDDay, rtc.getDay());
-			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeDYear, rtc.getYear());
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
@@ -1162,7 +1162,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceD, tempDistance2);
 			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
@@ -1220,7 +1220,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeD, tempTime2);
 			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeDDay, rtc.getDay());
-			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeDYear, rtc.getYear());
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
@@ -1291,7 +1291,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceD, tempDistance2);
 			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
@@ -1349,7 +1349,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeD, tempTime2);
 			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeDDay, rtc.getDay());
-			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeDYear, rtc.getYear());
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
@@ -1420,7 +1420,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceD, tempDistance2);
 			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
@@ -1478,7 +1478,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeD, tempTime2);
 			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeDDay, rtc.getDay());
-			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeDYear, rtc.getYear());
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
@@ -1549,7 +1549,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceD, tempDistance2);
 			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
@@ -1607,7 +1607,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeD, tempTime2);
 			EEPROM.put(eeBestTimeDDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeDDay, rtc.getDay());
-			EEPROM.put(eeBestTimeDMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeDMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeDYear, rtc.getYear());
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
@@ -3395,7 +3395,7 @@ void newMaxSpeedRecord() {
 			EEPROM.put(eeBestMaxSpeed, maxKphSpeed);
 			EEPROM.put(eeBestMaxSpeedDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestMaxSpeedDay, rtc.getDay());
-			EEPROM.put(eeBestMaxSpeedMonth, rtc.getMonth());
+			EEPROM.put(eeBestMaxSpeedMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestMaxSpeedYear, rtc.getYear());
 			EEPROM.put(eeBestMaxSpeedHour, rtc.getHour(true));
 			EEPROM.put(eeBestMaxSpeedMinute, rtc.getMinute());
@@ -3462,7 +3462,7 @@ void updateBestEverRecords() {
 			EEPROM.put(eeBestDistanceS, tempSession);
 			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
 			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
 			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
@@ -3517,7 +3517,7 @@ void updateBestEverRecords() {
 			EEPROM.put(eeBestTimeS, sessionTimeMillis);
 			EEPROM.put(eeBestTimeSDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeSDay, rtc.getDay());
-			EEPROM.put(eeBestTimeSMonth, rtc.getMonth());
+			EEPROM.put(eeBestTimeSMonth, rtc.getMonth() + 1);			// Plus one as rtc.getMonth is ints 0 to 11.
 			EEPROM.put(eeBestTimeSYear, rtc.getYear());
 			EEPROM.put(eeBestTimeSHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeSMinute, rtc.getMinute());
