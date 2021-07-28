@@ -721,23 +721,80 @@ void tone(byte pin, int freq) {
 String getJSONReadings() {
 
 	float tempMaxSpeed;
+	char tempMaxSpeedDate [40];
+	int tempDoW;
+	int tempDay;
+	int tempMonth;
+	int tempYear;
+	int tempHour;
+	int tempMinute;
+
 	EEPROM.get(eeBestMaxSpeed, tempMaxSpeed);
+	EEPROM.get(eeBestMaxSpeedDay, tempDay);
+	EEPROM.get(eeBestMaxSpeedMonth, tempMonth);
+	EEPROM.get(eeBestMaxSpeedYear, tempYear);
+	EEPROM.get(eeBestMaxSpeedHour, tempHour);
+	EEPROM.get(eeBestMaxSpeedMinute, tempMinute);
+	EEPROM.commit();
+
+	sprintf(tempMaxSpeedDate, "%u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
 
 	int tempSessionDistanceRecord;
+	char tempDistanceSDate[40];
+
 	EEPROM.get(eeBestDistanceS, tempSessionDistanceRecord);
+	EEPROM.get(eeBestDistanceSDay, tempDay);
+	EEPROM.get(eeBestDistanceSMonth, tempMonth);
+	EEPROM.get(eeBestDistanceSYear, tempYear);
+	EEPROM.get(eeBestDistanceSHour, tempHour);
+	EEPROM.get(eeBestDistanceSMinute, tempMinute);
+	EEPROM.commit();
+
+	sprintf(tempDistanceSDate, "%u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
 
 	int tempSessionTimeRecord;
 	long tempSessionTimeRecord1;
+	char tempTimeSDate[40];
+
 	EEPROM.get(eeBestTimeS, tempSessionTimeRecord1);
+	EEPROM.get(eeBestTimeSDay, tempDay);
+	EEPROM.get(eeBestTimeSMonth, tempMonth);
+	EEPROM.get(eeBestTimeSYear, tempYear);
+	EEPROM.get(eeBestTimeSHour, tempHour);
+	EEPROM.get(eeBestTimeSMinute, tempMinute);
+	EEPROM.commit();
+
 	tempSessionTimeRecord = tempSessionTimeRecord1 / 1000 / 60;
+	sprintf(tempTimeSDate, "%u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
 
 	int tempDailyDistanceRecord;
+	char tempDistanceDDate[40];
+
 	EEPROM.get(eeBestDistanceD, tempDailyDistanceRecord);
+	EEPROM.get(eeBestDistanceDDay, tempDay);
+	EEPROM.get(eeBestDistanceDMonth, tempMonth);
+	EEPROM.get(eeBestDistanceDYear, tempYear);
+	EEPROM.get(eeBestDistanceDHour, tempHour);
+	EEPROM.get(eeBestDistanceDMinute, tempMinute);
+	EEPROM.commit();
+
+	sprintf(tempDistanceDDate, "%u/%02u/%02u", tempDay, tempMonth, tempYear);
 	
 	int tempDailyTimeRecord;
 	long tempDailyTimeRecord1;
+	char tempTimeDDate[40];
+
 	EEPROM.get(eeBestTimeD, tempDailyTimeRecord1);
+	EEPROM.get(eeBestTimeDDoW, tempDoW);
+	EEPROM.get(eeBestTimeDDay, tempDay);
+	EEPROM.get(eeBestTimeDMonth, tempMonth);
+	EEPROM.get(eeBestTimeDYear, tempYear);
+	EEPROM.get(eeBestTimeDHour, tempHour);
+	EEPROM.get(eeBestTimeDMinute, tempMinute);
+	EEPROM.commit();
+
 	tempDailyTimeRecord = tempDailyTimeRecord1 / 1000 / 60;
+	sprintf(tempTimeDDate, "%u/%02u/%02u", tempDay, tempMonth, tempYear);
 	
 	// Get daily time activity.
 
@@ -762,10 +819,15 @@ String getJSONReadings() {
 	// Get best ever records.
 
 	readings["tempMaxSpeed"] = String(tempMaxSpeed);
+	readings["tempMaxSpeedDate"] = String(tempMaxSpeedDate);
 	readings["tempSessionDistanceRecord"] = String(tempSessionDistanceRecord);
+	readings["tempDistanceSDate"] = String(tempDistanceSDate);
 	readings["tempSessionTimeRecord"] = String(tempSessionTimeRecord);
+	readings["tempTimeSDate"] = String(tempTimeSDate);
 	readings["tempDailyDistanceRecord"] = String(tempDailyDistanceRecord);
+	readings["tempDistanceDDate"] = String(tempDistanceDDate);
 	readings["tempDailyTimeRecord"] = String(tempDailyTimeRecord);
+	readings["tempTimeDDate"] = String(tempTimeDDate);
 
 	String jsonString = JSON.stringify(readings);
 	return jsonString;

@@ -45,11 +45,15 @@ function getReadings() {
             document.getElementById("distanceTravelledArray5").innerHTML = myObj.distanceTravelledArray5;
             document.getElementById("distanceTravelledArray6").innerHTML = myObj.distanceTravelledArray6;
             document.getElementById("tempMaxSpeed").innerHTML = myObj.tempMaxSpeed;
+            document.getElementById("tempMaxSpeedDate").innerHTML = myObj.tempMaxSpeedDate;
             document.getElementById("tempSessionDistanceRecord").innerHTML = myObj.tempSessionDistanceRecord;
+            document.getElementById("tempDistanceSDate").innerHTML = myObj.tempDistanceSDate;
             document.getElementById("tempSessionTimeRecord").innerHTML = myObj.tempSessionTimeRecord;
+            document.getElementById("tempTimeSDate").innerHTML = myObj.tempTimeSDate;
             document.getElementById("tempDailyDistanceRecord").innerHTML = myObj.tempDailyDistanceRecord;
+            document.getElementById("tempDistanceDDate").innerHTML = myObj.tempDistanceDDate;
             document.getElementById("tempDailyTimeRecord").innerHTML = myObj.tempDailyTimeRecord;
-
+            document.getElementById("tempTimeDDate").innerHTML = myObj.tempTimeDDate;
             updateDateTime();
         }
     };
@@ -92,10 +96,15 @@ if (!!window.EventSource) {
         document.getElementById("distanceTravelledArray5").innerHTML = Obj.distanceTravelledArray5;
         document.getElementById("distanceTravelledArray6").innerHTML = Obj.distanceTravelledArray6;
         document.getElementById("tempMaxSpeed").innerHTML = Obj.tempMaxSpeed;
+        document.getElementById("tempMaxSpeedDate").innerHTML = Obj.tempMaxSpeedDate;
         document.getElementById("tempSessionDistanceRecord").innerHTML = Obj.tempSessionDistanceRecord;
+        document.getElementById("tempDistanceSDate").innerHTML = Obj.tempDistanceSDate;
         document.getElementById("tempSessionTimeRecord").innerHTML = Obj.tempSessionTimeRecord;
+        document.getElementById("tempTimeSDate").innerHTML = Obj.tempTimeSDate;
         document.getElementById("tempDailyDistanceRecord").innerHTML = Obj.tempDailyDistanceRecord;
+        document.getElementById("tempDistanceDDate").innerHTML = Obj.tempDistanceDDate;
         document.getElementById("tempDailyTimeRecord").innerHTML = Obj.tempDailyTimeRecord;
+        document.getElementById("tempTimeDDate").innerHTML = Obj.tempTimeDDate;
         updateDateTime();
     }, false);
 
