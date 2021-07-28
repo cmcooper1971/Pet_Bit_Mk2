@@ -679,17 +679,17 @@ void printLocalTime() {
 
 	// Check current time to pause interrupt and update daily best records.
 
-	if (rtc.getHour() == 11 && rtc.getMinute() == 59) {
+	if (rtc.getHour(true) == 23 && rtc.getMinute() == 59) {
 
 		detachInterrupt(sensorInt);									// Detach interrupt.
 	}
 
-	if (rtc.getHour() == 0 && rtc.getMinute() == 0) {
+	if (rtc.getHour(true) == 0 && rtc.getMinute() == 0) {
 
 		blankDailyData();
 	}
 
-	if (rtc.getHour() == 0 && rtc.getMinute() == 1) {
+	if (rtc.getHour(true) == 0 && rtc.getMinute() == 1) {
 
 		attachInterrupt(digitalPinToInterrupt(sensorInt), rotationInterruptISR, FALLING);	// Attach interrupt.
 	}
@@ -757,25 +757,31 @@ void blankDailyData() {
 
 	if (sessionArrayPosition == 0) {
 
-		float tempDistance1;
-		float tempDistance2;
+		int tempDistance1;
+		int tempDistance2;
 
 		EEPROM.get(eeBestDistanceD, tempDistance1);
 		EEPROM.get(eeSessionDistanceArray6Address, tempDistance2);
 		EEPROM.commit();
 
+		Serial.print("Data from Best Distance Record = ");
+		Serial.println(tempDistance1);
+		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.println(tempDistance2);
+		Serial.println("");
+
 		if (tempDistance1 < tempDistance2) {
 
 			EEPROM.put(eeBestDistanceD, tempDistance2);
-			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
-			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
-			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
-			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
-			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -815,6 +821,12 @@ void blankDailyData() {
 		EEPROM.get(eeBestTimeD, tempTime1);
 		EEPROM.get(eeSessionTimeArray6Address, tempTime2);
 		EEPROM.commit();
+
+		Serial.print("Data from Best Time Record = ");
+		Serial.println(tempTime1);
+		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.println(tempTime2);
+		Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -874,25 +886,31 @@ void blankDailyData() {
 
 	else if (sessionArrayPosition == 1) {
 
-		float tempDistance1;
-		float tempDistance2;
+		int tempDistance1;
+		int tempDistance2;
 
 		EEPROM.get(eeBestDistanceD, tempDistance1);
 		EEPROM.get(eeSessionDistanceArray0Address, tempDistance2);
 		EEPROM.commit();
 
+		Serial.print("Data from Best Distance Record = ");
+		Serial.println(tempDistance1);
+		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.println(tempDistance2);
+		Serial.println("");
+
 		if (tempDistance1 < tempDistance2) {
 
 			EEPROM.put(eeBestDistanceD, tempDistance2);
-			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
-			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
-			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
-			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
-			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -932,6 +950,12 @@ void blankDailyData() {
 		EEPROM.get(eeBestTimeD, tempTime1);
 		EEPROM.get(eeSessionTimeArray0Address, tempTime2);
 		EEPROM.commit();
+
+		Serial.print("Data from Best Time Record = ");
+		Serial.println(tempTime1);
+		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.println(tempTime2);
+		Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -991,25 +1015,31 @@ void blankDailyData() {
 
 	else if (sessionArrayPosition == 2) {
 
-		float tempDistance1;
-		float tempDistance2;
+		int tempDistance1;
+		int tempDistance2;
 
 		EEPROM.get(eeBestDistanceD, tempDistance1);
 		EEPROM.get(eeSessionDistanceArray1Address, tempDistance2);
 		EEPROM.commit();
 
+		Serial.print("Data from Best Distance Record = ");
+		Serial.println(tempDistance1);
+		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.println(tempDistance2);
+		Serial.println("");
+
 		if (tempDistance1 < tempDistance2) {
 
 			EEPROM.put(eeBestDistanceD, tempDistance2);
-			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
-			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
-			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
-			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
-			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1049,6 +1079,12 @@ void blankDailyData() {
 		EEPROM.get(eeBestTimeD, tempTime1);
 		EEPROM.get(eeSessionTimeArray1Address, tempTime2);
 		EEPROM.commit();
+
+		Serial.print("Data from Best Time Record = ");
+		Serial.println(tempTime1);
+		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.println(tempTime2);
+		Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1108,25 +1144,31 @@ void blankDailyData() {
 
 	else if (sessionArrayPosition == 3) {
 
-		float tempDistance1;
-		float tempDistance2;
+		int tempDistance1;
+		int tempDistance2;
 
 		EEPROM.get(eeBestDistanceD, tempDistance1);
 		EEPROM.get(eeSessionDistanceArray2Address, tempDistance2);
 		EEPROM.commit();
 
+		Serial.print("Data from Best Distance Record = ");
+		Serial.println(tempDistance1);
+		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.println(tempDistance2);
+		Serial.println("");
+
 		if (tempDistance1 < tempDistance2) {
 
 			EEPROM.put(eeBestDistanceD, tempDistance2);
-			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
-			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
-			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
-			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
-			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1166,6 +1208,12 @@ void blankDailyData() {
 		EEPROM.get(eeBestTimeD, tempTime1);
 		EEPROM.get(eeSessionTimeArray2Address, tempTime2);
 		EEPROM.commit();
+
+		Serial.print("Data from Best Time Record = ");
+		Serial.println(tempTime1);
+		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.println(tempTime2);
+		Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1225,25 +1273,31 @@ void blankDailyData() {
 
 	else if (sessionArrayPosition == 4) {
 
-		float tempDistance1;
-		float tempDistance2;
+		int  tempDistance1;
+		int  tempDistance2;
 
 		EEPROM.get(eeBestDistanceD, tempDistance1);
 		EEPROM.get(eeSessionDistanceArray3Address, tempDistance2);
 		EEPROM.commit();
 
+		Serial.print("Data from Best Distance Record = ");
+		Serial.println(tempDistance1);
+		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.println(tempDistance2);
+		Serial.println("");
+
 		if (tempDistance1 < tempDistance2) {
 
 			EEPROM.put(eeBestDistanceD, tempDistance2);
-			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
-			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
-			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
-			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
-			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1283,6 +1337,12 @@ void blankDailyData() {
 		EEPROM.get(eeBestTimeD, tempTime1);
 		EEPROM.get(eeSessionTimeArray3Address, tempTime2);
 		EEPROM.commit();
+
+		Serial.print("Data from Best Time Record = ");
+		Serial.println(tempTime1);
+		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.println(tempTime2);
+		Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1342,25 +1402,30 @@ void blankDailyData() {
 
 	else if (sessionArrayPosition == 5) {
 
-		float tempDistance1;
-		float tempDistance2;
+		int tempDistance1;
+		int tempDistance2;
 
 		EEPROM.get(eeBestDistanceD, tempDistance1);
 		EEPROM.get(eeSessionDistanceArray4Address, tempDistance2);
 		EEPROM.commit();
 
+		Serial.print("Data from Best Distance Record = ");
+		Serial.println(tempDistance1);
+		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.println(tempDistance2);
+
 		if (tempDistance1 < tempDistance2) {
 
 			EEPROM.put(eeBestDistanceD, tempDistance2);
-			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
-			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
-			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
-			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
-			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1400,6 +1465,12 @@ void blankDailyData() {
 		EEPROM.get(eeBestTimeD, tempTime1);
 		EEPROM.get(eeSessionTimeArray4Address, tempTime2);
 		EEPROM.commit();
+
+		Serial.print("Data from Best Time Record = ");
+		Serial.println(tempTime1);
+		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.println(tempTime2);
+		Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1459,25 +1530,31 @@ void blankDailyData() {
 
 	else if (sessionArrayPosition == 6) {
 
-		float tempDistance1;
-		float tempDistance2;
+		int tempDistance1;
+		int tempDistance2;
 
 		EEPROM.get(eeBestDistanceD, tempDistance1);
 		EEPROM.get(eeSessionDistanceArray5Address, tempDistance2);
 		EEPROM.commit();
 
+		Serial.print("Data from Best Distance Record = ");
+		Serial.println(tempDistance1);
+		Serial.print("Data from Session Array 2 (Tuesday) = ");
+		Serial.println(tempDistance2);
+		Serial.println("");
+
 		if (tempDistance1 < tempDistance2) {
 
 			EEPROM.put(eeBestDistanceD, tempDistance2);
-			EEPROM.put(eeBestDistanceSDoW, rtc.getDayofWeek());
-			EEPROM.put(eeBestDistanceSDay, rtc.getDay());
-			EEPROM.put(eeBestDistanceSMonth, rtc.getMonth());
-			EEPROM.put(eeBestDistanceSYear, rtc.getYear());
-			EEPROM.put(eeBestDistanceSHour, rtc.getHour(true));
-			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
+			EEPROM.put(eeBestDistanceDDoW, rtc.getDayofWeek());
+			EEPROM.put(eeBestDistanceDDay, rtc.getDay());
+			EEPROM.put(eeBestDistanceDMonth, rtc.getMonth());
+			EEPROM.put(eeBestDistanceDYear, rtc.getYear());
+			EEPROM.put(eeBestDistanceDHour, rtc.getHour(true));
+			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1517,6 +1594,12 @@ void blankDailyData() {
 		EEPROM.get(eeBestTimeD, tempTime1);
 		EEPROM.get(eeSessionTimeArray5Address, tempTime2);
 		EEPROM.commit();
+
+		Serial.print("Data from Best Time Record = ");
+		Serial.println(tempTime1);
+		Serial.print("Data from Time Array 2 (Tuesday) = ");
+		Serial.println(tempTime2);
+		Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1864,7 +1947,7 @@ void setup() {
 	Serial.println(tempMinute);
 	Serial.println(" ");
 
-	float tempDistanceD;
+	int tempDistanceD;
 
 	EEPROM.get(eeBestDistanceD, tempDistanceD);
 	EEPROM.get(eeBestDistanceDDoW, tempDoW);
@@ -3007,9 +3090,9 @@ void mainData() {
 			newBestSessionDistanceF = true;
 		}
 
-		if (sessionTime > maxSessionTime) {
+		if (sessionTimeMillis > maxSessionTime) {
 
-			maxSessionTime = sessionTime;
+			maxSessionTime = sessionTimeMillis;
 			newBestSessionTimeF = true;
 		}
 
@@ -3058,7 +3141,7 @@ void mainData() {
 
 		// Update array position for the day of the week.
 
-		//sessionArrayPosition = rtc.getDayofWeek();													// Get day of the week from RTC.
+		sessionArrayPosition = rtc.getDayofWeek();													// Get day of the week from RTC.
 
 		Serial.print("Session Array Position: ");
 		Serial.print(sessionArrayPosition);
@@ -3428,9 +3511,9 @@ void updateBestEverRecords() {
 		EEPROM.get(eeBestTimeS, tempTimeSessionRecord);
 		EEPROM.commit();
 
-		if (tempTimeSessionRecord < sessionTime) {
+		if (tempTimeSessionRecord < sessionTimeMillis) {
 
-			EEPROM.put(eeBestTimeS, sessionTime);
+			EEPROM.put(eeBestTimeS, sessionTimeMillis);
 			EEPROM.put(eeBestTimeSDoW, rtc.getDayofWeek());
 			EEPROM.put(eeBestTimeSDay, rtc.getDay());
 			EEPROM.put(eeBestTimeSMonth, rtc.getMonth());
@@ -4627,45 +4710,45 @@ void resetSystemDemoData() {
 	EEPROM.put(eeSessionDistanceArray6Address, 1200);
 	EEPROM.commit();
 
-	EEPROM.put(eeBestMaxSpeed, 20);												// EEPRPOM address for best ever max speed recording.
+	EEPROM.put(eeBestMaxSpeed, 0);												// EEPRPOM address for best ever max speed recording.
 	EEPROM.put(eeBestMaxSpeedMinute, 0);
 	EEPROM.put(eeBestMaxSpeedHour, 0);
-	EEPROM.put(eeBestMaxSpeedDoW, 5);
-	EEPROM.put(eeBestMaxSpeedDay, 1);
-	EEPROM.put(eeBestMaxSpeedMonth, 1);
-	EEPROM.put(eeBestMaxSpeedYear, 2021);
+	EEPROM.put(eeBestMaxSpeedDoW, 0);
+	EEPROM.put(eeBestMaxSpeedDay, 0);
+	EEPROM.put(eeBestMaxSpeedMonth, 0);
+	EEPROM.put(eeBestMaxSpeedYear, 0);
 
-	EEPROM.put(eeBestDistanceS, 100);											// EEPRPOM address for best ever distance per session recording.
+	EEPROM.put(eeBestDistanceS, 0);											// EEPRPOM address for best ever distance per session recording.
 	EEPROM.put(eeBestDistanceSMinute, 0);
 	EEPROM.put(eeBestDistanceSHour, 0);
-	EEPROM.put(eeBestDistanceSDoW, 5);
-	EEPROM.put(eeBestDistanceSDay, 1);
-	EEPROM.put(eeBestDistanceSMonth, 1);
-	EEPROM.put(eeBestDistanceSYear, 2021);
+	EEPROM.put(eeBestDistanceSDoW, 0);
+	EEPROM.put(eeBestDistanceSDay, 0);
+	EEPROM.put(eeBestDistanceSMonth, 0);
+	EEPROM.put(eeBestDistanceSYear, 0);
 
-	EEPROM.put(eeBestDistanceD, 1500);											// EEPRPOM address for best ever distance per day recording.
+	EEPROM.put(eeBestDistanceD, 0);											// EEPRPOM address for best ever distance per day recording.
 	EEPROM.put(eeBestDistanceDMinute, 0);
 	EEPROM.put(eeBestDistanceDHour, 0);
-	EEPROM.put(eeBestDistanceDDoW, 5);
-	EEPROM.put(eeBestDistanceDDay, 1);
-	EEPROM.put(eeBestDistanceDMonth, 1);
-	EEPROM.put(eeBestDistanceDYear, 2021);
+	EEPROM.put(eeBestDistanceDDoW, 0);
+	EEPROM.put(eeBestDistanceDDay, 0);
+	EEPROM.put(eeBestDistanceDMonth, 0);
+	EEPROM.put(eeBestDistanceDYear, 0);
 
-	EEPROM.put(eeBestTimeS, 60000);												// EEPRPOM address for best ever time per session recording.
+	EEPROM.put(eeBestTimeS, 0);												// EEPRPOM address for best ever time per session recording.
 	EEPROM.put(eeBestTimeSMinute, 0);
 	EEPROM.put(eeBestTimeSHour, 0);
-	EEPROM.put(eeBestTimeSDoW, 5);
-	EEPROM.put(eeBestTimeSDay, 1);
-	EEPROM.put(eeBestTimeSMonth, 1);
-	EEPROM.put(eeBestTimeSYear, 2021);
+	EEPROM.put(eeBestTimeSDoW, 0);
+	EEPROM.put(eeBestTimeSDay, 0);
+	EEPROM.put(eeBestTimeSMonth, 0);
+	EEPROM.put(eeBestTimeSYear, 0);
 
-	EEPROM.put(eeBestTimeD, 600000);											// EEPRPOM address for best ever time per day recording.
+	EEPROM.put(eeBestTimeD, 0);											// EEPRPOM address for best ever time per day recording.
 	EEPROM.put(eeBestTimeDMinute, 0);
 	EEPROM.put(eeBestTimeDHour, 0);
-	EEPROM.put(eeBestTimeDDoW, 5);
-	EEPROM.put(eeBestTimeDDay, 1);
-	EEPROM.put(eeBestTimeDMonth, 1);
-	EEPROM.put(eeBestTimeDYear, 2021);
+	EEPROM.put(eeBestTimeDDoW, 0);
+	EEPROM.put(eeBestTimeDDay, 0);
+	EEPROM.put(eeBestTimeDMonth, 0);
+	EEPROM.put(eeBestTimeDYear, 0);
 
 	EEPROM.get(eeMenuAddress, eeMenuSetting);									// Load data from EEPROM.
 	EEPROM.get(eeCircAddress, eeCircSetting);

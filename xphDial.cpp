@@ -16,7 +16,7 @@ void XphDialScreen(TFT_eSPI& tft, int cx, int cy, int r, int loval, double hival
 	tft.setTextSize(1);
 	tft.setTextColor(WHITE);
 	tft.setCursor(13, 26);
-	tft.println("Odemeter");
+	tft.println("Odometer");
 	tft.setFreeFont();
 
 
