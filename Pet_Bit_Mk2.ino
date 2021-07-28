@@ -279,6 +279,8 @@ char* dayArray[7] = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday
 char* dayShortArray[7] = { "Su","Mo","Tu","We","Th","Fr","Sa" };														// Short days of the week.
 char* ynArray[2] = { "No", "Yes" };																						// Yes / No options.
 
+String string1, string2, string3, string4, string5, string6, string7;
+
 uint16_t calData[5];						// Touch screen calibration data.
 boolean calTouchScreen = false;				// Change flag to trigger calibration function.
 
@@ -718,6 +720,25 @@ void tone(byte pin, int freq) {
 
 String getJSONReadings() {
 
+	float tempMaxSpeed;
+	EEPROM.get(eeBestMaxSpeed, tempMaxSpeed);
+
+	int tempSessionDistanceRecord;
+	EEPROM.get(eeBestDistanceS, tempSessionDistanceRecord);
+
+	int tempSessionTimeRecord;
+	long tempSessionTimeRecord1;
+	EEPROM.get(eeBestTimeS, tempSessionTimeRecord1);
+	tempSessionTimeRecord = tempSessionTimeRecord1 / 1000 / 60;
+
+	int tempDailyDistanceRecord;
+	EEPROM.get(eeBestDistanceD, tempDailyDistanceRecord);
+	
+	int tempDailyTimeRecord;
+	long tempDailyTimeRecord1;
+	EEPROM.get(eeBestTimeD, tempDailyTimeRecord1);
+	tempDailyTimeRecord = tempDailyTimeRecord1 / 1000 / 60;
+	
 	// Get daily time activity.
 
 	readings["sessionTimeArray0"] = String(sessionTimeArray0);
@@ -737,6 +758,14 @@ String getJSONReadings() {
 	readings["distanceTravelledArray4"] = String(distanceTravelledArray4);
 	readings["distanceTravelledArray5"] = String(distanceTravelledArray5);
 	readings["distanceTravelledArray6"] = String(distanceTravelledArray6);
+
+	// Get best ever records.
+
+	readings["tempMaxSpeed"] = String(tempMaxSpeed);
+	readings["tempSessionDistanceRecord"] = String(tempSessionDistanceRecord);
+	readings["tempSessionTimeRecord"] = String(tempSessionTimeRecord);
+	readings["tempDailyDistanceRecord"] = String(tempDailyDistanceRecord);
+	readings["tempDailyTimeRecord"] = String(tempDailyTimeRecord);
 
 	String jsonString = JSON.stringify(readings);
 	return jsonString;
@@ -1894,7 +1923,7 @@ void setup() {
 	Serial.println(tempMinute);
 	Serial.println(" ");
 
-	float tempDistanceS;
+	int tempDistanceS;
 
 	EEPROM.get(eeBestDistanceS, tempDistanceS);
 	EEPROM.get(eeBestDistanceSDoW, tempDoW);
@@ -2078,19 +2107,19 @@ void setup() {
 
 	// Load values saved in SPIFFS.
 
-	//ssid = "BT-7FA3K5";									// Remove these lines before final build.
-	//pass = "iKD94Y3K4Qvkck";
-	//ip = "192.168.1.200";
-	//subnet = "255.255.255.0";
-	//gateway = "192.168.1.254";
-	//dns = "192.168.1.254";
+	ssid = "BT-7FA3K5";									// Remove these lines before final build.
+	pass = "iKD94Y3K4Qvkck";
+	ip = "192.168.1.200";
+	subnet = "255.255.255.0";
+	gateway = "192.168.1.254";
+	dns = "192.168.1.254";
 
-	//writeFile(SPIFFS, ssidPath, ssid.c_str());
-	//writeFile(SPIFFS, passPath, pass.c_str());
-	//writeFile(SPIFFS, ipPath, ip.c_str());
-	//writeFile(SPIFFS, subnetPath, subnet.c_str());
-	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	//writeFile(SPIFFS, dnsPath, dns.c_str());
+	writeFile(SPIFFS, ssidPath, ssid.c_str());
+	writeFile(SPIFFS, passPath, pass.c_str());
+	writeFile(SPIFFS, ipPath, ip.c_str());
+	writeFile(SPIFFS, subnetPath, subnet.c_str());
+	writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	writeFile(SPIFFS, dnsPath, dns.c_str());
 
 	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
@@ -3450,12 +3479,12 @@ void updateBestEverRecords() {
 
 	if (disWiFi == false && newBestSessionDistanceF == true) {
 
-		float tempDistanceSessionRecord;
+		int tempDistanceSessionRecord;
 
 		EEPROM.get(eeBestDistanceS, tempDistanceSessionRecord);
 		EEPROM.commit();
 
-		float tempSession = sessionDistance;								// SessionDistance variable must remain as a double for ESP32, hence conversion here.
+		int tempSession = sessionDistance;								// SessionDistance variable must remain as a double for ESP32, hence conversion here.
 
 		if (tempDistanceSessionRecord < tempSession) {
 
@@ -3468,7 +3497,7 @@ void updateBestEverRecords() {
 			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempDistance;
+			int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;

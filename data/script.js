@@ -44,6 +44,12 @@ function getReadings() {
             document.getElementById("distanceTravelledArray4").innerHTML = myObj.distanceTravelledArray4;
             document.getElementById("distanceTravelledArray5").innerHTML = myObj.distanceTravelledArray5;
             document.getElementById("distanceTravelledArray6").innerHTML = myObj.distanceTravelledArray6;
+            document.getElementById("tempMaxSpeed").innerHTML = myObj.tempMaxSpeed;
+            document.getElementById("tempSessionDistanceRecord").innerHTML = myObj.tempSessionDistanceRecord;
+            document.getElementById("tempSessionTimeRecord").innerHTML = myObj.tempSessionTimeRecord;
+            document.getElementById("tempDailyDistanceRecord").innerHTML = myObj.tempDailyDistanceRecord;
+            document.getElementById("tempDailyTimeRecord").innerHTML = myObj.tempDailyTimeRecord;
+
             updateDateTime();
         }
     };
@@ -85,6 +91,11 @@ if (!!window.EventSource) {
         document.getElementById("distanceTravelledArray4").innerHTML = Obj.distanceTravelledArray4;
         document.getElementById("distanceTravelledArray5").innerHTML = Obj.distanceTravelledArray5;
         document.getElementById("distanceTravelledArray6").innerHTML = Obj.distanceTravelledArray6;
+        document.getElementById("tempMaxSpeed").innerHTML = Obj.tempMaxSpeed;
+        document.getElementById("tempSessionDistanceRecord").innerHTML = Obj.tempSessionDistanceRecord;
+        document.getElementById("tempSessionTimeRecord").innerHTML = Obj.tempSessionTimeRecord;
+        document.getElementById("tempDailyDistanceRecord").innerHTML = Obj.tempDailyDistanceRecord;
+        document.getElementById("tempDailyTimeRecord").innerHTML = Obj.tempDailyTimeRecord;
         updateDateTime();
     }, false);
 
