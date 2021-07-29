@@ -32,7 +32,7 @@ void ptSessionTimeV1(TFT_eSPI& tft, double x, double y, double w, double h, doub
 		tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
 		tft.setTextColor(textcolor, backcolor);
 		tft.setTextSize(1);
-		tft.setCursor(x + 2, y + 7);
+		tft.setCursor(x + 1, y + 7);
 		tft.println(label);
 		
 		// step val basically scales the hival and low val to the height
@@ -64,7 +64,7 @@ void ptSessionTimeV1(TFT_eSPI& tft, double x, double y, double w, double h, doub
 	// write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
 
 	tft.fillRect(x, y - h, w, h - level, voidcolor);
-	tft.fillRect(x, y - level + 1, w, level, barcolor);
+	tft.fillRect(x, y - level, w, level, barcolor);
 	
 	// write the current value
 	/*
@@ -93,7 +93,7 @@ void ptSessionTimeV2(TFT_eSPI& tft, double x, double y, double w, double h, doub
 		tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
 		tft.setTextColor(textcolor, backcolor);
 		tft.setTextSize(1);
-		tft.setCursor(x + 2, y + 7);
+		tft.setCursor(x + 1, y + 7);
 		tft.println(label);
 		
 		// step val basically scales the hival and low val to the height
@@ -124,7 +124,7 @@ void ptSessionTimeV2(TFT_eSPI& tft, double x, double y, double w, double h, doub
 	// write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
 	
 	tft.fillRect(x, y - h, w, h - level, voidcolor);
-	tft.fillRect(x, y - level + 1, w, level, barcolor);
+	tft.fillRect(x, y - level, w, level, barcolor);
 	
 	// write the current value
 	/*
@@ -153,7 +153,7 @@ void ptSessionTimeV3(TFT_eSPI& tft, double x, double y, double w, double h, doub
 		tft.drawRect(x - 1, y - h - 1, w + 2, h + 2, bordercolor);
 		tft.setTextColor(textcolor, backcolor);
 		tft.setTextSize(1);
-		tft.setCursor(x + 2, y + 7);
+		tft.setCursor(x + 1, y + 7);
 		tft.println(label);
 		
 		// step val basically scales the hival and low val to the height
@@ -184,7 +184,7 @@ void ptSessionTimeV3(TFT_eSPI& tft, double x, double y, double w, double h, doub
 	// write a upper and lower bar to minimize flicker cause by blanking out bar and redraw on update
 	
 	tft.fillRect(x, y - h, w, h - level, voidcolor);
-	tft.fillRect(x, y - level + 1, w, level, barcolor);
+	tft.fillRect(x, y - level, w, level, barcolor);
 	
 	// write the current value
 	/*

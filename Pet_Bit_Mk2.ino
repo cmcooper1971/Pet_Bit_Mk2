@@ -2127,14 +2127,19 @@ void setup() {
 	// Start up screen image and title.
 
 	tft.fillScreen(ILI9341_WHITE);
-	startUpScreen(tft);
-
+	drawBitmap(tft, 48, 96, startScreen, 128, 128);
+	
+	tft.setFreeFont(&FreeSans12pt7b);
 	tft.setTextSize(1);
 	tft.setTextColor(BLACK);
-	tft.setCursor(120, 120);
+	tft.setCursor(130, 210);
 	tft.println("PetBit");
+	tft.setFreeFont();
+	tft.setTextSize(1);
+	tft.setCursor(150, 220);
+	tft.println("Mk-2");
 
-	delay(1500);
+	delay(5000);
 
 	// Clear screen.
 
@@ -3088,7 +3093,7 @@ void loop() {
 			ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceGraphCap, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Th", graph_11);
 		}
 
-		else ((ptSessionDistanceV2(tft, graphX4, 110, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Th", graph_11)));
+		else ((ptSessionDistanceV2(tft, graphX4, graphY, graphW, graphH, 0, graphDM, graphDMI, distanceTravelledArray4, 3, 0, RED, DKGREY, WHITE, WHITE, BLACK, "Th", graph_11)));
 
 		if (distanceTravelledArray5 <= (distanceGraphCap * 0.8)) {
 
