@@ -720,6 +720,8 @@ void tone(byte pin, int freq) {
 
 String getJSONReadings() {
 
+	// Retrieve best ever / high scores from EEPROM.
+
 	float tempMaxSpeed;
 	char tempMaxSpeedDate [40];
 	int tempDoW;
@@ -816,7 +818,7 @@ String getJSONReadings() {
 	readings["distanceTravelledArray5"] = String(distanceTravelledArray5);
 	readings["distanceTravelledArray6"] = String(distanceTravelledArray6);
 
-	// Get best ever records.
+	// Get high scores.
 
 	readings["tempMaxSpeed"] = String(tempMaxSpeed);
 	readings["tempMaxSpeedDate"] = String(tempMaxSpeedDate);
@@ -842,9 +844,9 @@ void blankDailyData() {
 
 	sessionArrayPosition = rtc.getDayofWeek();
 
-	Serial.print("Session Array Position = ");
-	Serial.println(sessionArrayPosition);
-	Serial.println();
+	//Serial.print("Session Array Position = ");
+	//Serial.println(sessionArrayPosition);
+	//Serial.println();
 
 	if (sessionArrayPosition == 0) {
 
@@ -855,11 +857,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionDistanceArray6Address, tempDistance2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Distance Record = ");
-		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 6 (Saturday) = ");
-		Serial.println(tempDistance2);
-		Serial.println("");
+		//Serial.print("Data from Best Distance Record = ");
+		//Serial.println(tempDistance1);
+		//Serial.print("Data from Session Array 6 (Saturday) = ");
+		//Serial.println(tempDistance2);
+		//Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -872,7 +874,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -903,7 +905,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		unsigned long tempTime1;
@@ -913,11 +915,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionTimeArray6Address, tempTime2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Time Record = ");
-		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 6 (Saturday) = ");
-		Serial.println(tempTime2);
-		Serial.println("");
+		//Serial.print("Data from Best Time Record = ");
+		//Serial.println(tempTime1);
+		//Serial.print("Data from Time Array 6 (Saturday) = ");
+		//Serial.println(tempTime2);
+		//Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -929,7 +931,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -960,7 +962,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		sessionTimeArray0 = 0;
@@ -970,9 +972,9 @@ void blankDailyData() {
 		EEPROM.put(eeSessionDistanceArray0Address, 0);			// Record the chart data in EEPROM.
 		EEPROM.commit();
 
-		Serial.print("Daily Data Successfully Deleted: ");
-		Serial.print(dayArray[0]);
-		Serial.println();
+		//Serial.print("Daily Data Successfully Deleted: ");
+		//Serial.print(dayArray[0]);
+		//Serial.println();
 	}
 
 	else if (sessionArrayPosition == 1) {
@@ -984,11 +986,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionDistanceArray0Address, tempDistance2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Distance Record = ");
-		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 0 (Sunday) = ");
-		Serial.println(tempDistance2);
-		Serial.println("");
+		//Serial.print("Data from Best Distance Record = ");
+		//Serial.println(tempDistance1);
+		//Serial.print("Data from Session Array 0 (Sunday) = ");
+		//Serial.println(tempDistance2);
+		//Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -1001,7 +1003,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1032,7 +1034,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		unsigned long tempTime1;
@@ -1042,11 +1044,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionTimeArray0Address, tempTime2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Time Record = ");
-		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 0 (Sunday) = ");
-		Serial.println(tempTime2);
-		Serial.println("");
+		//Serial.print("Data from Best Time Record = ");
+		//Serial.println(tempTime1);
+		//Serial.print("Data from Time Array 0 (Sunday) = ");
+		//Serial.println(tempTime2);
+		//Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1058,7 +1060,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1089,7 +1091,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		sessionTimeArray1 = 0;
@@ -1099,9 +1101,9 @@ void blankDailyData() {
 		EEPROM.put(eeSessionDistanceArray1Address, 0);			// Record the chart data in EEPROM.
 		EEPROM.commit();
 
-		Serial.print("Daily Data Successfully Deleted: ");
-		Serial.print(dayArray[1]);
-		Serial.println();
+		//Serial.print("Daily Data Successfully Deleted: ");
+		//Serial.print(dayArray[1]);
+		//Serial.println();
 	}
 
 	else if (sessionArrayPosition == 2) {
@@ -1113,11 +1115,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionDistanceArray1Address, tempDistance2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Distance Record = ");
-		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 1 (Monday) = ");
-		Serial.println(tempDistance2);
-		Serial.println("");
+		//Serial.print("Data from Best Distance Record = ");
+		//Serial.println(tempDistance1);
+		//Serial.print("Data from Session Array 1 (Monday) = ");
+		//Serial.println(tempDistance2);
+		//Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -1130,7 +1132,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1161,7 +1163,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		unsigned long tempTime1;
@@ -1171,11 +1173,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionTimeArray1Address, tempTime2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Time Record = ");
-		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 1 (Monday) = ");
-		Serial.println(tempTime2);
-		Serial.println("");
+		//Serial.print("Data from Best Time Record = ");
+		//Serial.println(tempTime1);
+		//Serial.print("Data from Time Array 1 (Monday) = ");
+		//Serial.println(tempTime2);
+		//Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1187,7 +1189,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1218,7 +1220,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		sessionTimeArray2 = 0;
@@ -1228,9 +1230,9 @@ void blankDailyData() {
 		EEPROM.put(eeSessionDistanceArray2Address, 0);			// Record the chart data in EEPROM.
 		EEPROM.commit();
 
-		Serial.print("Daily Data Successfully Deleted: ");
-		Serial.print(dayArray[2]);
-		Serial.println();
+		//Serial.print("Daily Data Successfully Deleted: ");
+		//Serial.print(dayArray[2]);
+		//Serial.println();
 	}
 
 	else if (sessionArrayPosition == 3) {
@@ -1242,11 +1244,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionDistanceArray2Address, tempDistance2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Distance Record = ");
-		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 2 (Tuesday) = ");
-		Serial.println(tempDistance2);
-		Serial.println("");
+		//Serial.print("Data from Best Distance Record = ");
+		//Serial.println(tempDistance1);
+		//Serial.print("Data from Session Array 2 (Tuesday) = ");
+		//Serial.println(tempDistance2);
+		//Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -1259,7 +1261,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1290,7 +1292,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		unsigned long tempTime1;
@@ -1300,11 +1302,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionTimeArray2Address, tempTime2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Time Record = ");
-		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 2 (Tuesday) = ");
-		Serial.println(tempTime2);
-		Serial.println("");
+		//Serial.print("Data from Best Time Record = ");
+		//Serial.println(tempTime1);
+		//Serial.print("Data from Time Array 2 (Tuesday) = ");
+		//Serial.println(tempTime2);
+		//Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1316,7 +1318,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1347,7 +1349,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		sessionTimeArray3 = 0;
@@ -1357,9 +1359,9 @@ void blankDailyData() {
 		EEPROM.put(eeSessionDistanceArray3Address, 0);			// Record the chart data in EEPROM.
 		EEPROM.commit();
 
-		Serial.print("Daily Data Successfully Deleted: ");
-		Serial.print(dayArray[3]);
-		Serial.println();
+		//Serial.print("Daily Data Successfully Deleted: ");
+		//Serial.print(dayArray[3]);
+		//Serial.println();
 	}
 
 	else if (sessionArrayPosition == 4) {
@@ -1371,11 +1373,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionDistanceArray3Address, tempDistance2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Distance Record = ");
-		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 3 (Wednesday) = ");
-		Serial.println(tempDistance2);
-		Serial.println("");
+		//Serial.print("Data from Best Distance Record = ");
+		//Serial.println(tempDistance1);
+		//Serial.print("Data from Session Array 3 (Wednesday) = ");
+		//Serial.println(tempDistance2);
+		//Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -1388,7 +1390,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1419,7 +1421,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		unsigned long tempTime1;
@@ -1429,11 +1431,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionTimeArray3Address, tempTime2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Time Record = ");
-		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 3 (Wednesday) = ");
-		Serial.println(tempTime2);
-		Serial.println("");
+		//Serial.print("Data from Best Time Record = ");
+		//Serial.println(tempTime1);
+		//Serial.print("Data from Time Array 3 (Wednesday) = ");
+		//Serial.println(tempTime2);
+		//Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1445,7 +1447,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1476,7 +1478,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		sessionTimeArray4 = 0;
@@ -1486,9 +1488,9 @@ void blankDailyData() {
 		EEPROM.put(eeSessionDistanceArray4Address, 0);			// Record the chart data in EEPROM.
 		EEPROM.commit();
 
-		Serial.print("Daily Data Successfully Deleted: ");
-		Serial.print(dayArray[4]);
-		Serial.println();
+		//Serial.print("Daily Data Successfully Deleted: ");
+		//Serial.print(dayArray[4]);
+		//Serial.println();
 	}
 
 	else if (sessionArrayPosition == 5) {
@@ -1500,11 +1502,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionDistanceArray4Address, tempDistance2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Distance Record = ");
-		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 4 (Thursday) = ");
-		Serial.println(tempDistance2);
-		Serial.println("");
+		//Serial.print("Data from Best Distance Record = ");
+		//Serial.println(tempDistance1);
+		//Serial.print("Data from Session Array 4 (Thursday) = ");
+		//Serial.println(tempDistance2);
+		//Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -1517,7 +1519,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1548,7 +1550,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		unsigned long tempTime1;
@@ -1558,11 +1560,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionTimeArray4Address, tempTime2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Time Record = ");
-		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 4 (Thursday) = ");
-		Serial.println(tempTime2);
-		Serial.println("");
+		//Serial.print("Data from Best Time Record = ");
+		//Serial.println(tempTime1);
+		//Serial.print("Data from Time Array 4 (Thursday) = ");
+		//Serial.println(tempTime2);
+		//Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1574,7 +1576,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1605,7 +1607,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		sessionTimeArray5 = 0;
@@ -1615,9 +1617,9 @@ void blankDailyData() {
 		EEPROM.put(eeSessionDistanceArray5Address, 0);			// Record the chart data in EEPROM.
 		EEPROM.commit();
 
-		Serial.print("Daily Data Successfully Deleted: ");
-		Serial.print(dayArray[5]);
-		Serial.println();
+		//Serial.print("Daily Data Successfully Deleted: ");
+		//Serial.print(dayArray[5]);
+		//Serial.println();
 	}
 
 	else if (sessionArrayPosition == 6) {
@@ -1629,11 +1631,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionDistanceArray5Address, tempDistance2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Distance Record = ");
-		Serial.println(tempDistance1);
-		Serial.print("Data from Session Array 5 (Friday) = ");
-		Serial.println(tempDistance2);
-		Serial.println("");
+		//Serial.print("Data from Best Distance Record = ");
+		//Serial.println(tempDistance1);
+		//Serial.print("Data from Session Array 5 (Friday) = ");
+		//Serial.println(tempDistance2);
+		//Serial.println("");
 
 		if (tempDistance1 < tempDistance2) {
 
@@ -1646,7 +1648,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestDistanceDMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1677,7 +1679,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		unsigned long tempTime1;
@@ -1687,11 +1689,11 @@ void blankDailyData() {
 		EEPROM.get(eeSessionTimeArray5Address, tempTime2);
 		EEPROM.commit();
 
-		Serial.print("Data from Best Time Record = ");
-		Serial.println(tempTime1);
-		Serial.print("Data from Time Array 5 (Friday) = ");
-		Serial.println(tempTime2);
-		Serial.println("");
+		//Serial.print("Data from Best Time Record = ");
+		//Serial.println(tempTime1);
+		//Serial.print("Data from Time Array 5 (Friday) = ");
+		//Serial.println(tempTime2);
+		//Serial.println("");
 
 		if (tempTime1 < tempTime2) {
 
@@ -1703,7 +1705,7 @@ void blankDailyData() {
 			EEPROM.put(eeBestTimeDHour, rtc.getHour(true));
 			EEPROM.put(eeBestTimeDMinute, rtc.getMinute());
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -1734,7 +1736,7 @@ void blankDailyData() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		sessionTimeArray6 = 0;
@@ -1744,9 +1746,9 @@ void blankDailyData() {
 		EEPROM.put(eeSessionDistanceArray6Address, 0);			// Record the chart data in EEPROM.
 		EEPROM.commit();
 
-		Serial.print("Daily Data Successfully Deleted: ");
-		Serial.print(dayArray[6]);
-		Serial.println();
+		//Serial.print("Daily Data Successfully Deleted: ");
+		//Serial.print(dayArray[6]);
+		//Serial.println();
 	}
 
 } // Close function.
@@ -1835,16 +1837,16 @@ void setup() {
 
 	// Output graph time scale data to serial for checking.
 
-	Serial.println("Time graph settings output from Setup");
-	Serial.print("Time Scale: ");
-	Serial.print(graphTM);
-	Serial.print(" & ");
-	Serial.print("Increments: ");
-	Serial.print(graphTMI);
-	Serial.print(" & ");
-	Serial.print("Position: ");
-	Serial.println(graphTAP);
-	Serial.println(" ");
+	//Serial.println("Time graph settings output from Setup");
+	//Serial.print("Time Scale: ");
+	//Serial.print(graphTM);
+	//Serial.print(" & ");
+	//Serial.print("Increments: ");
+	//Serial.print(graphTMI);
+	//Serial.print(" & ");
+	//Serial.print("Position: ");
+	//Serial.println(graphTAP);
+	//Serial.println(" ");
 
 	EEPROM.commit();
 
@@ -1854,16 +1856,16 @@ void setup() {
 
 	// Output graph distance data to serial for checking.
 
-	Serial.println("Distance graph output from Setup");
-	Serial.print("Distance Scale: ");
-	Serial.print(graphDM);
-	Serial.print(" & ");
-	Serial.print("Increments: ");
-	Serial.print(graphDMI);
-	Serial.print(" & ");
-	Serial.print("Position: ");
-	Serial.print(graphDAP);
-	Serial.println(" ");
+	//Serial.println("Distance graph output from Setup");
+	//Serial.print("Distance Scale: ");
+	//Serial.print(graphDM);
+	//Serial.print(" & ");
+	//Serial.print("Increments: ");
+	//Serial.print(graphDMI);
+	//Serial.print(" & ");
+	//Serial.print("Position: ");
+	//Serial.print(graphDAP);
+	//Serial.println(" ");
 
 	EEPROM.commit();
 
@@ -1874,12 +1876,12 @@ void setup() {
 
 	// Output variables data to serial for checking.
 
-	Serial.println();
-	Serial.print("Beep Flag: ");
-	Serial.println(buzzerYN);
-	Serial.print("WiFi Flag: ");
-	Serial.println(wiFiYN);
-	Serial.println();
+	//Serial.println();
+	//Serial.print("Beep Flag: ");
+	//Serial.println(buzzerYN);
+	//Serial.print("WiFi Flag: ");
+	//Serial.println(wiFiYN);
+	//Serial.println();
 
 	EEPROM.get(eeCalYNAddress, calTouchScreen);				// Load touch screen calibration data.
 	EEPROM.get(eeCalDataAddress0, calData[0]);
@@ -1913,10 +1915,10 @@ void setup() {
 
 	sessionTimeCap = graphTM;
 
-	Serial.println();
-	Serial.print("Time Cap: ");
-	Serial.println(sessionTimeCap);
-	Serial.println(" ");
+	//Serial.println();
+	//Serial.print("Time Cap: ");
+	//Serial.println(sessionTimeCap);
+	//Serial.println(" ");
 
 	sessionTimeArray0 = sessionTimeArray[0] / 1000 / 60;						// Update chart variables from arrays.
 	sessionTimeArray1 = sessionTimeArray[1] / 1000 / 60;
@@ -1936,9 +1938,9 @@ void setup() {
 
 	distanceGraphCap = graphDM;													// Update graph cap to stop value exceeding chart level.
 
-	Serial.print("Distance Cap: ");
-	Serial.println(distanceGraphCap);
-	Serial.println(" ");
+	//Serial.print("Distance Cap: ");
+	//Serial.println(distanceGraphCap);
+	//Serial.println(" ");
 
 	EEPROM.commit();
 
@@ -1951,7 +1953,7 @@ void setup() {
 	distanceTravelledArray6 = distanceTravelledArray[6];
 
 	// Print best ever records data from EEPROM.
-
+	/*
 	float tempMaxSpeed;
 	int tempDoW;
 	int tempDay;
@@ -2091,7 +2093,7 @@ void setup() {
 	Serial.print(tempHour);
 	Serial.print(":");
 	Serial.println(tempMinute);
-	Serial.println(" ");
+	Serial.println(" ");*/
 
 	// Set menu position and circumference position from EEPROM data.
 
@@ -2174,19 +2176,19 @@ void setup() {
 
 	// Load values saved in SPIFFS.
 
-	ssid = "BT-7FA3K5";									// Remove these lines before final build.
-	pass = "iKD94Y3K4Qvkck";
-	ip = "192.168.1.200";
-	subnet = "255.255.255.0";
-	gateway = "192.168.1.254";
-	dns = "192.168.1.254";
+	//ssid = "BT-7FA3K5";									// Remove these lines before final build.
+	//pass = "iKD94Y3K4Qvkck";
+	//ip = "192.168.1.200";
+	//subnet = "255.255.255.0";
+	//gateway = "192.168.1.254";
+	//dns = "192.168.1.254";
 
-	writeFile(SPIFFS, ssidPath, ssid.c_str());
-	writeFile(SPIFFS, passPath, pass.c_str());
-	writeFile(SPIFFS, ipPath, ip.c_str());
-	writeFile(SPIFFS, subnetPath, subnet.c_str());
-	writeFile(SPIFFS, gatewayPath, gateway.c_str());
-	writeFile(SPIFFS, dnsPath, dns.c_str());
+	//writeFile(SPIFFS, ssidPath, ssid.c_str());
+	//writeFile(SPIFFS, passPath, pass.c_str());
+	//writeFile(SPIFFS, ipPath, ip.c_str());
+	//writeFile(SPIFFS, subnetPath, subnet.c_str());
+	//writeFile(SPIFFS, gatewayPath, gateway.c_str());
+	//writeFile(SPIFFS, dnsPath, dns.c_str());
 
 	Serial.println();
 	ssid = readFile(SPIFFS, ssidPath);
@@ -2701,10 +2703,10 @@ void loop() {
 					screenMenu = 1;
 					menuChange = 1;
 					screenR = 1;
-					Serial.print("Button 1 hit ");
-					Serial.print(" : Screen Menu: ");
-					Serial.print(screenMenu);
-					Serial.println(" ");
+					//Serial.print("Button 1 hit ");
+					//Serial.print(" : Screen Menu: ");
+					//Serial.print(screenMenu);
+					//Serial.println(" ");
 				}
 
 			}
@@ -2722,10 +2724,10 @@ void loop() {
 					screenMenu = 2;
 					menuChange = 1;
 					screenR = 1;
-					Serial.print("Button 2 hit ");
-					Serial.print(" : Screen Menu: ");
-					Serial.print(screenMenu);
-					Serial.println(" ");
+					//Serial.print("Button 2 hit ");
+					//Serial.print(" : Screen Menu: ");
+					//Serial.print(screenMenu);
+					//Serial.println(" ");
 				}
 
 				else if (screenMenu == 5 && configurationFlag == 7) {
@@ -2785,10 +2787,10 @@ void loop() {
 					screenMenu = 3;
 					menuChange = 1;
 					screenR = 1;
-					Serial.print("Button 3 hit ");
-					Serial.print(" : Screen Menu: ");
-					Serial.print(screenMenu);
-					Serial.println(" ");
+					//Serial.print("Button 3 hit ");
+					//Serial.print(" : Screen Menu: ");
+					//Serial.print(screenMenu);
+					//Serial.println(" ");
 				}
 
 				else if (screenMenu == 5 && configurationFlag == 7) {
@@ -2848,10 +2850,10 @@ void loop() {
 					screenMenu = 4;
 					menuChange = 1;
 					screenR = 1;
-					Serial.print("Button 4 hit ");
-					Serial.print(" : Screen Menu: ");
-					Serial.print(screenMenu);
-					Serial.println(" ");
+					//Serial.print("Button 4 hit ");
+					//Serial.print(" : Screen Menu: ");
+					//Serial.print(screenMenu);
+					//Serial.println(" ");
 				}
 
 				else if (screenMenu == 5) {
@@ -2864,9 +2866,9 @@ void loop() {
 						configurationFlag = byte(1);
 					}
 
-					Serial.print("Configuration Flag After If: ");
-					Serial.print(configurationFlag);
-					Serial.println(" ");
+					//Serial.print("Configuration Flag After If: ");
+					//Serial.print(configurationFlag);
+					//Serial.println(" ");
 				}
 
 			}
@@ -2882,10 +2884,10 @@ void loop() {
 					screenMenu = 5;
 					menuChange = 1;
 					screenR = 1;
-					Serial.print("Button 5 hit ");
-					Serial.print(" : Screen Menu: ");
-					Serial.print(screenMenu);
-					Serial.println(" ");
+					//Serial.print("Button 5 hit ");
+					//Serial.print(" : Screen Menu: ");
+					//Serial.print(screenMenu);
+					//Serial.println(" ");
 				}
 
 			}
@@ -3240,11 +3242,11 @@ void mainData() {
 
 		sessionArrayPosition = rtc.getDayofWeek();													// Get day of the week from RTC.
 
-		Serial.print("Session Array Position: ");
-		Serial.print(sessionArrayPosition);
-		Serial.print(" Day: ");
-		Serial.println(dayArray[sessionArrayPosition]);
-		Serial.println();
+		//Serial.print("Session Array Position: ");
+		//Serial.print(sessionArrayPosition);
+		//Serial.print(" Day: ");
+		//Serial.println(dayArray[sessionArrayPosition]);
+		//Serial.println();
 
 		sessionTimeArray[sessionArrayPosition] = millis() - sessionStartTime;						// Calculate last session time in millis & store into array.
 		distanceTravelledArray[sessionArrayPosition] = distanceTravelled - sessionStartDistance;	// Store distance travelled into array.
@@ -3273,8 +3275,8 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
-				Serial.println("Case 0 Triggered: ");
-				Serial.println("");
+				//Serial.println("Case 0 Triggered: ");
+				//Serial.println("");
 
 				break;
 
@@ -3293,8 +3295,8 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
-				Serial.println("Case 1 Triggered: ");
-				Serial.println("");
+				//Serial.println("Case 1 Triggered: ");
+				//Serial.println("");
 
 				break;
 
@@ -3313,8 +3315,8 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
-				Serial.println("Case 2 Triggered: ");
-				Serial.println("");
+				//Serial.println("Case 2 Triggered: ");
+				//Serial.println("");
 
 				break;
 
@@ -3333,8 +3335,8 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
-				Serial.println("Case 3 Triggered: ");
-				Serial.println("");
+				//Serial.println("Case 3 Triggered: ");
+				//Serial.println("");
 
 				break;
 
@@ -3353,8 +3355,8 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
-				Serial.println("Case 4 Triggered: ");
-				Serial.println("");
+				//Serial.println("Case 4 Triggered: ");
+				//Serial.println("");
 
 				break;
 
@@ -3373,8 +3375,8 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
-				Serial.println("Case 5 Triggered: ");
-				Serial.println("");
+				//Serial.println("Case 5 Triggered: ");
+				//Serial.println("");
 
 				break;
 
@@ -3393,8 +3395,8 @@ void mainData() {
 				EEPROM.commit();
 				eeSessionChange = false;
 
-				Serial.println("Case 6 Triggered: ");
-				Serial.println("");
+				//Serial.println("Case 6 Triggered: ");
+				//Serial.println("");
 
 				break;
 			}
@@ -3497,7 +3499,7 @@ void newMaxSpeedRecord() {
 			EEPROM.put(eeBestMaxSpeedMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			float tempMaxSpeed;
+			/*float tempMaxSpeed;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -3528,7 +3530,7 @@ void newMaxSpeedRecord() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 
 		newMaxSpeedF = false;
@@ -3564,7 +3566,7 @@ void updateBestEverRecords() {
 			EEPROM.put(eeBestDistanceSMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			int tempDistance;
+			/*int tempDistance;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -3595,7 +3597,7 @@ void updateBestEverRecords() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 	}
 
@@ -3619,7 +3621,7 @@ void updateBestEverRecords() {
 			EEPROM.put(eeBestTimeSMinute, rtc.getMinute());
 			EEPROM.commit();
 
-			long tempTime;
+			/*long tempTime;
 			int tempDoW;
 			int tempDay;
 			int tempMonth;
@@ -3650,7 +3652,7 @@ void updateBestEverRecords() {
 			Serial.print(tempHour);
 			Serial.print(":");
 			Serial.println(tempMinute);
-			Serial.println(" ");
+			Serial.println(" ");*/
 		}
 	}
 
@@ -4012,9 +4014,9 @@ void menuSettingSave() {
 		EEPROM.commit();
 		eeMenuSettingChange = false;
 
-		Serial.print("Menu Setting: ");
-		Serial.print(eeMenuSetting);
-		Serial.println(" ");
+		//Serial.print("Menu Setting: ");
+		//Serial.print(eeMenuSetting);
+		//Serial.println(" ");
 	}
 
 }  // Close function.
@@ -4093,15 +4095,15 @@ void distanceScaleSettingSave() {
 		EEPROM.put(eegraphDAPAddress, graphDAP);
 		EEPROM.commit();
 
-		Serial.print("Distance Scale: ");
-		Serial.print(graphDAM[graphDAP]);
-		Serial.print(" & ");
-		Serial.print("Increments: ");
-		Serial.print(graphDAI[graphDAP]);
-		Serial.print(" & ");
-		Serial.print("Position: ");
-		Serial.print(graphDAP);
-		Serial.println(" ");
+		//Serial.print("Distance Scale: ");
+		//Serial.print(graphDAM[graphDAP]);
+		//Serial.print(" & ");
+		//Serial.print("Increments: ");
+		//Serial.print(graphDAI[graphDAP]);
+		//Serial.print(" & ");
+		//Serial.print("Position: ");
+		//Serial.print(graphDAP);
+		//Serial.println(" ");
 
 		graphDSC = false;
 	}
@@ -4182,15 +4184,15 @@ void timeScaleSettingSave() {
 		EEPROM.put(eegraphTAPAddress, graphTAP);
 		EEPROM.commit();
 
-		Serial.print("Time Scale: ");
-		Serial.print(graphTAM[graphTAP]);
-		Serial.print(" & ");
-		Serial.print("Increments: ");
-		Serial.print(graphTAI[graphTAP]);
-		Serial.print(" & ");
-		Serial.print("Position: ");
-		Serial.print(graphTAP);
-		Serial.println(" ");
+		//Serial.print("Time Scale: ");
+		//Serial.print(graphTAM[graphTAP]);
+		//Serial.print(" & ");
+		//Serial.print("Increments: ");
+		//Serial.print(graphTAI[graphTAP]);
+		//Serial.print(" & ");
+		//Serial.print("Position: ");
+		//Serial.print(graphTAP);
+		//Serial.println(" ");
 
 		graphTSC = false;
 	}
@@ -4255,9 +4257,9 @@ void buzzerSettingSave() {
 		EEPROM.commit();
 		eeBuzzerYNChange = false;
 
-		Serial.print("Buzzer Enabled: ");
-		Serial.print(buzzerYN);
-		Serial.println(" ");
+		//Serial.print("Buzzer Enabled: ");
+		//Serial.print(buzzerYN);
+		//Serial.println(" ");
 	}
 
 }  // Close function.
@@ -4318,9 +4320,9 @@ void wiFiSettingSave() {
 		EEPROM.commit();
 		eeWiFiYNChange = false;
 
-		Serial.print("WiFi Reset: ");
-		Serial.print(wiFiYN);
-		Serial.println(" ");
+		//Serial.print("WiFi Reset: ");
+		//Serial.print(wiFiYN);
+		//Serial.println(" ");
 	}
 
 }  // Close function.
@@ -4392,9 +4394,9 @@ void resetMenuSettingSave() {
 		EEPROM.commit();
 		eeResetSettingChange = false;
 
-		Serial.print("Reset Setting: ");
-		Serial.print(eeResetSetting);
-		Serial.println(" ");
+		//Serial.print("Reset Setting: ");
+		//Serial.print(eeResetSetting);
+		//Serial.println(" ");
 	}
 
 } // Close function.
@@ -4469,9 +4471,9 @@ void circumferenceSettingSave() {
 		EEPROM.commit();
 		eeCircSettingChange = false;
 
-		Serial.print("Circumference Setting: ");
-		Serial.print(eeCircSetting);
-		Serial.println(" ");
+		//Serial.print("Circumference Setting: ");
+		//Serial.print(eeCircSetting);
+		//Serial.println(" ");
 	}
 
 }  // Close function.
