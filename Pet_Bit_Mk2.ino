@@ -279,8 +279,6 @@ char* dayArray[7] = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday
 char* dayShortArray[7] = { "Su","Mo","Tu","We","Th","Fr","Sa" };														// Short days of the week.
 char* ynArray[2] = { "No", "Yes" };																						// Yes / No options.
 
-String string1, string2, string3, string4, string5, string6, string7;
-
 uint16_t calData[5];						// Touch screen calibration data.
 boolean calTouchScreen = false;				// Change flag to trigger calibration function.
 
@@ -723,7 +721,7 @@ String getJSONReadings() {
 	// Retrieve best ever / high scores from EEPROM.
 
 	float tempMaxSpeed;
-	char tempMaxSpeedDate [40];
+	char tempMaxSpeedDate[40];
 	int tempDoW;
 	int tempDay;
 	int tempMonth;
@@ -781,7 +779,7 @@ String getJSONReadings() {
 	EEPROM.commit();
 
 	sprintf(tempDistanceDDate, "%u/%02u/%02u", tempDay, tempMonth, tempYear);
-	
+
 	int tempDailyTimeRecord;
 	long tempDailyTimeRecord1;
 	char tempTimeDDate[40];
@@ -797,7 +795,7 @@ String getJSONReadings() {
 
 	tempDailyTimeRecord = tempDailyTimeRecord1 / 1000 / 60;
 	sprintf(tempTimeDDate, "%u/%02u/%02u", tempDay, tempMonth, tempYear);
-	
+
 	// Get daily time activity.
 
 	readings["sessionTimeArray0"] = String(sessionTimeArray0);
@@ -1795,6 +1793,8 @@ void setup() {
 
 	// Check reset flag and either reset all settings back to new or load demo data.
 
+	//eeResetSetting = 1;
+
 	if (eeResetSetting == 1) {
 
 		resetSystemData();
@@ -2130,7 +2130,7 @@ void setup() {
 
 	tft.fillScreen(ILI9341_WHITE);
 	drawBitmap(tft, 48, 96, startScreen, 128, 128);
-	
+
 	tft.setFreeFont(&FreeSans12pt7b);
 	tft.setTextSize(1);
 	tft.setTextColor(BLACK);
