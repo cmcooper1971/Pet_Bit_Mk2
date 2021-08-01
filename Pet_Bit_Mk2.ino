@@ -663,7 +663,7 @@ void printLocalTime() {
 
 	// Text block to over write characters from longer dates when date changes and unit has been running.
 
-	tft.setTextColor(BLACK);
+	tft.setTextColor(WHITE, BLACK);
 	tft.setFreeFont();
 	tft.setTextSize(1);
 	tft.setCursor(150, 220);
