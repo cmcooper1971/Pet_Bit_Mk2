@@ -750,7 +750,7 @@ String getJSONReadings() {
 	EEPROM.get(eeBestDistanceSMinute, tempMinute);
 	EEPROM.commit();
 
-	sprintf(tempDistanceSDate, "%u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
+	sprintf(tempDistanceSDate, "%02u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
 
 	int tempSessionTimeRecord;
 	long tempSessionTimeRecord1;
@@ -765,7 +765,7 @@ String getJSONReadings() {
 	EEPROM.commit();
 
 	tempSessionTimeRecord = tempSessionTimeRecord1 / 1000 / 60;
-	sprintf(tempTimeSDate, "%u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
+	sprintf(tempTimeSDate, "%02u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
 
 	int tempDailyDistanceRecord;
 	char tempDistanceDDate[40];
@@ -778,7 +778,7 @@ String getJSONReadings() {
 	EEPROM.get(eeBestDistanceDMinute, tempMinute);
 	EEPROM.commit();
 
-	sprintf(tempDistanceDDate, "%u/%02u/%02u", tempDay, tempMonth, tempYear);
+	sprintf(tempDistanceDDate, "%02u/%02u/%02u", tempDay, tempMonth, tempYear);
 
 	int tempDailyTimeRecord;
 	long tempDailyTimeRecord1;
@@ -794,7 +794,7 @@ String getJSONReadings() {
 	EEPROM.commit();
 
 	tempDailyTimeRecord = tempDailyTimeRecord1 / 1000 / 60;
-	sprintf(tempTimeDDate, "%u/%02u/%02u", tempDay, tempMonth, tempYear);
+	sprintf(tempTimeDDate, "%02u/%02u/%02u", tempDay, tempMonth, tempYear);
 
 	// Get daily time activity.
 
