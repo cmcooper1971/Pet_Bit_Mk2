@@ -737,7 +737,7 @@ String getJSONReadings() {
 	EEPROM.get(eeBestMaxSpeedMinute, tempMinute);
 	EEPROM.commit();
 
-	sprintf(tempMaxSpeedDate, "%u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
+	sprintf(tempMaxSpeedDate, "%02u/%02u/%02u at %02u:%02u", tempDay, tempMonth, tempYear, tempHour, tempMinute);
 
 	int tempSessionDistanceRecord;
 	char tempDistanceSDate[40];
